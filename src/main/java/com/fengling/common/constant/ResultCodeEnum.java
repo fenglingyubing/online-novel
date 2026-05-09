@@ -7,11 +7,11 @@ public enum ResultCodeEnum {
     /**
      * 操作成功后的返回
      */
-    SUCCESS(200,"操作成功"),
+    SUCCESS(200, "操作成功"),
     /**
      * 操作失败后的返回
      */
-    FAIL(500,"操作失败"),
+    FAIL(500, "操作失败"),
     /**
      * 用户未登录或登录已失效的返回
      */
@@ -19,9 +19,19 @@ public enum ResultCodeEnum {
     /**
      * 用户名已存在的返回
      */
-    USERNAME_EXIST(1001,"用户名已存在");
+    USERNAME_EXIST(1001, "用户名已存在"),
 
-    private ResultCodeEnum(Integer code, String message){
+    /**
+     * 用户名或密码错误
+     */
+    USERNAME_OR_PASSWORD_ERROR(1002, "用户名或密码错误"),
+
+    /**
+     * 用户不存在
+     */
+    USER_NOT_EXIST(1003, "用户不存在");
+
+    private ResultCodeEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

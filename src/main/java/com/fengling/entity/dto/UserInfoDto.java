@@ -16,4 +16,8 @@ public class UserInfoDto {
      * 用户状态
      */
     private Integer status;
+    /**
+     * 用户角色
+     */
+    private Integer userRole;
 }

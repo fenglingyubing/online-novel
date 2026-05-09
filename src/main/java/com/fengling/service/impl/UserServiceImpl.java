@@ -6,6 +6,7 @@ import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.UserInfo;
 import com.fengling.entity.dto.UserInfoDto;
+import com.fengling.entity.dto.UserLoginDto;
 import com.fengling.entity.dto.UserRegisterReqDto;
 import com.fengling.mapper.UserMapper;
 import com.fengling.service.UserService;
@@ -28,7 +29,7 @@ public class UserServiceImpl implements UserService {
                 new LambdaQueryWrapper<UserInfo>()
                         .eq(UserInfo::getUsername, userRegisterReqDto.getUsername())
         );
-        if (existUser != null ){
+        if (existUser != null) {
             throw new BusinessException(ResultCodeEnum.USERNAME_EXIST);
         }
         UserInfo userInfo = new UserInfo();
@@ -36,8 +37,8 @@ public class UserServiceImpl implements UserService {
         userInfo.setPassword(passwordEncoder.encode(userRegisterReqDto.getPassword()));
         userInfo.setNickName(generateNickname());
         int insert = userMapper.insert(userInfo);
-        if (insert != 1){
-            throw new BusinessException(ResultCodeEnum.FAIL,"注册失败");
+        if (insert != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
         }
         UserInfo queryUserInfo = userMapper.selectOne(
                 new LambdaQueryWrapper<UserInfo>()
@@ -49,12 +50,31 @@ public class UserServiceImpl implements UserService {
         return CommonResult.success(userInfoDto);
     }
 
+    @Override
+    public CommonResult<UserInfoDto> login(UserLoginDto userLoginDto) {
+        UserInfo userInfo = userMapper.selectOne(
+                new LambdaQueryWrapper<UserInfo>()
+                        .eq(UserInfo::getUsername, userLoginDto.getUsername())
+        );
+        // 用户不存在
+        if (userInfo == null) {
+            throw new BusinessException(ResultCodeEnum.USER_NOT_EXIST);
+        }
+        // 密码不正确
+        if(!passwordEncoder.matches(userLoginDto.getPassword(), userInfo.getPassword())){
+            throw new BusinessException(ResultCodeEnum.USERNAME_OR_PASSWORD_ERROR);
+        }
+        UserInfoDto userInfoDto = new UserInfoDto(userInfo.getId(),
+                userInfo.getUserStatus(),userInfo.getUserRole());
+        return CommonResult.success(userInfoDto);
+    }
+
     /**
      * 生成随机的用户昵称
      * @return reader_123456
      */
-    private String generateNickname(){
-        int random = ThreadLocalRandom.current().nextInt(100000,999999);
+    private String generateNickname() {
+        int random = ThreadLocalRandom.current().nextInt(100000, 999999);
         return "reader_" + random;
     }
 }
