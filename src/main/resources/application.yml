@@ -8,3 +8,16 @@ spring:
     url: jdbc:mysql://localhost:3306/online-novel?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
+
+--- # Redis 配置
+spring:
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+--- # JWT 配置
+novel:
+  jwt:
+    secret: myJwtSecretKey2026fenglingyubingfenglingwej1234567890
+    ttl: 7200000

@@ -2,7 +2,8 @@ package com.fengling.service;
 
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.UserInfoDto;
-import com.fengling.entity.dto.UserLoginDto;
+import com.fengling.entity.dto.UserLoginReqDto;
+import com.fengling.entity.dto.UserAuthRespDto;
 import com.fengling.entity.dto.UserRegisterReqDto;
 
 public interface UserService {
@@ -11,12 +12,12 @@ public interface UserService {
      * @param userRegisterReqDto
      * @return UserInfoDto
      */
-    CommonResult<UserInfoDto> register(UserRegisterReqDto userRegisterReqDto);
+    CommonResult<UserAuthRespDto> register(UserRegisterReqDto userRegisterReqDto);
 
     /**
      * 用户登录接口
-     * @param userLoginDto
-     * @return
+     * @param userLoginReqDto
+     * @return UserInfoDto
      */
-    CommonResult<UserInfoDto> login(UserLoginDto userLoginDto);
+    CommonResult<UserAuthRespDto> login(UserLoginReqDto userLoginReqDto);
 }

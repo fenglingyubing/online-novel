@@ -3,7 +3,7 @@
 CREATE TABLE `user_info` (
                              `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '用户id',
                              `username` VARCHAR(20) NOT NULL COMMENT '用户名（登录名）',
-                             `password` VARCHAR(255) NOT NULL COMMENT '密码-加密',
+                             `password` VARCHAR(255) NOT NULL COMMENT 'BCrypt加密后的密码',
                              `user_sex` TINYINT DEFAULT NULL COMMENT '性别（0-男，1-女）',
                              `nick_name` VARCHAR(32) DEFAULT NULL COMMENT '昵称',
                              `user_role` TINYINT NOT NULL DEFAULT 1 COMMENT '用户角色（0-管理员，1-读者，2-作家）',

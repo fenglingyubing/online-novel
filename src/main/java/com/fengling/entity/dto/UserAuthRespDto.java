@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserInfoDto {
+public class UserAuthRespDto {
     /**
      * 用户id
      */
@@ -20,4 +20,8 @@ public class UserInfoDto {
      * 用户角色
      */
     private Integer userRole;
+    /**
+     * 登录token
+     */
+    private String token;
 }

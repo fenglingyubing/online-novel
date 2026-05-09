@@ -3,7 +3,8 @@ package com.fengling.controller.front;
 import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.UserInfoDto;
-import com.fengling.entity.dto.UserLoginDto;
+import com.fengling.entity.dto.UserLoginReqDto;
+import com.fengling.entity.dto.UserAuthRespDto;
 import com.fengling.entity.dto.UserRegisterReqDto;
 import com.fengling.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +25,17 @@ public class UserController {
      * @return
      */
     @PostMapping("/register")
-    public CommonResult<UserInfoDto> userRegister(@RequestBody UserRegisterReqDto userRegisterReqDto){
+    public CommonResult<UserAuthRespDto> userRegister(@RequestBody UserRegisterReqDto userRegisterReqDto){
         return userService.register(userRegisterReqDto);
     }
 
     /**
      * 用户登录接口
-     * @param userLoginDto
+     * @param userLoginReqDto
      * @return
      */
     @PostMapping("/login")
-    public CommonResult<UserInfoDto> userLogin(@RequestBody UserLoginDto userLoginDto){
-        return userService.login(userLoginDto);
+    public CommonResult<UserAuthRespDto> userLogin(@RequestBody UserLoginReqDto userLoginReqDto){
+        return userService.login(userLoginReqDto);
     }
 }

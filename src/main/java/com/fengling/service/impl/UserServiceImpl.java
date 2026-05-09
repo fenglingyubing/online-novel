@@ -1,12 +1,16 @@
 package com.fengling.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fengling.common.constant.CacheConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.common.util.JWTUtil;
+import com.fengling.common.util.RedisUtil;
 import com.fengling.entity.UserInfo;
 import com.fengling.entity.dto.UserInfoDto;
-import com.fengling.entity.dto.UserLoginDto;
+import com.fengling.entity.dto.UserLoginReqDto;
+import com.fengling.entity.dto.UserAuthRespDto;
 import com.fengling.entity.dto.UserRegisterReqDto;
 import com.fengling.mapper.UserMapper;
 import com.fengling.service.UserService;
@@ -21,9 +25,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JWTUtil jwtUtil;
+    private final RedisUtil redisUtil;
 
     @Override
-    public CommonResult<UserInfoDto> register(UserRegisterReqDto userRegisterReqDto) {
+    public CommonResult<UserAuthRespDto> register(UserRegisterReqDto userRegisterReqDto) {
         // 判断用户是否存在
         UserInfo existUser = userMapper.selectOne(
                 new LambdaQueryWrapper<UserInfo>()
@@ -44,33 +50,46 @@ public class UserServiceImpl implements UserService {
                 new LambdaQueryWrapper<UserInfo>()
                         .eq(UserInfo::getUsername, userRegisterReqDto.getUsername())
         );
-        UserInfoDto userInfoDto = new UserInfoDto();
-        userInfoDto.setId(queryUserInfo.getId());
-        userInfoDto.setStatus(queryUserInfo.getUserStatus());
-        return CommonResult.success(userInfoDto);
+        //生成JWT
+        String jwtToken = jwtUtil.createJwtToken(queryUserInfo.getId(), queryUserInfo.getUserRole());
+        //将JWT放到Redis
+        String key = CacheConstants.REDIS_PREFIX + CacheConstants.AUTH_TOKEN + queryUserInfo.getId();
+        redisUtil.addRedisCache(key, jwtToken, jwtUtil.getTtl());
+        UserAuthRespDto authRespDto = new UserAuthRespDto();
+        authRespDto.setId(queryUserInfo.getId());
+        authRespDto.setUserStatus(queryUserInfo.getUserStatus());
+        authRespDto.setUserRole(queryUserInfo.getUserRole());
+        authRespDto.setToken(jwtToken);
+        return CommonResult.success(authRespDto);
     }
 
     @Override
-    public CommonResult<UserInfoDto> login(UserLoginDto userLoginDto) {
+    public CommonResult<UserAuthRespDto> login(UserLoginReqDto userLoginReqDto) {
         UserInfo userInfo = userMapper.selectOne(
                 new LambdaQueryWrapper<UserInfo>()
-                        .eq(UserInfo::getUsername, userLoginDto.getUsername())
+                        .eq(UserInfo::getUsername, userLoginReqDto.getUsername())
         );
         // 用户不存在
         if (userInfo == null) {
             throw new BusinessException(ResultCodeEnum.USER_NOT_EXIST);
         }
         // 密码不正确
-        if(!passwordEncoder.matches(userLoginDto.getPassword(), userInfo.getPassword())){
+        if (!passwordEncoder.matches(userLoginReqDto.getPassword(), userInfo.getPassword())) {
             throw new BusinessException(ResultCodeEnum.USERNAME_OR_PASSWORD_ERROR);
         }
-        UserInfoDto userInfoDto = new UserInfoDto(userInfo.getId(),
-                userInfo.getUserStatus(),userInfo.getUserRole());
-        return CommonResult.success(userInfoDto);
+        // 生成JWT
+        String jwtToken = jwtUtil.createJwtToken(userInfo.getId(), userInfo.getUserRole());
+        // 将JWT加入Redis
+        String key = CacheConstants.REDIS_PREFIX + CacheConstants.AUTH_TOKEN + userInfo.getId();
+        redisUtil.addRedisCache(key, jwtToken, jwtUtil.getTtl());
+        UserAuthRespDto userAuthRespDto = new UserAuthRespDto(userInfo.getId(),
+                userInfo.getUserStatus(), userInfo.getUserRole(),jwtToken);
+        return CommonResult.success(userAuthRespDto);
     }
 
     /**
      * 生成随机的用户昵称
+     *
      * @return reader_123456
      */
     private String generateNickname() {
