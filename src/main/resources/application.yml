@@ -21,3 +21,9 @@ novel:
   jwt:
     secret: myJwtSecretKey2026fenglingyubingfenglingwej1234567890
     ttl: 7200000
+
+--- # MyBatis-Plus 配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml #  mappr文件路径
+  configuration:
+    map-underscore-to-camel-case: true #  驼峰映射

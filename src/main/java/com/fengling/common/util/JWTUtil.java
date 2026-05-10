@@ -1,5 +1,6 @@
 package com.fengling.common.util;
 
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
@@ -25,6 +26,12 @@ public class JWTUtil {
         this.ttl = ttl;
     }
 
+    /**
+     * 创建jwt令牌
+     * @param userId    用户id
+     * @param userRole  用户角色
+     * @return jwt令牌
+     */
     public String createJwtToken(Long userId, Integer userRole){
         Date now = new Date();
         Date expiration = new Date(now.getTime() + ttl);
@@ -36,5 +43,24 @@ public class JWTUtil {
                 .expiration(expiration)
                 .signWith(secretKey, Jwts.SIG.HS256)
                 .compact();
+    }
+
+    /**
+     * 验证jwt
+     * @param token jwt
+     * @return 是否过期/是否被篡改
+     */
+    public boolean validateJwtToken(String token) {
+        try {
+            if (token == null || token.isBlank()){
+                return false;
+            }
+            Jwts.parser().verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fengling.mapper.BookMapper">
+    <select id="selectCategoryNovelPage" resultType="com.fengling.entity.dto.BookListRespDto">
+        select
+            b.id,
+            b.book_name as bookName,
+            b.cover_url as coverUrl,
+            a.author_name as authorName,
+            b.category_id as categoryId,
+            b.update_status as updateStatus,
+            b.book_intro as bookIntro,
+            b.word_count as wordCount,
+            b.latest_chapter_id as latestChapterId,
+            b.latest_chapter_name as latestChapterName
+        from book_info as b
+        left join author_info a on b.author_id = a.id
+        where b.category_id = #{categoryId}
+    </select>
+
+</mapper>

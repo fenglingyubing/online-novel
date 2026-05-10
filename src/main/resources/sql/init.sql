@@ -15,3 +15,74 @@ CREATE TABLE `user_info` (
                              PRIMARY KEY (`id`),
                              UNIQUE KEY `uk_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- 小说分类表
+CREATE TABLE `book_category` (
+                                 `id` smallint unsigned NOT NULL AUTO_INCREMENT COMMENT '小说分类ID',
+                                 `parent_id` smallint unsigned NOT NULL DEFAULT 0 COMMENT '父分类ID，0表示一级分类',
+                                 `category_name` varchar(50) NOT NULL COMMENT '小说分类名称',
+                                 `sort` smallint unsigned NOT NULL DEFAULT 0 COMMENT '排序值，越小越靠前',
+                                 `status` tinyint unsigned NOT NULL DEFAULT 1 COMMENT '状态：0禁用，1启用',
+                                 `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                 `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+                                 PRIMARY KEY (`id`),
+                                 UNIQUE KEY `uk_book_category_parent_name` (`parent_id`, `category_name`),
+                                 KEY `idx_book_category_parent_status_sort` (`parent_id`, `status`, `sort`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='小说分类表';
+
+-- 小说详情表
+CREATE TABLE book_info (
+                           id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '小说ID',
+                           book_name VARCHAR(255) NOT NULL COMMENT '小说名称',
+                           cover_url VARCHAR(500) DEFAULT NULL COMMENT '小说封面',
+                           author_id BIGINT UNSIGNED NOT NULL COMMENT '作者ID',
+                           category_id SMALLINT UNSIGNED NOT NULL COMMENT '小说分类ID',
+                           publish_status TINYINT NOT NULL DEFAULT 1 COMMENT '发布状态：0-下架，1-上架',
+                           update_status TINYINT NOT NULL DEFAULT 0 COMMENT '更新状态：0-连载中，1-已完结',
+                           book_intro TEXT COMMENT '小说简介',
+                           chapter_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '小说章节数',
+                           word_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '总字数',
+                           latest_chapter_id BIGINT UNSIGNED DEFAULT NULL COMMENT '最新章节ID',
+                           latest_chapter_name VARCHAR(255) DEFAULT NULL COMMENT '最新章节名称',
+                           last_chapter_time DATETIME DEFAULT NULL COMMENT '最新章节更新时间',
+                           create_time DATETIME NOT NULL COMMENT '创建时间',
+                           update_time DATETIME NOT NULL COMMENT '修改时间',
+                           PRIMARY KEY (id),
+                           KEY idx_author_id (author_id),
+                           KEY idx_category_id (category_id),
+                           KEY idx_category_publish_update_time (category_id, publish_status, update_time)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='小说信息表';
+
+-- 小说章节表
+CREATE TABLE book_chapter (
+                              id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '小说章节ID',
+                              book_id BIGINT UNSIGNED NOT NULL COMMENT '小说ID',
+                              chapter_num INT UNSIGNED NOT NULL COMMENT '章节序号',
+                              chapter_name VARCHAR(255) NOT NULL COMMENT '小说章节名',
+                              chapter_content MEDIUMTEXT NOT NULL COMMENT '小说正文',
+                              word_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '章节字数',
+                              chapter_status TINYINT NOT NULL DEFAULT 1 COMMENT '章节状态：0-草稿，1-已发布，2-下架',
+                              publish_time DATETIME DEFAULT NULL COMMENT '发布时间',
+                              create_time DATETIME NOT NULL COMMENT '创建时间',
+                              update_time DATETIME NOT NULL COMMENT '修改时间',
+                              PRIMARY KEY (id),
+                              UNIQUE KEY uk_book_chapter_num (book_id, chapter_num),
+                              KEY idx_book_id (book_id),
+                              KEY idx_book_status_num (book_id, chapter_status, chapter_num)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='小说章节表';
+
+-- 作家表
+CREATE TABLE author_info (
+                             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '作者ID',
+                             user_id BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+                             author_name VARCHAR(255) NOT NULL COMMENT '作者笔名',
+                             author_intro TEXT DEFAULT NULL COMMENT '作者简介',
+                             author_status TINYINT NOT NULL DEFAULT 1 COMMENT '作者状态：0-禁用，1-正常，2-审核中',
+                             book_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '作品数',
+                             word_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '累计字数',
+                             create_time DATETIME NOT NULL COMMENT '创建时间',
+                             update_time DATETIME NOT NULL COMMENT '修改时间',
+                             PRIMARY KEY (id),
+                             UNIQUE KEY uk_user_id (user_id),
+                             UNIQUE KEY uk_author_name (author_name)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='作家表';
