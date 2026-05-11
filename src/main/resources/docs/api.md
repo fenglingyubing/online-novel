@@ -204,3 +204,35 @@ chapterList -> 章节目录列表
 chapterList.id -> 章节id
 chapterList.chapterName -> 章节名称
 ```
+
+## 小说正文查询
+```text
+请求路径：
+/api/novel/{bookId}/chapter/{chapterId}
+请求方式：
+    GET
+参数：
+    bookId -> 小说id
+    chapterId -> 章节id
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "id": 1,
+            "bookId": 1,
+            "chapterNum": 1,
+            "chapterName": "第一章 碧阳仙门",
+            "chapterContent": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。",
+            "preChapterId": null,
+            "nextChapterId": 2
+        }
+    }
+id -> 章节id
+bookId -> 小说id
+chapterNum -> 章节序号
+chapterName -> 章节名称
+chapterContent -> 章节正文
+preChapterId -> 上一章id，没有上一章时为null
+nextChapterId -> 下一章id，没有下一章时为null
+```

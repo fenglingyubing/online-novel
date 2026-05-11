@@ -6,6 +6,7 @@ import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.BookInfoRespDto;
 import com.fengling.entity.dto.BookListRespDto;
+import com.fengling.entity.dto.ChapterContentRespDto;
 import com.fengling.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,5 +46,18 @@ public class BookController {
     @GetMapping("/{bookId}")
     public CommonResult<BookInfoRespDto> getBookInfoById(@PathVariable("bookId") Long bookId) {
         return bookService.getBookInfoById(bookId);
+    }
+
+    /**
+     * 根据小说id和章节id查询小说正文
+     *
+     * @param bookId    小说id
+     * @param chapterId 章节id
+     * @return 小说正文实体
+     */
+    @GetMapping("/{bookId}/chapter/{chapterId}")
+    public CommonResult<ChapterContentRespDto> getBookContentById(@PathVariable("bookId") Long bookId,
+                                                                  @PathVariable("chapterId") Long chapterId) {
+        return bookService.getBookContentById(bookId, chapterId);
     }
 }

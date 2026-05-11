@@ -10,6 +10,39 @@
             bc.chapter_name as chapterName
         from book_chapter as bc
         where book_id = #{bookId}
-        order by chapter_num asc;
+        order by chapter_num asc
+    </select>
+
+    <!--小说阅读页-->
+    <select id="getBookContentById" resultType="com.fengling.entity.dto.ChapterContentRespDto">
+        select
+            bc.id,
+            bc.book_id as bookId,
+            bc.chapter_num as chapterNum,
+            bc.chapter_name as chapterName,
+            bc.chapter_content as chapterContent
+        from book_chapter as bc
+        where bc.id = #{chapterId}
+        and bc.book_id = #{bookId}
+    </select>
+
+    <!--获取上一章id-->
+    <select id="getPreChapterId" resultType="java.lang.Long">
+        select
+            id
+        from book_chapter
+        where book_id = #{bookId}
+        and chapter_num &lt; #{chapterNum}
+        order by chapter_num desc limit 1
+    </select>
+
+    <!--获取下一章id-->
+    <select id="getNextChapterId" resultType="java.lang.Long">
+        select
+            bc.id
+        from book_chapter as bc
+        where bc.book_id = #{bookId}
+          and bc.chapter_num &gt; #{chapterNum}
+        order by bc.chapter_num limit 1
     </select>
 </mapper>

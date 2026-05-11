@@ -23,7 +23,7 @@
         where bi.category_id = #{categoryId}
     </select>
 
-    <select id="getBookInfoById" resultType="com.fengling.entity.dto.BookInfoRespDto">
+    <select id="getBookInfoById"  resultType="com.fengling.entity.dto.BookInfoRespDto">
         select
             bi.id,
             bi.book_name as bookName,

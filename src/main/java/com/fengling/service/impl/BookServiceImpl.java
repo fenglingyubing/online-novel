@@ -11,6 +11,7 @@ import com.fengling.entity.AuthorInfo;
 import com.fengling.entity.BookInfo;
 import com.fengling.entity.dto.BookInfoRespDto;
 import com.fengling.entity.dto.BookListRespDto;
+import com.fengling.entity.dto.ChapterContentRespDto;
 import com.fengling.entity.dto.ChapterListRespDto;
 import com.fengling.mapper.AuthorMapper;
 import com.fengling.mapper.BookMapper;
@@ -50,6 +51,18 @@ public class BookServiceImpl implements BookService {
         List<ChapterListRespDto> chapterList = chapterMapper.getChapterListByBookId(bookId);
         bookInfoRespDto.setChapterList(chapterList);
         return CommonResult.success(bookInfoRespDto);
+    }
+
+    @Override
+    public CommonResult<ChapterContentRespDto> getBookContentById(Long bookId, Long chapterId) {
+        ChapterContentRespDto chapterContentRespDto = chapterMapper.getBookContentById(bookId, chapterId);
+        chapterContentRespDto.setPreChapterId(
+                chapterMapper.getPreChapterId(bookId, chapterContentRespDto.getChapterNum())
+        );
+        chapterContentRespDto.setNextChapterId(
+                chapterMapper.getNextChapterId(bookId, chapterContentRespDto.getChapterNum())
+        );
+        return CommonResult.success(chapterContentRespDto);
     }
 
     /**

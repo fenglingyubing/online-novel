@@ -2,12 +2,49 @@ package com.fengling.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.fengling.entity.ChapterInfo;
+import com.fengling.entity.dto.ChapterContentRespDto;
 import com.fengling.entity.dto.ChapterListRespDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 @Mapper
 public interface ChapterMapper extends BaseMapper<ChapterInfo> {
+    /**
+     * 根据小说id查询小说目录
+     *
+     * @param bookId 小说id
+     * @return 小说目录列表
+     */
     List<ChapterListRespDto> getChapterListByBookId(Long bookId);
+
+    /**
+     * 根据小说id和章节id查询小说正文
+     *
+     * @param bookId    小说id
+     * @param chapterId 章节id
+     * @return 小说正文实体
+     */
+    ChapterContentRespDto getBookContentById(Long bookId, Long chapterId);
+
+    /**
+     * 获取上一章id
+     *
+     * @param bookId  小说章节id
+     * @param chapterNum 小说章节数
+     * @return 上一章id
+     */
+    Long getPreChapterId(@Param("bookId") Long bookId,
+                         @Param("chapterNum") Integer chapterNum);
+
+    /**
+     * 获取上一章id
+     *
+     * @param bookId  小说章节id
+     * @param chapterNum 小说章节数
+     * @return 上一章id
+     */
+    Long getNextChapterId(@Param("bookId") Long bookId,
+                          @Param("chapterNum") Integer chapterNum);
 }

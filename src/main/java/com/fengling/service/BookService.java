@@ -5,6 +5,7 @@ import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.BookInfoRespDto;
 import com.fengling.entity.dto.BookListRespDto;
+import com.fengling.entity.dto.ChapterContentRespDto;
 
 import java.util.List;
 
@@ -25,4 +26,13 @@ public interface BookService {
      * @return BookInfoRespDto
      */
     CommonResult<BookInfoRespDto> getBookInfoById(Long bookId);
+
+    /**
+     * 根据小说id和章节id查询小说正文
+     *
+     * @param bookId    小说id
+     * @param chapterId 章节id
+     * @return 小说正文实体
+     */
+    CommonResult<ChapterContentRespDto> getBookContentById(Long bookId, Long chapterId);
 }
