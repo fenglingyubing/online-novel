@@ -29,7 +29,12 @@ public enum ResultCodeEnum {
     /**
      * 用户不存在
      */
-    USER_NOT_EXIST(1003, "用户不存在");
+    USER_NOT_EXIST(1003, "用户不存在"),
+
+    /**
+     * 资源未找到
+     */
+    NOT_FOUND(404,"资源未找到");
 
     private ResultCodeEnum(Integer code, String message) {
         this.code = code;

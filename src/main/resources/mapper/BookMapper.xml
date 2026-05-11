@@ -4,21 +4,43 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.fengling.mapper.BookMapper">
+
+    <!--查询某分类下的小说-->
     <select id="selectCategoryNovelPage" resultType="com.fengling.entity.dto.BookListRespDto">
         select
-            b.id,
-            b.book_name as bookName,
-            b.cover_url as coverUrl,
-            a.author_name as authorName,
-            b.category_id as categoryId,
-            b.update_status as updateStatus,
-            b.book_intro as bookIntro,
-            b.word_count as wordCount,
-            b.latest_chapter_id as latestChapterId,
-            b.latest_chapter_name as latestChapterName
-        from book_info as b
-        left join author_info a on b.author_id = a.id
-        where b.category_id = #{categoryId}
+            bi.id,
+            bi.book_name as bookName,
+            bi.cover_url as coverUrl,
+            ai.author_name as authorName,
+            bi.category_id as categoryId,
+            bi.update_status as updateStatus,
+            bi.book_intro as bookIntro,
+            bi.word_count as wordCount,
+            bi.latest_chapter_id as latestChapterId,
+            bi.latest_chapter_name as latestChapterName
+        from book_info as bi
+        left join author_info ai on bi.author_id = ai.id
+        where bi.category_id = #{categoryId}
+    </select>
+
+    <select id="getBookInfoById" resultType="com.fengling.entity.dto.BookInfoRespDto">
+        select
+            bi.id,
+            bi.book_name as bookName,
+            bi.cover_url as coverUrl,
+            ai.author_name as authorName,
+            bc.category_name as categoryName,
+            bi.update_status as updateStatus,
+            bi.book_intro as bookIntro,
+            bi.chapter_count as chapterCount,
+            bi.word_count as wordCount,
+            bi.latest_chapter_id as latestChapterId,
+            bi.latest_chapter_name as latestChapterName,
+            bi.last_chapter_time as lastChapterTime
+        from book_info as bi
+        left join author_info as ai on bi.author_id = ai.id
+        left join book_category as bc on bi.category_id = bc.id
+        where bi.id = #{bookId};
     </select>
 
 </mapper>
