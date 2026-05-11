@@ -86,3 +86,19 @@ CREATE TABLE author_info (
                              UNIQUE KEY uk_user_id (user_id),
                              UNIQUE KEY uk_author_name (author_name)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='作家表';
+
+-- 书架表
+CREATE TABLE book_shelf (
+                            id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '书架id',
+                            user_id BIGINT NOT NULL COMMENT '用户id',
+                            book_id BIGINT NOT NULL COMMENT '小说id',
+                            last_read_chapter_id BIGINT NULL COMMENT '上次阅读章节id',
+                            last_read_time DATETIME NULL COMMENT '上次阅读时间',
+                            create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                            update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+
+                            UNIQUE KEY uk_user_book (user_id, book_id),
+                            KEY idx_user_update_time (user_id, update_time),
+                            KEY idx_book_id (book_id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='书架';
+

@@ -25,4 +25,9 @@ public final class ApiPathConstants {
      * 请求列表
      */
     public static final String LIST = "/list";
+
+    /**
+     * 书架
+     */
+    public static final String SHELF = API + "/shelf";
 }

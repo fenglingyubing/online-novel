@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fengling.mapper.BookShelfMapper">
+
+    <select id="listShelfNovels" resultType="com.fengling.entity.dto.BookShelfRespDto">
+        select
+            bs.id,
+            bs.user_id as userId,
+            bs.book_id as bookId,
+            bi.book_name as bookName,
+            bi.cover_url as coverUrl,
+            bs.last_read_chapter_id as lastReadChapterId,
+            bs.last_read_time as lastReadTime
+        from book_shelf as bs
+        join book_info bi on bs.book_id = bi.id
+        where bs.user_id = #{userId}
+        order by bs.update_time desc
+    </select>
+</mapper>

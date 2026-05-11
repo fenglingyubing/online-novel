@@ -236,3 +236,74 @@ chapterContent -> 章节正文
 preChapterId -> 上一章id，没有上一章时为null
 nextChapterId -> 下一章id，没有下一章时为null
 ```
+
+## 书架小说列表查询
+```text
+请求路径：
+/api/shelf/{userId}/list?pageNum=1&pageSize=10
+请求方式：
+    GET
+参数：
+    userId -> 用户id
+    pageNum -> 当前是第几页
+    pageSize -> 每页有多少条数据
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "userId": 2052767332125331457,
+                    "bookId": 1,
+                    "bookName": "碧阳仙门",
+                    "coverUrl": "https://bookcover.yuewen.com/qdbimg/349573/1048992740/600.webp",
+                    "lastReadChapterId": 1,
+                    "lastReadTime": "2026-05-11T12:00:00"
+                },
+                {
+                    "id": 2,
+                    "userId": 2052767332125331457,
+                    "bookId": 2,
+                    "bookName": "修仙界唯一出马仙",
+                    "coverUrl": "https://bookcover.yuewen.com/qdbimg/349573/1048721558/600.webp",
+                    "lastReadChapterId": null,
+                    "lastReadTime": null
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 10,
+            "pages": 1
+        }
+    }
+id -> 书架id
+userId -> 用户id
+bookId -> 小说id
+bookName -> 小说名称
+coverUrl -> 小说封面链接
+lastReadChapterId -> 上次阅读章节id，未阅读时为null
+lastReadTime -> 上次阅读时间，未阅读时为null
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+```
+
+## 添加小说到书架
+```text
+请求路径：
+/api/shelf/{userId}/{bookId}
+请求方式：
+    POST
+参数：
+    userId -> 用户id
+    bookId -> 小说id
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+```
