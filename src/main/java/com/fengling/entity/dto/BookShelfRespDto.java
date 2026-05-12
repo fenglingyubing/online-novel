@@ -27,6 +27,14 @@ public class BookShelfRespDto {
      */
     private String coverUrl;
     /**
+     * 第几章
+     */
+    private Integer lastChapterNum;
+    /**
+     * 一共有多少章
+     */
+    private Integer chapterCount;
+    /**
      * 上次阅读章节id
      */
     private Long lastReadChapterId;

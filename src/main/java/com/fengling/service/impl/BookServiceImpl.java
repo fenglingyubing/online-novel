@@ -73,12 +73,27 @@ public class BookServiceImpl implements BookService {
     @Override
     public CommonResult<ChapterContentRespDto> getBookContentById(Long bookId, Long chapterId) {
         ChapterContentRespDto chapterContentRespDto = chapterMapper.getBookContentById(bookId, chapterId);
+        if(chapterContentRespDto == null){
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "小说章节不存在");
+        }
         chapterContentRespDto.setPreChapterId(
                 chapterMapper.getPreChapterId(bookId, chapterContentRespDto.getChapterNum())
         );
         chapterContentRespDto.setNextChapterId(
                 chapterMapper.getNextChapterId(bookId, chapterContentRespDto.getChapterNum())
         );
+
+        AuthUserInfo authUserInfo = UserContext.getAuthUserInfo();
+        if (authUserInfo != null) {
+            //设置小说最后阅读到的章节id
+            bookShelfMapper.update(
+                    new BookShelf().setLastReadChapterId(chapterId),
+                    new LambdaQueryWrapper<BookShelf>()
+                            .eq(BookShelf::getUserId, authUserInfo.getUserId())
+                            .eq(BookShelf::getBookId, bookId)
+            );
+        }
+
         return CommonResult.success(chapterContentRespDto);
     }
 

@@ -1,6 +1,7 @@
 package com.fengling.config;
 
 import com.fengling.interceptor.AuthInterceptor;
+import com.fengling.interceptor.OptionalAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final AuthInterceptor authInterceptor;
+    private final OptionalAuthInterceptor optionalAuthInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -20,5 +22,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/user/login",
                         "/api/user/register"
                 );
+        registry.addInterceptor(optionalAuthInterceptor)
+                .addPathPatterns("/api/novel/*/chapter/*");
     }
 }

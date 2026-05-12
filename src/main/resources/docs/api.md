@@ -9,15 +9,21 @@
 
 ## 登录认证说明
 ```text
-需要登录的接口必须在请求头中携带JWT令牌：
+强制登录接口必须在请求头中携带JWT令牌：
     Authorization: Bearer token值
 
-当前需要登录拦截的接口：
+当前强制登录拦截的接口：
     /api/shelf/**
 
-当前需要登录的功能：
+当前强制登录的功能：
     查询书架小说列表
     添加小说到书架
+
+当前可选登录解析的接口：
+    /api/novel/{bookId}/chapter/{chapterId}
+
+当前可选登录的功能：
+    小说正文查询
 
 认证失败响应：
     {
@@ -31,6 +37,8 @@
     2. Authorization必须以"Bearer "开头
     3. Bearer后面需要跟一个空格，再拼接token值
     4. 用户id由后端从token中解析，前端不需要传userId
+    5. 强制登录接口未携带token或token无效会返回401
+    6. 可选登录接口未携带token仍可访问；携带有效token时，后端会识别当前用户
 ```
 ## 注册接口
 ```text
@@ -238,6 +246,8 @@ chapterList.chapterName -> 章节名称
 /api/novel/{bookId}/chapter/{chapterId}
 请求方式：
     GET
+请求头：
+    Authorization: Bearer token值（可选，登录用户携带后会更新书架阅读进度）
 参数：
     bookId -> 小说id
     chapterId -> 章节id
@@ -262,6 +272,7 @@ chapterName -> 章节名称
 chapterContent -> 章节正文
 preChapterId -> 上一章id，没有上一章时为null
 nextChapterId -> 下一章id，没有下一章时为null
+说明：未登录用户可直接访问正文；登录用户携带有效token访问时，会自动更新书架中的lastReadChapterId和lastReadTime
 ```
 
 ## 书架小说列表查询
@@ -287,6 +298,8 @@ nextChapterId -> 下一章id，没有下一章时为null
                     "bookId": 1,
                     "bookName": "碧阳仙门",
                     "coverUrl": "https://bookcover.yuewen.com/qdbimg/349573/1048992740/600.webp",
+                    "lastChapterNum": 1,
+                    "chapterCount": 9,
                     "lastReadChapterId": 1,
                     "lastReadTime": "2026-05-11T12:00:00"
                 },
@@ -296,6 +309,8 @@ nextChapterId -> 下一章id，没有下一章时为null
                     "bookId": 2,
                     "bookName": "修仙界唯一出马仙",
                     "coverUrl": "https://bookcover.yuewen.com/qdbimg/349573/1048721558/600.webp",
+                    "lastChapterNum": null,
+                    "chapterCount": 39,
                     "lastReadChapterId": null,
                     "lastReadTime": null
                 }
@@ -311,6 +326,8 @@ userId -> 用户id，由登录令牌解析得到
 bookId -> 小说id
 bookName -> 小说名称
 coverUrl -> 小说封面链接
+lastChapterNum -> 上次阅读到第几章，未阅读时为null
+chapterCount -> 小说总章节数
 lastReadChapterId -> 上次阅读章节id，未阅读时为null
 lastReadTime -> 上次阅读时间，未阅读时为null
 total -> 一共有多少条数据
@@ -336,5 +353,6 @@ pages -> 一共有几页
         "data": null
     }
 ```
+
 
 
