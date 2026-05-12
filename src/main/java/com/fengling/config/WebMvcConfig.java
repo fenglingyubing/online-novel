@@ -17,7 +17,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/api/shelf/**")
+                .addPathPatterns(
+                        "/api/shelf/**",
+                        "/api/user/logout"
+                )
                 .excludePathPatterns(
                         "/api/user/login",
                         "/api/user/register"

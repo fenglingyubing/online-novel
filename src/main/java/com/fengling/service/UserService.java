@@ -20,4 +20,6 @@ public interface UserService {
      * @return UserInfoDto
      */
     CommonResult<UserAuthRespDto> login(UserLoginReqDto userLoginReqDto);
+
+    CommonResult<Void> userLoginOut();
 }

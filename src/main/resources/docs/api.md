@@ -14,10 +14,12 @@
 
 当前强制登录拦截的接口：
     /api/shelf/**
+    /api/user/logout
 
 当前强制登录的功能：
     查询书架小说列表
     添加小说到书架
+    退出登录
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -90,6 +92,28 @@
     status -> 用户状态 （0-正常，1-禁用）
     userRole -> 用户角色（0-管理员，1-读者，2-作家）
     token -> JWT令牌
+```
+
+## 退出登录接口
+```text
+请求路径：
+/api/user/logout
+请求方式：
+    POST
+请求头：
+    Authorization: Bearer token值
+参数：
+    无
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 后端会清除Redis中当前token对应的缓存
+    3. 退出成功后，当前token将失效
 ```
 
 ## 首页小说分类接口

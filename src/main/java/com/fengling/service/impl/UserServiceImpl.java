@@ -3,23 +3,25 @@ package com.fengling.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fengling.common.constant.CacheConstants;
 import com.fengling.common.constant.ResultCodeEnum;
+import com.fengling.common.context.UserContext;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.JWTUtil;
 import com.fengling.common.util.RedisUtil;
 import com.fengling.entity.UserInfo;
-import com.fengling.entity.dto.UserInfoDto;
 import com.fengling.entity.dto.UserLoginReqDto;
 import com.fengling.entity.dto.UserAuthRespDto;
 import com.fengling.entity.dto.UserRegisterReqDto;
 import com.fengling.mapper.UserMapper;
 import com.fengling.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -83,8 +85,21 @@ public class UserServiceImpl implements UserService {
         String key = CacheConstants.AUTH_TOKEN + userInfo.getId();
         redisUtil.addRedisCache(key, jwtToken, jwtUtil.getTtl());
         UserAuthRespDto userAuthRespDto = new UserAuthRespDto(userInfo.getId(),
-                userInfo.getUserStatus(), userInfo.getUserRole(),jwtToken);
+                userInfo.getUserStatus(), userInfo.getUserRole(), jwtToken);
         return CommonResult.success(userAuthRespDto);
+    }
+
+    @Override
+    public CommonResult<Void> userLoginOut() {
+        Long userId = UserContext.getUserId();
+        if (userId != null) {
+            String key = CacheConstants.AUTH_TOKEN + userId;
+            String redisToken = redisUtil.getValueForKey(key);
+            if (redisToken != null && !redisToken.isBlank()) {
+                redisUtil.deleteKey(key);
+            }
+        }
+        return CommonResult.success();
     }
 
     /**
