@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
         //生成JWT
         String jwtToken = jwtUtil.createJwtToken(queryUserInfo.getId(), queryUserInfo.getUserRole());
         //将JWT放到Redis
-        String key = CacheConstants.REDIS_PREFIX + CacheConstants.AUTH_TOKEN + queryUserInfo.getId();
+        String key = CacheConstants.AUTH_TOKEN + queryUserInfo.getId();
         redisUtil.addRedisCache(key, jwtToken, jwtUtil.getTtl());
         UserAuthRespDto authRespDto = new UserAuthRespDto();
         authRespDto.setId(queryUserInfo.getId());
@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
         // 生成JWT
         String jwtToken = jwtUtil.createJwtToken(userInfo.getId(), userInfo.getUserRole());
         // 将JWT加入Redis
-        String key = CacheConstants.REDIS_PREFIX + CacheConstants.AUTH_TOKEN + userInfo.getId();
+        String key = CacheConstants.AUTH_TOKEN + userInfo.getId();
         redisUtil.addRedisCache(key, jwtToken, jwtUtil.getTtl());
         UserAuthRespDto userAuthRespDto = new UserAuthRespDto(userInfo.getId(),
                 userInfo.getUserStatus(), userInfo.getUserRole(),jwtToken);

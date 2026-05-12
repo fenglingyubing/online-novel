@@ -8,5 +8,5 @@ public class CacheConstants {
     /**
      * jwt令牌缓存前缀
      */
-    public static final String AUTH_TOKEN = "jwt:";
+    public static final String AUTH_TOKEN = REDIS_PREFIX + "jwt:";
 }

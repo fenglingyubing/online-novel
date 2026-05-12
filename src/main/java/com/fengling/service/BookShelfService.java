@@ -11,18 +11,16 @@ public interface BookShelfService {
     /**
      * 查询书架小说列表
      *
-     * @param userId     用户id
      * @param pageReqDto 分页对象
      * @return 小说列表（分页后）
      */
-    CommonResult<PageRespDto<BookShelfRespDto>> listShelfNovels(Long userId, PageReqDto pageReqDto);
+    CommonResult<PageRespDto<BookShelfRespDto>> listShelfNovels(PageReqDto pageReqDto);
 
     /**
      * 添加小说到书籍
      *
-     * @param userId 用户id
      * @param bookId 书籍id
      * @return 无
      */
-    CommonResult<Void> saveBookToBookShelf(Long userId, Long bookId);
+    CommonResult<Void> saveBookToBookShelf(Long bookId);
 }

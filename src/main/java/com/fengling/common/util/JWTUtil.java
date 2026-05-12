@@ -1,5 +1,7 @@
 package com.fengling.common.util;
 
+import com.fengling.common.context.AuthUserInfo;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -28,16 +30,17 @@ public class JWTUtil {
 
     /**
      * 创建jwt令牌
-     * @param userId    用户id
-     * @param userRole  用户角色
+     *
+     * @param userId   用户id
+     * @param userRole 用户角色
      * @return jwt令牌
      */
-    public String createJwtToken(Long userId, Integer userRole){
+    public String createJwtToken(Long userId, Integer userRole) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + ttl);
         return Jwts.builder()
                 .subject(String.valueOf(userId))
-                .claim("userId",userId)
+                .claim("userId", userId)
                 .claim("userRole", userRole)
                 .issuedAt(now)
                 .expiration(expiration)
@@ -47,12 +50,13 @@ public class JWTUtil {
 
     /**
      * 验证jwt
+     *
      * @param token jwt
      * @return 是否过期/是否被篡改
      */
     public boolean validateJwtToken(String token) {
         try {
-            if (token == null || token.isBlank()){
+            if (token == null || token.isBlank()) {
                 return false;
             }
             Jwts.parser().verifyWith(secretKey)
@@ -62,5 +66,24 @@ public class JWTUtil {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+
+    /**
+     * 解析JWT令牌
+     *
+     * @param token JWT令牌
+     * @return 认证对象
+     */
+    public AuthUserInfo parseJWT(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return new AuthUserInfo(
+                claims.get("userId", Long.class),
+                claims.get("userRole", Integer.class)
+        );
     }
 }

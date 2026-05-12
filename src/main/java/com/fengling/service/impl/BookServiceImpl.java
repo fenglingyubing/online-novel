@@ -3,18 +3,22 @@ package com.fengling.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.ResultCodeEnum;
+import com.fengling.common.context.AuthUserInfo;
+import com.fengling.common.context.UserContext;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.AuthorInfo;
 import com.fengling.entity.BookInfo;
+import com.fengling.entity.BookShelf;
 import com.fengling.entity.dto.BookInfoRespDto;
 import com.fengling.entity.dto.BookListRespDto;
 import com.fengling.entity.dto.ChapterContentRespDto;
 import com.fengling.entity.dto.ChapterListRespDto;
 import com.fengling.mapper.AuthorMapper;
 import com.fengling.mapper.BookMapper;
+import com.fengling.mapper.BookShelfMapper;
 import com.fengling.mapper.ChapterMapper;
 import com.fengling.service.BookService;
 import io.netty.util.internal.StringUtil;
@@ -31,6 +35,7 @@ public class BookServiceImpl implements BookService {
 
     private final BookMapper bookMapper;
     private final ChapterMapper chapterMapper;
+    private final BookShelfMapper bookShelfMapper;
 
     @Override
     public CommonResult<PageRespDto<BookListRespDto>> listCategoryNovel(Integer categoryId, PageReqDto pageReqDto) {
@@ -47,6 +52,18 @@ public class BookServiceImpl implements BookService {
         BookInfoRespDto bookInfoRespDto = bookMapper.getBookInfoById(bookId);
         if (bookInfoRespDto == null) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND);
+        }
+        //获取是否在书架中
+        AuthUserInfo authUserInfo = UserContext.getAuthUserInfo();
+        if (authUserInfo != null) {
+            BookShelf one = bookShelfMapper.selectOne(
+                    new LambdaQueryWrapper<BookShelf>()
+                            .eq(BookShelf::getUserId, authUserInfo.getUserId())
+                            .eq(BookShelf::getBookId, bookId)
+            );
+            if (one != null) {
+                bookInfoRespDto.setIsShelf(true);
+            }
         }
         List<ChapterListRespDto> chapterList = chapterMapper.getChapterListByBookId(bookId);
         bookInfoRespDto.setChapterList(chapterList);

@@ -1,4 +1,4 @@
-# 接口文档
+﻿# 接口文档
 ## 结果码
 - 200 操作成功
 - 500 操作失败
@@ -7,6 +7,31 @@
 - 1002 用户名或密码错误
 - 1003 用户不存在
 
+## 登录认证说明
+```text
+需要登录的接口必须在请求头中携带JWT令牌：
+    Authorization: Bearer token值
+
+当前需要登录拦截的接口：
+    /api/shelf/**
+
+当前需要登录的功能：
+    查询书架小说列表
+    添加小说到书架
+
+认证失败响应：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+
+说明：
+    1. token由注册或登录接口返回
+    2. Authorization必须以"Bearer "开头
+    3. Bearer后面需要跟一个空格，再拼接token值
+    4. 用户id由后端从token中解析，前端不需要传userId
+```
 ## 注册接口
 ```text
 请求路径：
@@ -174,6 +199,7 @@ pages -> 一共有几页
             "wordCount": 37200,
             "latestChapterId": 9,
             "latestChapterName": "第九章 装逼",
+            "isShelf": true,
             "lastChapterTime": "2026-05-11T12:00:00",
             "chapterList": [
                 {
@@ -199,6 +225,7 @@ chapterCount -> 小说章节数
 wordCount -> 小说字数
 latestChapterId -> 最新章节id
 latestChapterName -> 最新章节名
+isShelf -> 是否已加入当前登录用户书架（true-已加入，false-未加入）
 lastChapterTime -> 最新章节更新时间
 chapterList -> 章节目录列表
 chapterList.id -> 章节id
@@ -240,11 +267,12 @@ nextChapterId -> 下一章id，没有下一章时为null
 ## 书架小说列表查询
 ```text
 请求路径：
-/api/shelf/{userId}/list?pageNum=1&pageSize=10
+/api/shelf/list?pageNum=1&pageSize=10
 请求方式：
     GET
+请求头：
+    Authorization: Bearer token值
 参数：
-    userId -> 用户id
     pageNum -> 当前是第几页
     pageSize -> 每页有多少条数据
 响应数据：
@@ -279,7 +307,7 @@ nextChapterId -> 下一章id，没有下一章时为null
         }
     }
 id -> 书架id
-userId -> 用户id
+userId -> 用户id，由登录令牌解析得到
 bookId -> 小说id
 bookName -> 小说名称
 coverUrl -> 小说封面链接
@@ -294,11 +322,12 @@ pages -> 一共有几页
 ## 添加小说到书架
 ```text
 请求路径：
-/api/shelf/{userId}/{bookId}
+/api/shelf/{bookId}
 请求方式：
     POST
+请求头：
+    Authorization: Bearer token值
 参数：
-    userId -> 用户id
     bookId -> 小说id
 响应数据：
     {
@@ -307,3 +336,5 @@ pages -> 一共有几页
         "data": null
     }
 ```
+
+

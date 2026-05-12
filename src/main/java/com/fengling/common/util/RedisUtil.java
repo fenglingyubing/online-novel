@@ -15,4 +15,8 @@ public class RedisUtil {
     public void addRedisCache(String key, String value, long ttl){
         redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.MILLISECONDS);
     }
+
+    public String getValueForKey(String Key){
+        return redisTemplate.opsForValue().get(Key);
+    }
 }

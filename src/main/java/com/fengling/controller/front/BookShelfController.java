@@ -22,27 +22,23 @@ public class BookShelfController {
     /**
      * 查询书架书籍列表
      *
-     * @param userId     用户id
      * @param pageReqDto 分页对象
      * @return 小说列表（分页后）
      */
-    @GetMapping("/{userId}" + ApiPathConstants.LIST)
-    public CommonResult<PageRespDto<BookShelfRespDto>> listShelfNovels(@PathVariable("userId") Long userId,
-                                                                       PageReqDto pageReqDto) {
-        return bookShelfService.listShelfNovels(userId, pageReqDto);
+    @GetMapping( ApiPathConstants.LIST)
+    public CommonResult<PageRespDto<BookShelfRespDto>> listShelfNovels(PageReqDto pageReqDto) {
+        return bookShelfService.listShelfNovels(pageReqDto);
     }
 
     /**
      * 添加小说到书架
      *
-     * @param userId 用户id
      * @param bookId 书籍id
      * @return 无
      */
-    @PostMapping("/{userId}/{bookId}")
-    public CommonResult<Void> saveBookToBookShelf(@PathVariable("userId") Long userId,
-                                                  @PathVariable("bookId") Long bookId) {
-        return bookShelfService.saveBookToBookShelf(userId, bookId);
+    @PostMapping("/{bookId}")
+    public CommonResult<Void> saveBookToBookShelf(@PathVariable("bookId") Long bookId) {
+        return bookShelfService.saveBookToBookShelf(bookId);
     }
 
 }

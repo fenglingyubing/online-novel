@@ -52,10 +52,9 @@ public class BookInfoRespDto {
      */
     private String latestChapterName;
     /**
-     * 是否加入书架（待实现，等完成JWT后完成）
+     * 是否加入书架
      */
-    // TODO 是否加入书架（差用户id-user_id）
-    private Boolean isShelf;
+    private Boolean isShelf = false;
     /**
      * 最新章节更新时间
      */
