@@ -17,10 +17,12 @@ import com.fengling.mapper.AuthorMapper;
 import com.fengling.mapper.UserMapper;
 import com.fengling.service.AuthorService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
@@ -42,7 +44,6 @@ public class AuthorServiceImpl implements AuthorService {
         String username = authorReqDto.getUsername();
         String password = authorReqDto.getPassword();
         String authorName = authorReqDto.getAuthorName();
-
         if (username == null || username.isBlank()) {
             throw new BusinessException(ResultCodeEnum.FAIL, "用户名为空");
         }
@@ -77,7 +78,6 @@ public class AuthorServiceImpl implements AuthorService {
         if (insert != 1) {
             throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
         }
-
         Long userId = registerUser.getId();
         int author = authorMapper.insert(new AuthorInfo(
                 authorName,

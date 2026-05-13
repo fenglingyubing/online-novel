@@ -69,6 +69,44 @@
     token -> JWT令牌
 ```
 
+## 作家注册接口
+```text
+请求路径：
+/api/author/register
+请求方式：
+    POST
+参数：
+    username -> 用户名
+    password -> 密码
+    authorName -> 作者笔名
+请求体示例：
+    {
+        "username": "author001",
+        "password": "123456",
+        "authorName": "风铃"
+    }
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "id": 2052757804000399362,
+            "userStatus": 0,
+            "userRole": 2,
+            "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMDUzMDI2NDU5ODA4NDA3NTUzIiwidXNlcklkIjoyMDUzMDI2NDU5ODA4NDA3NTUzLCJ1c2VyUm9sZSI6MiwiaWF0IjoxNzc4MzE0NjI2LCJleHAiOjE3NzgzMjE4MjZ9.xxx"
+        }
+    }
+    id -> 用户id
+    userStatus -> 用户状态（0-正常，1-禁用）
+    userRole -> 用户角色（0-管理员，1-读者，2-作家）
+    token -> JWT令牌
+说明：
+    1. 作家注册成功后会同时创建用户信息和作者信息
+    2. 注册成功后会返回JWT令牌，前端可用于后续登录认证
+    3. 用户名不能重复
+    4. 作者笔名不能重复
+```
+
 ## 登录接口
 ```text
 请求路径：
@@ -405,5 +443,4 @@ pages -> 一共有几页
     3. 只会删除当前登录用户书架中bookIdList对应的小说记录
     4. 如果列表中的小说不在当前用户书架中，不会产生影响
 ```
-
 

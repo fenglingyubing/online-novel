@@ -80,8 +80,8 @@ CREATE TABLE author_info (
                              author_status TINYINT NOT NULL DEFAULT 1 COMMENT '作者状态：0-禁用，1-正常，2-审核中',
                              book_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '作品数',
                              word_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '累计字数',
-                             create_time DATETIME NOT NULL COMMENT '创建时间',
-                             update_time DATETIME NOT NULL COMMENT '修改时间',
+                             create_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                             update_time datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
                              PRIMARY KEY (id),
                              UNIQUE KEY uk_user_id (user_id),
                              UNIQUE KEY uk_author_name (author_name)
