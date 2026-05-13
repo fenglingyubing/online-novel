@@ -21,6 +21,10 @@ public class UserAuthRespDto {
      */
     private Integer userRole;
     /**
+     * 用户余额
+     */
+    private Integer userBalance;
+    /**
      * 登录token
      */
     private String token;

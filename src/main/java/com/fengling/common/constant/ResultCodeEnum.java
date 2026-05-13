@@ -34,7 +34,12 @@ public enum ResultCodeEnum {
     /**
      * 资源未找到
      */
-    NOT_FOUND(404,"资源未找到");
+    NOT_FOUND(404,"资源未找到"),
+
+    /**
+     * 用户已被禁用
+     */
+    ACCOUNT_DISABLED(1004,"用户已被禁用");
 
     private ResultCodeEnum(Integer code, String message) {
         this.code = code;

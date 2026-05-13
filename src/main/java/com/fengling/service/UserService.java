@@ -27,5 +27,18 @@ public interface UserService {
      */
     CommonResult<Void> userLoginOut();
 
+    /**
+     * 查询个人主页信息
+     *
+     * @return 个人信息响应实体
+     */
     CommonResult<UserInfoMineRespDto> getMineUserInfo();
+
+    /**
+     * 更新个人信息
+     *
+     * @param userInfoMineReqDto 用户信息实体
+     * @return 无
+     */
+    CommonResult<Void> updateUserInfo(UserInfoMineReqDto userInfoMineReqDto);
 }

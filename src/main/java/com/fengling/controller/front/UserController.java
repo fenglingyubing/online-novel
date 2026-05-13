@@ -2,10 +2,7 @@ package com.fengling.controller.front;
 
 import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.UserInfoMineRespDto;
-import com.fengling.entity.dto.UserLoginReqDto;
-import com.fengling.entity.dto.UserAuthRespDto;
-import com.fengling.entity.dto.UserRegisterReqDto;
+import com.fengling.entity.dto.*;
 import com.fengling.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -48,8 +45,24 @@ public class UserController {
         return userService.userLoginOut();
     }
 
+    /**
+     * 查询个人主页信息
+     *
+     * @return 个人信息响应实体
+     */
     @GetMapping("/mine")
-    public CommonResult<UserInfoMineRespDto> getMineUserInfo(){
+    public CommonResult<UserInfoMineRespDto> getMineUserInfo() {
         return userService.getMineUserInfo();
+    }
+
+    /**
+     * 更新个人信息
+     *
+     * @param userInfoMineReqDto 用户信息实体
+     * @return 无
+     */
+    @PutMapping("/updateinfo")
+    public CommonResult<Void> updateUserInfo(@RequestBody UserInfoMineReqDto userInfoMineReqDto) {
+        return userService.updateUserInfo(userInfoMineReqDto);
     }
 }

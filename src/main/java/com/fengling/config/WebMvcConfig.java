@@ -20,7 +20,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns(
                         "/api/shelf/**",
                         "/api/user/logout",
-                        "/api/user/mine"
+                        "/api/user/mine",
+                        "/api/user/updateinfo"
                 )
                 .excludePathPatterns(
                         "/api/user/login",

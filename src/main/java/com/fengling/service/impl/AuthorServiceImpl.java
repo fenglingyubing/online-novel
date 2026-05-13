@@ -1,5 +1,6 @@
 package com.fengling.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fengling.common.constant.CacheConstants;
 import com.fengling.common.constant.CommonConstants;
@@ -74,6 +75,7 @@ public class AuthorServiceImpl implements AuthorService {
         registerUser.setPassword(passwordEncoder.encode(password));
         registerUser.setUserRole(CommonConstants.USER_ROLE_AUTHOR);
         registerUser.setUserStatus(CommonConstants.USER_STATUS_NORMAL);
+        registerUser.setUserBalance(CommonConstants.USER_DEFAULT_BALANCE);
         int insert = userMapper.insert(registerUser);
         if (insert != 1) {
             throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
@@ -91,12 +93,11 @@ public class AuthorServiceImpl implements AuthorService {
         // 将JWT令牌放到Redis
         String key = CacheConstants.AUTH_TOKEN + userId;
         redisUtil.addRedisCache(key, jwtToken, jwtUtil.getTtl());
-        UserAuthRespDto userAuthRespDto = new UserAuthRespDto(
-                userId,
-                registerUser.getUserStatus(),
-                registerUser.getUserRole(),
-                jwtToken
+        UserAuthRespDto userAuthRespDto = BeanUtil.copyProperties(
+                registerUser,
+                UserAuthRespDto.class
         );
+        userAuthRespDto.setToken(jwtToken);
         return CommonResult.success(userAuthRespDto);
     }
 }

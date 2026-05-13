@@ -16,12 +16,14 @@
     /api/shelf/**
     /api/user/logout
     /api/user/mine
+    /api/user/updateinfo
 
 当前强制登录的功能：
     查询书架小说列表
     添加小说到书架
     退出登录
     查询我的页面用户信息
+    修改我的页面用户信息
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -60,14 +62,16 @@
         "message": "操作成功",
         "data": {
             "id": 2052757804000399362,
-            "status": 0,
+            "userStatus": 0,
             "userRole": 1,
+            "userBalance": 0,
             "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMDUzMDI2NDU5ODA4NDA3NTUzIiwidXNlcklkIjoyMDUzMDI2NDU5ODA4NDA3NTUzLCJ1c2VyUm9sZSI6MSwiaWF0IjoxNzc4MzE0NjI2LCJleHAiOjE3NzgzMjE4MjZ9.3v26ZA2RnSjaFwrNye_DDVwKvYCtDxcEvREGXQmr4f4"
         }
     }
     id -> 用户id
-    status -> 用户状态 （0-正常，1-禁用）
+    userStatus -> 用户状态（0-正常，1-禁用）
     userRole -> 用户角色（0-管理员，1-读者，2-作家）
+    userBalance -> 用户书币余额
     token -> JWT令牌
 ```
 
@@ -95,12 +99,14 @@
             "id": 2052757804000399362,
             "userStatus": 0,
             "userRole": 2,
+            "userBalance": 0,
             "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMDUzMDI2NDU5ODA4NDA3NTUzIiwidXNlcklkIjoyMDUzMDI2NDU5ODA4NDA3NTUzLCJ1c2VyUm9sZSI6MiwiaWF0IjoxNzc4MzE0NjI2LCJleHAiOjE3NzgzMjE4MjZ9.xxx"
         }
     }
     id -> 用户id
     userStatus -> 用户状态（0-正常，1-禁用）
     userRole -> 用户角色（0-管理员，1-读者，2-作家）
+    userBalance -> 用户书币余额
     token -> JWT令牌
 说明：
     1. 作家注册成功后会同时创建用户信息和作者信息
@@ -124,14 +130,16 @@
         "message": "操作成功",
         "data": {
             "id": 2052757804000399362,
-            "status": 0,
+            "userStatus": 0,
             "userRole": 1,
+            "userBalance": 0,
             "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMDUzMDI2NDU5ODA4NDA3NTUzIiwidXNlcklkIjoyMDUzMDI2NDU5ODA4NDA3NTUzLCJ1c2VyUm9sZSI6MSwiaWF0IjoxNzc4MzE0NjI2LCJleHAiOjE3NzgzMjE4MjZ9.3v26ZA2RnSjaFwrNye_DDVwKvYCtDxcEvREGXQmr4f4"
         }
     }
     id -> 用户id
-    status -> 用户状态 （0-正常，1-禁用）
+    userStatus -> 用户状态（0-正常，1-禁用）
     userRole -> 用户角色（0-管理员，1-读者，2-作家）
+    userBalance -> 用户书币余额
     token -> JWT令牌
 ```
 
@@ -191,6 +199,36 @@ userStatus -> 用户状态（0-正常，1-禁用）
 说明：
     1. 该接口需要登录后调用
     2. 用户id由后端从token中解析，前端不需要传userId
+```
+
+## 我的页面用户信息修改
+```text
+请求路径：
+/api/user/updateinfo
+请求方式：
+    PUT
+请求头：
+    Authorization: Bearer token值
+参数：
+    userSex -> 用户性别
+    nickName -> 用户昵称
+    userPhoto -> 用户头像
+请求体示例：
+    {
+        "userSex": 0,
+        "nickName": "reader_654321",
+        "userPhoto": "https://xxx.com/avatar.png"
+    }
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 用户id由后端从token中解析，前端不需要传userId
+    3. 只会修改请求体中不为null的字段
 ```
 
 ## 首页小说分类接口
