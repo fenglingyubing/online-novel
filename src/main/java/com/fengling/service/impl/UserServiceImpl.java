@@ -1,5 +1,6 @@
 package com.fengling.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fengling.common.constant.CacheConstants;
 import com.fengling.common.constant.ResultCodeEnum;
@@ -9,6 +10,7 @@ import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.JWTUtil;
 import com.fengling.common.util.RedisUtil;
 import com.fengling.entity.UserInfo;
+import com.fengling.entity.dto.UserInfoMineRespDto;
 import com.fengling.entity.dto.UserLoginReqDto;
 import com.fengling.entity.dto.UserAuthRespDto;
 import com.fengling.entity.dto.UserRegisterReqDto;
@@ -100,6 +102,15 @@ public class UserServiceImpl implements UserService {
             }
         }
         return CommonResult.success();
+    }
+
+    @Override
+    public CommonResult<UserInfoMineRespDto> getMineUserInfo() {
+        Long userId = UserContext.getUserId();
+        UserInfo userInfo = userMapper.selectById(userId);
+        UserInfoMineRespDto userInfoMineRespDto = BeanUtil.copyProperties(userInfo, UserInfoMineRespDto.class);
+        log.info("我的首页信息 -> {}", userInfoMineRespDto);
+        return CommonResult.success(userInfoMineRespDto);
     }
 
     /**

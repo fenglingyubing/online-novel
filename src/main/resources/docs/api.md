@@ -15,11 +15,13 @@
 当前强制登录拦截的接口：
     /api/shelf/**
     /api/user/logout
+    /api/user/mine
 
 当前强制登录的功能：
     查询书架小说列表
     添加小说到书架
     退出登录
+    查询我的页面用户信息
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -153,6 +155,42 @@
     1. 该接口需要登录后调用
     2. 后端会清除Redis中当前token对应的缓存
     3. 退出成功后，当前token将失效
+```
+
+## 我的页面用户信息查询
+```text
+请求路径：
+/api/user/mine
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    无
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "userId": 2052767332125331457,
+            "userSex": 0,
+            "nickName": "reader_123456",
+            "userRole": 1,
+            "userPhoto": "https://xxx.com/avatar.png",
+            "userBalance": 0,
+            "userStatus": 0
+        }
+    }
+userId -> 用户id
+userSex -> 用户性别（0-男，1-女）
+nickName -> 用户昵称
+userRole -> 用户角色（0-管理员，1-读者，2-作家）
+userPhoto -> 用户头像
+userBalance -> 用户书币余额
+userStatus -> 用户状态（0-正常，1-禁用）
+说明：
+    1. 该接口需要登录后调用
+    2. 用户id由后端从token中解析，前端不需要传userId
 ```
 
 ## 首页小说分类接口
@@ -443,4 +481,3 @@ pages -> 一共有几页
     3. 只会删除当前登录用户书架中bookIdList对应的小说记录
     4. 如果列表中的小说不在当前用户书架中，不会产生影响
 ```
-

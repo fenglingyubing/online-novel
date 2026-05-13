@@ -2,6 +2,7 @@ package com.fengling.controller.front;
 
 import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.entity.dto.UserInfoMineRespDto;
 import com.fengling.entity.dto.UserLoginReqDto;
 import com.fengling.entity.dto.UserAuthRespDto;
 import com.fengling.entity.dto.UserRegisterReqDto;
@@ -18,8 +19,8 @@ public class UserController {
     /**
      * 用户注册接口
      *
-     * @param userRegisterReqDto
-     * @return
+     * @param userRegisterReqDto 注册请求实体
+     * @return 用户认证响应实体
      */
     @PostMapping("/register")
     public CommonResult<UserAuthRespDto> userRegister(@RequestBody UserRegisterReqDto userRegisterReqDto) {
@@ -29,8 +30,8 @@ public class UserController {
     /**
      * 用户登录接口
      *
-     * @param userLoginReqDto
-     * @return
+     * @param userLoginReqDto 登录请求实体
+     * @return 用户认证响应实体
      */
     @PostMapping("/login")
     public CommonResult<UserAuthRespDto> userLogin(@RequestBody UserLoginReqDto userLoginReqDto) {
@@ -45,5 +46,10 @@ public class UserController {
     @DeleteMapping("/logout")
     public CommonResult<Void> userLoginOut() {
         return userService.userLoginOut();
+    }
+
+    @GetMapping("/mine")
+    public CommonResult<UserInfoMineRespDto> getMineUserInfo(){
+        return userService.getMineUserInfo();
     }
 }

@@ -79,7 +79,12 @@
             <version>0.12.5</version>
         </dependency>
 
-        <!--Spring boot 事务依赖-->
+        <!--Hutool 工具包-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+            <version>5.8.44</version>
+        </dependency>
 
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

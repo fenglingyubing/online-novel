@@ -1,10 +1,7 @@
 package com.fengling.service;
 
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.UserInfoDto;
-import com.fengling.entity.dto.UserLoginReqDto;
-import com.fengling.entity.dto.UserAuthRespDto;
-import com.fengling.entity.dto.UserRegisterReqDto;
+import com.fengling.entity.dto.*;
 
 public interface UserService {
     /**
@@ -29,4 +26,6 @@ public interface UserService {
      * @return 无
      */
     CommonResult<Void> userLoginOut();
+
+    CommonResult<UserInfoMineRespDto> getMineUserInfo();
 }
