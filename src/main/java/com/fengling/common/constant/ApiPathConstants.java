@@ -30,4 +30,9 @@ public final class ApiPathConstants {
      * 书架
      */
     public static final String SHELF = API + "/shelf";
+
+    /**
+     * 作家注册前缀
+     */
+    public static final String AUTHOR = API + "/author";
 }

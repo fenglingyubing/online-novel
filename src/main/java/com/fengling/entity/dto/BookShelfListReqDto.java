@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class BookShelfListReq {
+public class BookShelfListReqDto {
     /**
      * 小说id
      */

@@ -23,7 +23,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 )
                 .excludePathPatterns(
                         "/api/user/login",
-                        "/api/user/register"
+                        "/api/user/register",
+                        "api/author/register"
                 );
         registry.addInterceptor(optionalAuthInterceptor)
                 .addPathPatterns("/api/novel/*/chapter/*");

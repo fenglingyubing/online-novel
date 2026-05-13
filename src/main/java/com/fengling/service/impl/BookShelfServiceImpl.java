@@ -7,7 +7,7 @@ import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.BookShelf;
-import com.fengling.entity.dto.BookShelfListReq;
+import com.fengling.entity.dto.BookShelfListReqDto;
 import com.fengling.entity.dto.BookShelfRespDto;
 import com.fengling.mapper.BookShelfMapper;
 import com.fengling.service.BookShelfService;
@@ -42,10 +42,10 @@ public class BookShelfServiceImpl implements BookShelfService {
     }
 
     @Override
-    public CommonResult<Void> deleteBookById(BookShelfListReq bookShelfListReq) {
+    public CommonResult<Void> deleteBookById(BookShelfListReqDto bookShelfListReqDto) {
         //获取用户id
         Long userId = UserContext.getUserId();
-        List<Long> bookIdList = bookShelfListReq.getBookIdList();
+        List<Long> bookIdList = bookShelfListReqDto.getBookIdList();
         bookShelfMapper.delete(
                 new LambdaQueryWrapper<BookShelf>()
                         .eq(BookShelf::getUserId, userId)

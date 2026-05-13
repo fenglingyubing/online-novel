@@ -42,4 +42,9 @@ public class AuthorInfo {
      * 修改时间
      */
     private LocalDateTime updateTime;
+
+    public AuthorInfo(String authorName, Long userId){
+        this.authorName = authorName;
+        this.userId = userId;
+    }
 }

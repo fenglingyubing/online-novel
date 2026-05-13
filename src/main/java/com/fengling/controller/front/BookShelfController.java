@@ -4,7 +4,7 @@ import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.BookShelfListReq;
+import com.fengling.entity.dto.BookShelfListReqDto;
 import com.fengling.entity.dto.BookShelfRespDto;
 import com.fengling.service.BookShelfService;
 import lombok.RequiredArgsConstructor;
@@ -43,12 +43,12 @@ public class BookShelfController {
 
     /**
      * 从书架删除小说
-     * @param bookShelfListReq 小说Id实体
+     * @param bookShelfListReqDto 小说Id实体
      * @return 无
      */
     @DeleteMapping()
-    public CommonResult<Void> deleteBookById(@RequestBody BookShelfListReq bookShelfListReq){
-        return bookShelfService.deleteBookById(bookShelfListReq);
+    public CommonResult<Void> deleteBookById(@RequestBody BookShelfListReqDto bookShelfListReqDto){
+        return bookShelfService.deleteBookById(bookShelfListReqDto);
     }
 
 }

@@ -1,10 +1,9 @@
 package com.fengling.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.BookShelfListReq;
+import com.fengling.entity.dto.BookShelfListReqDto;
 import com.fengling.entity.dto.BookShelfRespDto;
 
 public interface BookShelfService {
@@ -27,8 +26,8 @@ public interface BookShelfService {
 
     /**
      * 从书架删除小说
-     * @param bookShelfListReq 小说id实体
+     * @param bookShelfListReqDto 小说id实体
      * @return 无
      */
-    CommonResult<Void> deleteBookById(BookShelfListReq bookShelfListReq);
+    CommonResult<Void> deleteBookById(BookShelfListReqDto bookShelfListReqDto);
 }
