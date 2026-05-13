@@ -2,6 +2,7 @@ package com.fengling.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fengling.common.constant.CacheConstants;
+import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
@@ -34,37 +35,66 @@ public class AuthorServiceImpl implements AuthorService {
     @Transactional
     @Override
     public CommonResult<UserAuthRespDto> authorRegister(AuthorReqDto authorReqDto) {
+        if (authorReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.FAIL);
+        }
         //判断用户名是否存在
-        UserInfo one = registerUtil.getUserInfoByUserName(authorReqDto.getUsername());
+        String username = authorReqDto.getUsername();
+        String password = authorReqDto.getPassword();
+        String authorName = authorReqDto.getAuthorName();
+
+        if (username == null || username.isBlank()) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "用户名为空");
+        }
+        if (password == null || password.isBlank()) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "密码为空");
+        }
+        if (authorName == null || authorName.isBlank()) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "作者名为空");
+        }
+
+        UserInfo one = registerUtil.getUserInfoByUserName(username);
         if (one != null) {
             throw new BusinessException(ResultCodeEnum.USERNAME_EXIST);
         }
-        if (authorReqDto.getUsername() != null && authorReqDto.getPassword() != null){
-            UserInfo registerUser = new UserInfo();
-            registerUser.setUsername(authorReqDto.getUsername());
-            //加密密码
-            registerUser.setPassword(passwordEncoder.encode(authorReqDto.getPassword()));
-            int insert = userMapper.insert(registerUser);
-            if (insert != 1) {
-                throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
-            }
+
+        // 判断作者名是否存在
+        AuthorInfo authorInfo = authorMapper.selectOne(
+                new LambdaQueryWrapper<AuthorInfo>()
+                        .eq(AuthorInfo::getAuthorName, authorName)
+        );
+        if (authorInfo != null) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
         }
 
-        UserInfo userInfo = registerUtil.getUserInfoByUserName(authorReqDto.getUsername());
-        int author = authorMapper.insert(new AuthorInfo(authorReqDto.getAuthorName(),
-                userInfo.getId()));
-        if(author != 1){
+        UserInfo registerUser = new UserInfo();
+        registerUser.setUsername(username);
+        //加密密码
+        registerUser.setPassword(passwordEncoder.encode(password));
+        registerUser.setUserRole(CommonConstants.USER_ROLE_AUTHOR);
+        registerUser.setUserStatus(CommonConstants.USER_STATUS_NORMAL);
+        int insert = userMapper.insert(registerUser);
+        if (insert != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
+        }
+
+        Long userId = registerUser.getId();
+        int author = authorMapper.insert(new AuthorInfo(
+                authorName,
+                userId
+        ));
+        if (author != 1) {
             throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
         }
         // 生成JWT令牌
-        String jwtToken = jwtUtil.createJwtToken(userInfo.getId(), userInfo.getUserRole());
+        String jwtToken = jwtUtil.createJwtToken(userId, registerUser.getUserRole());
         // 将JWT令牌放到Redis
-        String key = CacheConstants.AUTH_TOKEN + userInfo.getId();
+        String key = CacheConstants.AUTH_TOKEN + userId;
         redisUtil.addRedisCache(key, jwtToken, jwtUtil.getTtl());
         UserAuthRespDto userAuthRespDto = new UserAuthRespDto(
-                userInfo.getId(),
-                userInfo.getUserStatus(),
-                userInfo.getUserRole(),
+                userId,
+                registerUser.getUserStatus(),
+                registerUser.getUserRole(),
                 jwtToken
         );
         return CommonResult.success(userAuthRespDto);
