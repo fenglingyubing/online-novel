@@ -9,6 +9,7 @@ import com.fengling.entity.dto.UserRegisterReqDto;
 public interface UserService {
     /**
      * 用户注册接口
+     *
      * @param userRegisterReqDto
      * @return UserInfoDto
      */
@@ -16,10 +17,16 @@ public interface UserService {
 
     /**
      * 用户登录接口
+     *
      * @param userLoginReqDto
      * @return UserInfoDto
      */
     CommonResult<UserAuthRespDto> login(UserLoginReqDto userLoginReqDto);
 
+    /**
+     * 退出登录
+     *
+     * @return 无
+     */
     CommonResult<Void> userLoginOut();
 }

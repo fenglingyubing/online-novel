@@ -1,10 +1,10 @@
 package com.fengling.controller.front;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.entity.dto.BookShelfListReq;
 import com.fengling.entity.dto.BookShelfRespDto;
 import com.fengling.service.BookShelfService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +39,16 @@ public class BookShelfController {
     @PostMapping("/{bookId}")
     public CommonResult<Void> saveBookToBookShelf(@PathVariable("bookId") Long bookId) {
         return bookShelfService.saveBookToBookShelf(bookId);
+    }
+
+    /**
+     * 从书架删除小说
+     * @param bookShelfListReq 小说Id实体
+     * @return 无
+     */
+    @DeleteMapping()
+    public CommonResult<Void> deleteBookById(@RequestBody BookShelfListReq bookShelfListReq){
+        return bookShelfService.deleteBookById(bookShelfListReq);
     }
 
 }

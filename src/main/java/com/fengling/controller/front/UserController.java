@@ -17,26 +17,33 @@ public class UserController {
 
     /**
      * 用户注册接口
+     *
      * @param userRegisterReqDto
      * @return
      */
     @PostMapping("/register")
-    public CommonResult<UserAuthRespDto> userRegister(@RequestBody UserRegisterReqDto userRegisterReqDto){
+    public CommonResult<UserAuthRespDto> userRegister(@RequestBody UserRegisterReqDto userRegisterReqDto) {
         return userService.register(userRegisterReqDto);
     }
 
     /**
      * 用户登录接口
+     *
      * @param userLoginReqDto
      * @return
      */
     @PostMapping("/login")
-    public CommonResult<UserAuthRespDto> userLogin(@RequestBody UserLoginReqDto userLoginReqDto){
+    public CommonResult<UserAuthRespDto> userLogin(@RequestBody UserLoginReqDto userLoginReqDto) {
         return userService.login(userLoginReqDto);
     }
 
+    /**
+     * 退出登录
+     *
+     * @return 无
+     */
     @DeleteMapping("/logout")
-    public CommonResult<Void> userLoginOut(){
+    public CommonResult<Void> userLoginOut() {
         return userService.userLoginOut();
     }
 }

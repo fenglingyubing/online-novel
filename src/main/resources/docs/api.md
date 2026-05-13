@@ -42,6 +42,7 @@
     5. 强制登录接口未携带token或token无效会返回401
     6. 可选登录接口未携带token仍可访问；携带有效token时，后端会识别当前用户
 ```
+
 ## 注册接口
 ```text
 请求路径：
@@ -378,5 +379,31 @@ pages -> 一共有几页
     }
 ```
 
+## 删除书架小说
+```text
+请求路径：
+/api/shelf
+请求方式：
+    DELETE
+请求头：
+    Authorization: Bearer token值
+参数：
+    bookIdList -> 小说id列表
+请求体示例：
+    {
+        "bookIdList": [1, 2, 3]
+    }
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 用户id由后端从token中解析，前端不需要传userId
+    3. 只会删除当前登录用户书架中bookIdList对应的小说记录
+    4. 如果列表中的小说不在当前用户书架中，不会产生影响
+```
 
 
