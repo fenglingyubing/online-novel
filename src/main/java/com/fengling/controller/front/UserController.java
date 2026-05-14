@@ -6,6 +6,7 @@ import com.fengling.entity.dto.*;
 import com.fengling.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(ApiPathConstants.USER)
@@ -64,5 +65,13 @@ public class UserController {
     @PutMapping("/updateinfo")
     public CommonResult<Void> updateUserInfo(@RequestBody UserInfoMineReqDto userInfoMineReqDto) {
         return userService.updateUserInfo(userInfoMineReqDto);
+    }
+
+    @PostMapping("/uploadphoto")
+    public CommonResult<UserUploadPhotoRespDto> uploadUserPhoto(
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(value = "imageUrl", required = false) String imageUrl
+    ) {
+        return userService.uploadUserPhoto(file, imageUrl);
     }
 }

@@ -10,6 +10,7 @@ import com.fengling.common.context.UserContext;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.JWTUtil;
+import com.fengling.common.util.OSSUtil;
 import com.fengling.common.util.RedisUtil;
 import com.fengling.common.util.RegisterUtil;
 import com.fengling.entity.UserInfo;
@@ -20,8 +21,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
@@ -33,6 +36,7 @@ public class UserServiceImpl implements UserService {
     private final JWTUtil jwtUtil;
     private final RedisUtil redisUtil;
     private final RegisterUtil registerUtil;
+    private final OSSUtil ossUtil;
 
     @Override
     public CommonResult<UserAuthRespDto> register(UserRegisterReqDto userRegisterReqDto) {
@@ -146,6 +150,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public CommonResult<Void> updateUserInfo(UserInfoMineReqDto userInfoMineReqDto) {
+        log.info("进入 updateUserInfo 接口");
         UserInfo userInfo = new UserInfo();
         Long userId = UserContext.getUserId();
         userInfo.setId(userId);
@@ -160,6 +165,55 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ResultCodeEnum.FAIL, "更新失败");
         }
         return CommonResult.success();
+    }
+
+    @Override
+    public CommonResult<UserUploadPhotoRespDto> uploadUserPhoto(MultipartFile file, String imageUrl) {
+        boolean hasFile = file != null && !file.isEmpty();
+        boolean hasImageUrl = imageUrl != null && !imageUrl.isBlank();
+        // 判断是不是两个都没传或者两个都传了
+        if (hasFile == hasImageUrl) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "请选择一种头像上传方式");
+        }
+        Long userId = UserContext.getUserId();
+        UserInfo oldUserInfo = userMapper.selectOne(
+                new LambdaQueryWrapper<UserInfo>()
+                        .select(UserInfo::getUserPhoto)
+                        .eq(UserInfo::getId, userId)
+        );
+        String oldUserPhoto = oldUserInfo == null ? null : oldUserInfo.getUserPhoto();
+        log.info("旧头像链接: {}",oldUserPhoto);
+        UserInfo userInfo = new UserInfo();
+        userInfo.setId(userId);
+        String userPhoto;
+        if (hasFile) {
+            userPhoto = ossUtil.upload(file, CommonConstants.USER_PATH_NAME);
+        } else {
+            userPhoto = imageUrl.trim();
+            String lower = userPhoto.toLowerCase(Locale.ROOT);
+            // 校验图片链接格式是否正确
+            if (
+                    !lower.startsWith(CommonConstants.IMAGE_PREFIX_HTTP) &&
+                    !lower.startsWith(CommonConstants.IMAGE_PREFIX_HTTPS)
+            ) {
+                throw new BusinessException(ResultCodeEnum.FAIL, "图片链接格式错误");
+            }
+        }
+        userInfo.setUserPhoto(userPhoto);
+        int i = userMapper.updateById(userInfo);
+        if (i != 1) {
+            // 数据库更新失败并且用的是文件上传
+            if (hasFile) {
+                ossUtil.delete(userPhoto);
+            }
+            throw new BusinessException(ResultCodeEnum.FAIL, "头像更新失败");
+        }
+        if (oldUserPhoto != null && !oldUserPhoto.isBlank() && !oldUserPhoto.equals(userPhoto)) {
+            log.info("开始删除旧头像");
+            ossUtil.delete(oldUserPhoto);
+            log.info("删除成功");
+        }
+        return CommonResult.success(new UserUploadPhotoRespDto(userPhoto));
     }
 
     /**

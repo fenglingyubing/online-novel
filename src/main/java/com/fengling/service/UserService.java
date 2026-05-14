@@ -2,6 +2,7 @@ package com.fengling.service;
 
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.*;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     /**
@@ -41,4 +42,6 @@ public interface UserService {
      * @return 无
      */
     CommonResult<Void> updateUserInfo(UserInfoMineReqDto userInfoMineReqDto);
+
+    CommonResult<UserUploadPhotoRespDto> uploadUserPhoto(MultipartFile file, String imageUrl);
 }

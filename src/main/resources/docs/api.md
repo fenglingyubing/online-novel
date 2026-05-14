@@ -17,6 +17,7 @@
     /api/user/logout
     /api/user/mine
     /api/user/updateinfo
+    /api/user/uploadphoto
 
 当前强制登录的功能：
     查询书架小说列表
@@ -24,6 +25,7 @@
     退出登录
     查询我的页面用户信息
     修改我的页面用户信息
+    上传用户头像
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -229,6 +231,45 @@ userStatus -> 用户状态（0-正常，1-禁用）
     1. 该接口需要登录后调用
     2. 用户id由后端从token中解析，前端不需要传userId
     3. 只会修改请求体中不为null的字段
+```
+
+## 用户头像上传
+```text
+请求路径：
+/api/user/uploadphoto
+请求方式：
+    POST
+请求头：
+    Authorization: Bearer token值
+参数：
+    file -> 本地图片文件
+    imageUrl -> 图片链接
+参数说明：
+    1. file和imageUrl必须二选一
+    2. file用于上传本地图片，使用multipart/form-data提交
+    3. imageUrl用于直接保存图片链接，使用Query参数提交
+    4. imageUrl必须以http://或https://开头
+    5. 如果更新成功，后端会删除当前用户原来的OSS头像文件
+本地文件上传示例：
+    Content-Type: multipart/form-data
+    file: 选择本地图片文件
+图片链接上传示例：
+    /api/user/uploadphoto?imageUrl=https://xxx.com/avatar.png
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "userPhoto": "https://xxx.com/avatar.png"
+        }
+    }
+userPhoto -> 更新后的用户头像链接
+说明：
+    1. 该接口需要登录后调用
+    2. 用户id由后端从token中解析，前端不需要传userId
+    3. file和imageUrl不能同时传，也不能同时为空
+    4. 文件上传仅支持jpg、jpeg、png、webp格式图片
+    5. 如果数据库更新失败，本次新上传到OSS的图片会被删除
 ```
 
 ## 首页小说分类接口

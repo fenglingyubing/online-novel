@@ -100,6 +100,12 @@
             <version>5.8.44</version>
         </dependency>
 
+        <!--阿里云OSS-->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.18.4</version>
+        </dependency>
     </dependencies>
 
     <build>
