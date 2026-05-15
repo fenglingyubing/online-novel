@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
 
         userInfo.setUsername(username);
         userInfo.setPassword(passwordEncoder.encode(password));
-        userInfo.setNickName(generateNickname());
+        userInfo.setNickName(registerUtil.generateNickname());
         userInfo.setUserRole(CommonConstants.USER_ROLE_READER);
         userInfo.setUserStatus(CommonConstants.USER_STATUS_NORMAL);
         userInfo.setUserBalance(CommonConstants.USER_DEFAULT_BALANCE);
@@ -214,15 +214,5 @@ public class UserServiceImpl implements UserService {
             log.info("删除成功");
         }
         return CommonResult.success(new UserUploadPhotoRespDto(userPhoto));
-    }
-
-    /**
-     * 生成随机的用户昵称
-     *
-     * @return reader_123456
-     */
-    private String generateNickname() {
-        int random = ThreadLocalRandom.current().nextInt(100000, 999999);
-        return "reader_" + random;
     }
 }

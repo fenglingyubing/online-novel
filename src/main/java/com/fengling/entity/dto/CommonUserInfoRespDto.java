@@ -5,28 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用户认证响应结果
+ * 当前登录用户公共信息响应结果
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserAuthRespDto {
-    /**
-     * 用户id
-     */
-    private Long id;
-    /**
-     * 用户状态
-     */
-    private Integer userStatus;
-    /**
-     * 用户角色
-     */
-    private Integer userRole;
-    /**
-     * 用户余额
-     */
-    private Integer userBalance;
+public class CommonUserInfoRespDto {
     /**
      * 用户性别
      */
@@ -40,7 +24,7 @@ public class UserAuthRespDto {
      */
     private String userPhoto;
     /**
-     * 登录token
+     * 用户余额
      */
-    private String token;
+    private Integer userBalance;
 }

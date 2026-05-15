@@ -74,6 +74,7 @@ public class AuthorServiceImpl implements AuthorService {
         //加密密码
         registerUser.setPassword(passwordEncoder.encode(password));
         registerUser.setUserRole(CommonConstants.USER_ROLE_AUTHOR);
+        registerUser.setNickName(registerUtil.generateNickname());
         registerUser.setUserStatus(CommonConstants.USER_STATUS_NORMAL);
         registerUser.setUserBalance(CommonConstants.USER_DEFAULT_BALANCE);
         int insert = userMapper.insert(registerUser);

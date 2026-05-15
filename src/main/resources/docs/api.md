@@ -67,6 +67,9 @@
             "userStatus": 0,
             "userRole": 1,
             "userBalance": 0,
+            "userSex": null,
+            "nickName": "reader_123456",
+            "userPhoto": null,
             "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMDUzMDI2NDU5ODA4NDA3NTUzIiwidXNlcklkIjoyMDUzMDI2NDU5ODA4NDA3NTUzLCJ1c2VyUm9sZSI6MSwiaWF0IjoxNzc4MzE0NjI2LCJleHAiOjE3NzgzMjE4MjZ9.3v26ZA2RnSjaFwrNye_DDVwKvYCtDxcEvREGXQmr4f4"
         }
     }
@@ -74,7 +77,11 @@
     userStatus -> 用户状态（0-正常，1-禁用）
     userRole -> 用户角色（0-管理员，1-读者，2-作家）
     userBalance -> 用户书币余额
+    userSex -> 用户性别（0-男，1-女，未设置时为null）
+    nickName -> 用户昵称
+    userPhoto -> 用户头像，未设置时为null
     token -> JWT令牌
+说明：注册成功后会返回首页展示所需的用户公共信息，前端可直接使用nickName、userPhoto、userBalance渲染登录态
 ```
 
 ## 作家注册接口
@@ -102,6 +109,9 @@
             "userStatus": 0,
             "userRole": 2,
             "userBalance": 0,
+            "userSex": null,
+            "nickName": "reader_123456",
+            "userPhoto": null,
             "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMDUzMDI2NDU5ODA4NDA3NTUzIiwidXNlcklkIjoyMDUzMDI2NDU5ODA4NDA3NTUzLCJ1c2VyUm9sZSI6MiwiaWF0IjoxNzc4MzE0NjI2LCJleHAiOjE3NzgzMjE4MjZ9.xxx"
         }
     }
@@ -109,6 +119,9 @@
     userStatus -> 用户状态（0-正常，1-禁用）
     userRole -> 用户角色（0-管理员，1-读者，2-作家）
     userBalance -> 用户书币余额
+    userSex -> 用户性别（0-男，1-女，未设置时为null）
+    nickName -> 用户昵称
+    userPhoto -> 用户头像，未设置时为null
     token -> JWT令牌
 说明：
     1. 作家注册成功后会同时创建用户信息和作者信息
@@ -135,6 +148,9 @@
             "userStatus": 0,
             "userRole": 1,
             "userBalance": 0,
+            "userSex": 0,
+            "nickName": "reader_123456",
+            "userPhoto": "https://xxx.com/avatar.png",
             "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMDUzMDI2NDU5ODA4NDA3NTUzIiwidXNlcklkIjoyMDUzMDI2NDU5ODA4NDA3NTUzLCJ1c2VyUm9sZSI6MSwiaWF0IjoxNzc4MzE0NjI2LCJleHAiOjE3NzgzMjE4MjZ9.3v26ZA2RnSjaFwrNye_DDVwKvYCtDxcEvREGXQmr4f4"
         }
     }
@@ -142,7 +158,11 @@
     userStatus -> 用户状态（0-正常，1-禁用）
     userRole -> 用户角色（0-管理员，1-读者，2-作家）
     userBalance -> 用户书币余额
+    userSex -> 用户性别（0-男，1-女，未设置时为null）
+    nickName -> 用户昵称
+    userPhoto -> 用户头像，未设置时为null
     token -> JWT令牌
+说明：登录成功后会返回首页展示所需的用户公共信息，前端可直接使用nickName、userPhoto、userBalance渲染登录态
 ```
 
 ## 退出登录接口
