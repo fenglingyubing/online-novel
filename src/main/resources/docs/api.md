@@ -363,6 +363,48 @@ pageNum -> 当前是第几页
 pageSize -> 当前页有多少条数据
 pages -> 一共有几页
 ```
+
+## 最新上架小说查询
+```text
+请求路径：
+/api/novel/recent
+请求方式：
+    GET
+参数：
+    无
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": [
+            {
+                "id": 1,
+                "bookName": "碧阳仙门",
+                "coverUrl": "https://bookcover.yuewen.com/qdbimg/349573/1048992740/600.webp",
+                "authorName": "鹤守月满池",
+                "bookIntro": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙……",
+                "categoryName": "玄幻"
+            },
+            {
+                "id": 2,
+                "bookName": "修仙界唯一出马仙",
+                "coverUrl": "https://bookcover.yuewen.com/qdbimg/349573/1048721558/600.webp",
+                "authorName": "尼禄2077",
+                "bookIntro": "雨夜，高速，半挂卡车。没有奥丁，也没有尼伯龙根这……",
+                "categoryName": "仙侠"
+            },
+            ...
+        ]
+    }
+id -> 小说id
+bookName -> 小说名称
+coverUrl -> 小说封面链接
+authorName -> 作者名字
+bookIntro -> 小说简介（截断后）
+categoryName -> 小说分类名称
+说明：该接口默认返回已发布小说中最新上架的前4本
+```
+
 ## 小说详情页查询
 ```text
 请求路径：

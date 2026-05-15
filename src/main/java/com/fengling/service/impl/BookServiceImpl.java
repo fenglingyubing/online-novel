@@ -1,7 +1,9 @@
 package com.fengling.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fengling.common.constant.CacheConstants;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.context.AuthUserInfo;
@@ -10,16 +12,17 @@ import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.common.util.RedisUtil;
 import com.fengling.entity.BookShelf;
 import com.fengling.entity.dto.*;
 import com.fengling.mapper.BookMapper;
 import com.fengling.mapper.BookShelfMapper;
 import com.fengling.mapper.ChapterMapper;
 import com.fengling.service.BookService;
-import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,6 +32,7 @@ public class BookServiceImpl implements BookService {
     private final BookMapper bookMapper;
     private final ChapterMapper chapterMapper;
     private final BookShelfMapper bookShelfMapper;
+    private final RedisUtil redisUtil;
 
     @Override
     public CommonResult<PageRespDto<BookListRespDto>> listCategoryNovel(Integer categoryId, PageReqDto pageReqDto) {
@@ -85,9 +89,10 @@ public class BookServiceImpl implements BookService {
 
         AuthUserInfo authUserInfo = UserContext.getAuthUserInfo();
         if (authUserInfo != null) {
-            //设置小说最后阅读到的章节id
+            //设置小说最后阅读到的章节id和最后阅读时间
             bookShelfMapper.update(
-                    new BookShelf().setLastReadChapterId(chapterId),
+                    new BookShelf().setLastReadChapterId(chapterId)
+                            .setLastReadTime(LocalDateTime.now()),
                     new LambdaQueryWrapper<BookShelf>()
                             .eq(BookShelf::getUserId, authUserInfo.getUserId())
                             .eq(BookShelf::getBookId, bookId)
@@ -99,11 +104,23 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public CommonResult<List<BookRecentListRespDto>> listRecentBookList() {
+        // 从redis读取
+        String jsonStr = redisUtil.getValueForKey(CacheConstants.NOVEL_RECENT);
+        if (jsonStr != null && !jsonStr.isBlank()) {
+            return CommonResult.success(JSONUtil.toList(jsonStr, BookRecentListRespDto.class));
+        }
         List<BookRecentListRespDto> recentBookList = bookMapper.listRecentBookList(
                 CommonConstants.NOVEL_RECENT_LIMIT
         );
         recentBookList.forEach(
                 book -> book.setBookIntro(shortBookIntro(book.getBookIntro()))
+        );
+        // 将列表转换为字符串
+        String valueStr = JSONUtil.toJsonStr(recentBookList);
+        redisUtil.addRedisCache(
+                CacheConstants.NOVEL_RECENT,
+                valueStr,
+                CacheConstants.NOVEL_RECENT_TTL
         );
         return CommonResult.success(recentBookList);
     }
@@ -115,7 +132,7 @@ public class BookServiceImpl implements BookService {
      * @return 压缩后的小说简介
      */
     private String shortBookIntro(String bookIntro) {
-        if (StringUtil.isNullOrEmpty(bookIntro) || bookIntro.length() <= 50) {
+        if (bookIntro == null || bookIntro.isBlank() || bookIntro.length() <= 50) {
             return bookIntro;
         }
         return bookIntro.substring(0, 50) + "……";

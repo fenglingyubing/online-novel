@@ -20,6 +20,6 @@
         join book_info bi on bs.book_id = bi.id
         left join book_chapter bc on bs.last_read_chapter_id = bc.id
         where bs.user_id = #{userId}
-        order by bs.update_time desc
+        order by coalesce(bs.last_read_time, bs.create_time) desc
     </select>
 </mapper>

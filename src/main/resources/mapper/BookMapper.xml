@@ -19,7 +19,7 @@
                bi.latest_chapter_name as latestChapterName
         from book_info as bi
                  left join author_info ai on bi.author_id = ai.id
-        where bi.category_id = #{categoryId}
+        where bi.category_id = #{categoryId} and bi.publish_status = 1
     </select>
 
     <!--查询全部小说-->
@@ -36,6 +36,7 @@
                bi.latest_chapter_name as latestChapterName
         from book_info as bi
                  left join author_info ai on bi.author_id = ai.id
+        where bi.publish_status = 1
         order by bi.update_time desc
     </select>
 
@@ -56,7 +57,7 @@
         from book_info as bi
                  left join author_info as ai on bi.author_id = ai.id
                  left join book_category as bc on bi.category_id = bc.id
-        where bi.id = #{bookId};
+        where bi.id = #{bookId} and bi.publish_status = 1
     </select>
 
     <!--最新上架书籍查询-->
