@@ -16,6 +16,17 @@ public enum ResultCodeEnum {
      * 用户未登录或登录已失效的返回
      */
     UNAUTHORIZED(401, "未登录或登录已失效"),
+
+    /**
+     * 无权限访问
+     */
+    FORBIDDEN(403, "无权限访问"),
+
+    /**
+     * 资源未找到
+     */
+    NOT_FOUND(404,"资源未找到"),
+
     /**
      * 用户名已存在的返回
      */
@@ -30,11 +41,6 @@ public enum ResultCodeEnum {
      * 用户不存在
      */
     USER_NOT_EXIST(1003, "用户不存在"),
-
-    /**
-     * 资源未找到
-     */
-    NOT_FOUND(404,"资源未找到"),
 
     /**
      * 用户已被禁用

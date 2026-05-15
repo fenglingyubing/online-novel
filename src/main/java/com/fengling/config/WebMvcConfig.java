@@ -22,12 +22,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/user/logout",
                         "/api/user/mine",
                         "/api/user/updateinfo",
-                        "/api/user/uploadphoto"
+                        "/api/user/uploadphoto",
+                        "/api/author/home"
                 )
                 .excludePathPatterns(
                         "/api/user/login",
                         "/api/user/register",
-                        "api/author/register"
+                        "/api/author/register"
                 );
         registry.addInterceptor(optionalAuthInterceptor)
                 .addPathPatterns("/api/novel/*/chapter/*");

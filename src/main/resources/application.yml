@@ -29,7 +29,7 @@ mybatis-plus:
     map-underscore-to-camel-case: true #  驼峰映射
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
---- # 阿里云OSS 配置
+--- # 阿里云 OSS 配置
 aliyun:
   oss:
     endpoint: https://oss-cn-chengdu.aliyuncs.com

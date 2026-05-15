@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fengling.mapper.AuthorMapper">
+
+    <!--查询作家首页信息-->
+    <select id="getAuthorHomeInfo" resultType="com.fengling.entity.dto.AuthorHomeRespDto">
+        select ai.id,
+               ai.author_name as authorName,
+               ui.user_photo  as userPhoto,
+               ai.word_count  as wordCount
+        from author_info ai
+                 left join user_info ui on ai.user_id = ui.id
+        where ai.user_id = #{userId}
+    </select>
+</mapper>
