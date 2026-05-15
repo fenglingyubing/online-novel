@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * 用户个人信息响应结果
+ */
 @Data
 @AllArgsConstructor
 public class UserInfoMineRespDto {

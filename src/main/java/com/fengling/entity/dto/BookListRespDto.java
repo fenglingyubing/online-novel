@@ -3,6 +3,9 @@ package com.fengling.entity.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * 小说列表响应结果
+ */
 @Data
 @AllArgsConstructor
 public class BookListRespDto {

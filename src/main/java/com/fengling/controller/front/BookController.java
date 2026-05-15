@@ -6,6 +6,7 @@ import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.BookInfoRespDto;
 import com.fengling.entity.dto.BookListRespDto;
+import com.fengling.entity.dto.BookRecentListRespDto;
 import com.fengling.entity.dto.ChapterContentRespDto;
 import com.fengling.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(ApiPathConstants.NOVEL)
@@ -57,5 +60,15 @@ public class BookController {
     public CommonResult<ChapterContentRespDto> getBookContentById(@PathVariable("bookId") Long bookId,
                                                                   @PathVariable("chapterId") Long chapterId) {
         return bookService.getBookContentById(bookId, chapterId);
+    }
+
+    /**
+     * 查询最新上架小说
+     *
+     * @return 最新上架小说列表
+     */
+    @GetMapping("/recent")
+    public CommonResult<List<BookRecentListRespDto>> listRecentBookList() {
+        return bookService.listRecentBookList();
     }
 }

@@ -2,6 +2,7 @@ package com.fengling.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.context.AuthUserInfo;
 import com.fengling.common.context.UserContext;
@@ -10,10 +11,7 @@ import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.BookShelf;
-import com.fengling.entity.dto.BookInfoRespDto;
-import com.fengling.entity.dto.BookListRespDto;
-import com.fengling.entity.dto.ChapterContentRespDto;
-import com.fengling.entity.dto.ChapterListRespDto;
+import com.fengling.entity.dto.*;
 import com.fengling.mapper.BookMapper;
 import com.fengling.mapper.BookShelfMapper;
 import com.fengling.mapper.ChapterMapper;
@@ -37,10 +35,10 @@ public class BookServiceImpl implements BookService {
         //分页对象
         Page<BookListRespDto> page = new Page<>(pageReqDto.getPageNum(), pageReqDto.getPageSize());
         Page<BookListRespDto> bookPage;
-        if (categoryId == 0){
+        if (categoryId == 0) {
             // 查询所有小说
             bookPage = bookMapper.selectAllNovelPage(page);
-        }else {
+        } else {
             bookPage = bookMapper.selectCategoryNovelPage(page, categoryId);
         }
         // 压缩简介
@@ -97,6 +95,17 @@ public class BookServiceImpl implements BookService {
         }
 
         return CommonResult.success(chapterContentRespDto);
+    }
+
+    @Override
+    public CommonResult<List<BookRecentListRespDto>> listRecentBookList() {
+        List<BookRecentListRespDto> recentBookList = bookMapper.listRecentBookList(
+                CommonConstants.NOVEL_RECENT_LIMIT
+        );
+        recentBookList.forEach(
+                book -> book.setBookIntro(shortBookIntro(book.getBookIntro()))
+        );
+        return CommonResult.success(recentBookList);
     }
 
     /**

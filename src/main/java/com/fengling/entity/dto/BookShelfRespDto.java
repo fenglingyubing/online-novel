@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * 书架列表响应结果
+ */
 @Data
 public class BookShelfRespDto {
     /**

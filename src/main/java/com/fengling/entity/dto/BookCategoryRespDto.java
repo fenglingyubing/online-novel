@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 小说分类响应结果
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

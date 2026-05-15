@@ -5,6 +5,7 @@ import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.BookInfoRespDto;
 import com.fengling.entity.dto.BookListRespDto;
+import com.fengling.entity.dto.BookRecentListRespDto;
 import com.fengling.entity.dto.ChapterContentRespDto;
 
 import java.util.List;
@@ -35,4 +36,11 @@ public interface BookService {
      * @return 小说正文实体
      */
     CommonResult<ChapterContentRespDto> getBookContentById(Long bookId, Long chapterId);
+
+    /**
+     * 查询最新上架小说
+     *
+     * @return 最新小说列表
+     */
+    CommonResult<List<BookRecentListRespDto>> listRecentBookList();
 }

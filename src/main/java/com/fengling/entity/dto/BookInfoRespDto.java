@@ -5,6 +5,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 小说详情响应结果
+ */
 @Data
 public class BookInfoRespDto {
     /**

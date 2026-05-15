@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.entity.BookInfo;
 import com.fengling.entity.dto.BookInfoRespDto;
 import com.fengling.entity.dto.BookListRespDto;
+import com.fengling.entity.dto.BookRecentListRespDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface BookMapper extends BaseMapper<BookInfo> {
@@ -20,6 +23,12 @@ public interface BookMapper extends BaseMapper<BookInfo> {
     Page<BookListRespDto> selectCategoryNovelPage(Page<BookListRespDto> page,
                                                   @Param("categoryId") Integer categoryId);
 
+    /**
+     * 查询全部小说
+     *
+     * @param page 分页对象
+     * @return 全部小说列表
+     */
     Page<BookListRespDto> selectAllNovelPage(Page<BookListRespDto> page);
 
     /**
@@ -29,4 +38,12 @@ public interface BookMapper extends BaseMapper<BookInfo> {
      * @return BookInfoRespDto 小说详情响应实体
      */
     BookInfoRespDto getBookInfoById(Long bookId);
+
+    /**
+     * 查询最新上架小说
+     *
+     * @param limit 首页最新上架小说展示数量
+     * @return 最新上架小说列表
+     */
+    List<BookRecentListRespDto> listRecentBookList(@Param("limit") Integer limit);
 }

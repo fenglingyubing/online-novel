@@ -5,6 +5,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * 用户个人信息修改请求参数
+ */
 @Data
 @NoArgsConstructor
 public class UserInfoMineReqDto {

@@ -2,6 +2,9 @@ package com.fengling.entity.dto;
 
 import lombok.Data;
 
+/**
+ * 章节目录响应结果
+ */
 @Data
 public class ChapterListRespDto {
     /**
