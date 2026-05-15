@@ -1,4 +1,4 @@
-package com.fengling.controller.auhtor;
+package com.fengling.controller.author;
 
 import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.resp.CommonResult;

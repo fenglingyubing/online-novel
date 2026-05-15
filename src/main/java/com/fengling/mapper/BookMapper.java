@@ -20,6 +20,8 @@ public interface BookMapper extends BaseMapper<BookInfo> {
     Page<BookListRespDto> selectCategoryNovelPage(Page<BookListRespDto> page,
                                                   @Param("categoryId") Integer categoryId);
 
+    Page<BookListRespDto> selectAllNovelPage(Page<BookListRespDto> page);
+
     /**
      * 查询小说详情
      *

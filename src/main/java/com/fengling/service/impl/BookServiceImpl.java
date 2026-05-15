@@ -9,24 +9,19 @@ import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.AuthorInfo;
-import com.fengling.entity.BookInfo;
 import com.fengling.entity.BookShelf;
 import com.fengling.entity.dto.BookInfoRespDto;
 import com.fengling.entity.dto.BookListRespDto;
 import com.fengling.entity.dto.ChapterContentRespDto;
 import com.fengling.entity.dto.ChapterListRespDto;
-import com.fengling.mapper.AuthorMapper;
 import com.fengling.mapper.BookMapper;
 import com.fengling.mapper.BookShelfMapper;
 import com.fengling.mapper.ChapterMapper;
 import com.fengling.service.BookService;
 import io.netty.util.internal.StringUtil;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,7 +36,14 @@ public class BookServiceImpl implements BookService {
     public CommonResult<PageRespDto<BookListRespDto>> listCategoryNovel(Integer categoryId, PageReqDto pageReqDto) {
         //分页对象
         Page<BookListRespDto> page = new Page<>(pageReqDto.getPageNum(), pageReqDto.getPageSize());
-        Page<BookListRespDto> bookPage = bookMapper.selectCategoryNovelPage(page, categoryId);
+        Page<BookListRespDto> bookPage;
+        if (categoryId == 0){
+            // 查询所有小说
+            bookPage = bookMapper.selectAllNovelPage(page);
+        }else {
+            bookPage = bookMapper.selectCategoryNovelPage(page, categoryId);
+        }
+        // 压缩简介
         bookPage.getRecords().forEach(book ->
                 book.setBookIntro(shortBookIntro(book.getBookIntro())));
         return CommonResult.success(PageRespDto.of(bookPage));
@@ -73,7 +75,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public CommonResult<ChapterContentRespDto> getBookContentById(Long bookId, Long chapterId) {
         ChapterContentRespDto chapterContentRespDto = chapterMapper.getBookContentById(bookId, chapterId);
-        if(chapterContentRespDto == null){
+        if (chapterContentRespDto == null) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND, "小说章节不存在");
         }
         chapterContentRespDto.setPreChapterId(
