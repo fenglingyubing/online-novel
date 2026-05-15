@@ -5,8 +5,19 @@ public class CacheConstants {
      * redis远程缓存前缀
      */
     public static final String REDIS_PREFIX = "novel:";
+
     /**
      * jwt令牌缓存前缀
      */
     public static final String AUTH_TOKEN = REDIS_PREFIX + "jwt:";
+
+    /**
+     * 首页书籍分类
+     */
+    public static final String CATEGORY = REDIS_PREFIX + "category";
+
+    /**
+     * 书架分类缓存时间
+     */
+    public static final Long CATEGORY_TTL = 1000 * 60 * 60 * 24L;
 }

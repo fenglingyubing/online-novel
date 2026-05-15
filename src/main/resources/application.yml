@@ -27,6 +27,7 @@ mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml #  mappr文件路径
   configuration:
     map-underscore-to-camel-case: true #  驼峰映射
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 --- # 阿里云OSS 配置
 aliyun:
