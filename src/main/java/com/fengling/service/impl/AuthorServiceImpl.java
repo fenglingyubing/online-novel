@@ -2,22 +2,22 @@ package com.fengling.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CacheConstants;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
-import com.fengling.common.context.UserContext;
+import com.fengling.common.dto.PageReqDto;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.common.util.AuthorAuthUtil;
 import com.fengling.common.util.JWTUtil;
 import com.fengling.common.util.RedisUtil;
 import com.fengling.common.util.RegisterUtil;
 import com.fengling.entity.AuthorInfo;
 import com.fengling.entity.BookInfo;
 import com.fengling.entity.UserInfo;
-import com.fengling.entity.dto.AuthorHomeRespDto;
-import com.fengling.entity.dto.AuthorRecentNovelRespDto;
-import com.fengling.entity.dto.AuthorReqDto;
-import com.fengling.entity.dto.UserAuthRespDto;
+import com.fengling.entity.dto.*;
 import com.fengling.mapper.AuthorMapper;
 import com.fengling.mapper.BookMapper;
 import com.fengling.mapper.UserMapper;
@@ -40,6 +40,7 @@ public class AuthorServiceImpl implements AuthorService {
     private final JWTUtil jwtUtil;
     private final RedisUtil redisUtil;
     private final BookMapper bookMapper;
+    private final AuthorAuthUtil authorAuthUtil;
 
     @Transactional
     @Override
@@ -110,17 +111,8 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public CommonResult<AuthorHomeRespDto> getAuthorHomeInfo() {
-        // 从JWT获取用户信息
-        Long userId = UserContext.getUserId();
-        if (userId == null) {
-            throw new BusinessException(ResultCodeEnum.UNAUTHORIZED);
-        }
-        Integer userRole = UserContext.getUserRole();
-        if (!CommonConstants.USER_ROLE_AUTHOR.equals(userRole)) {
-            throw new BusinessException(ResultCodeEnum.FORBIDDEN);
-        }
-
-        AuthorHomeRespDto authorHomeRespDto = authorMapper.getAuthorHomeInfo(userId);
+        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
+        AuthorHomeRespDto authorHomeRespDto = authorMapper.getAuthorHomeInfo(userInfoDto.getId());
         if (authorHomeRespDto == null) {
             throw new BusinessException(ResultCodeEnum.FAIL, "没有这个作者信息");
         }
@@ -146,5 +138,29 @@ public class AuthorServiceImpl implements AuthorService {
             authorHomeRespDto.setRecentNovelRespDto(recentNovelRespDto);
         }
         return CommonResult.success(authorHomeRespDto);
+    }
+
+    @Override
+    public CommonResult<PageRespDto<AuthorNovelsListRespDto>> listAuthorNovelsList(PageReqDto pageReqDto) {
+        log.info("------------------进入----------------------------");
+        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
+        AuthorInfo authorInfo = authorMapper.selectOne(
+                new LambdaQueryWrapper<AuthorInfo>()
+                        .select(AuthorInfo::getId)
+                        .eq(AuthorInfo::getUserId, userInfoDto.getId())
+        );
+        if (authorInfo == null) {
+            throw new BusinessException(ResultCodeEnum.FORBIDDEN, "当前用户不是作家");
+        }
+
+        Page<AuthorNovelsListRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        Page<AuthorNovelsListRespDto> pageAuthorNovels = bookMapper.listAuthorNovelsList(
+                page,
+                authorInfo.getId()
+        );
+        return CommonResult.success(PageRespDto.of(pageAuthorNovels));
     }
 }

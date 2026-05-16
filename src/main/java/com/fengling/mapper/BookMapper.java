@@ -3,6 +3,7 @@ package com.fengling.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.entity.BookInfo;
+import com.fengling.entity.dto.AuthorNovelsListRespDto;
 import com.fengling.entity.dto.BookInfoRespDto;
 import com.fengling.entity.dto.BookListRespDto;
 import com.fengling.entity.dto.BookRecentListRespDto;
@@ -46,4 +47,16 @@ public interface BookMapper extends BaseMapper<BookInfo> {
      * @return 最新上架小说列表
      */
     List<BookRecentListRespDto> listRecentBookList(@Param("limit") Integer limit);
+
+    /**
+     * 查询作家的所有作品
+     *
+     * @param page 分页对象
+     * @param authorId   作家id
+     * @return 作家作品管理页面响应结果
+     */
+    Page<AuthorNovelsListRespDto> listAuthorNovelsList(
+            Page<AuthorNovelsListRespDto> page,
+            @Param("authorId") Long authorId
+    );
 }

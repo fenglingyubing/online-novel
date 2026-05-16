@@ -1,8 +1,11 @@
 package com.fengling.controller.author;
 
 import com.fengling.common.constant.ApiPathConstants;
+import com.fengling.common.dto.PageReqDto;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.AuthorHomeRespDto;
+import com.fengling.entity.dto.AuthorNovelsListRespDto;
 import com.fengling.entity.dto.AuthorReqDto;
 import com.fengling.entity.dto.UserAuthRespDto;
 import com.fengling.service.AuthorService;
@@ -27,8 +30,18 @@ public class AuthorController {
         return authorService.authorRegister(authorReqDto);
     }
 
+    /**
+     * 作家首页信息查询
+     *
+     * @return 作家主页响应结果
+     */
     @GetMapping("/home")
-    public CommonResult<AuthorHomeRespDto> getAuthorHomeInfo(){
+    public CommonResult<AuthorHomeRespDto> getAuthorHomeInfo() {
         return authorService.getAuthorHomeInfo();
+    }
+
+    @GetMapping("/novels")
+    public CommonResult<PageRespDto<AuthorNovelsListRespDto>> listAuthorNovelsList(PageReqDto pageReqDto){
+        return authorService.listAuthorNovelsList(pageReqDto);
     }
 }

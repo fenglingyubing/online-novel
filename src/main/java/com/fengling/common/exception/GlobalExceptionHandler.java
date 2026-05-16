@@ -14,6 +14,7 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(Exception.class)
     public CommonResult<Void> handleException(Exception ex){
+        ex.printStackTrace();
         return CommonResult.fail(ResultCodeEnum.FAIL,"系统异常");
     }
 }
