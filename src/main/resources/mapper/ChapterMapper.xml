@@ -62,4 +62,18 @@
         and bc.chapter_status = 0
         order by bc.update_time desc
     </select>
+
+    <!--查询某小说的某章节信息-->
+    <select id="getChapterInfo" resultType="com.fengling.entity.dto.ChapterEditInfoRespDto">
+        select bc.id,
+               bi.book_name       as bookName,
+               bc.chapter_name    as chapterName,
+               bc.chapter_content as chapterContent,
+               bc.word_count      as wordCount
+        from book_chapter bc
+                 inner join book_info bi on bc.book_id = bi.id
+        where bc.id = #{chapterId}
+          and bc.book_id = #{bookId}
+          and bi.author_id = #{authorId}
+    </select>
 </mapper>

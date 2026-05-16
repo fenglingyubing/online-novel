@@ -4,17 +4,13 @@ import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.context.UserContext;
 import com.fengling.common.exception.BusinessException;
-import com.fengling.entity.dto.AuthorHomeRespDto;
 import com.fengling.entity.dto.UserInfoDto;
-import com.fengling.mapper.AuthorMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class AuthorAuthUtil {
-    private final AuthorMapper authorMapper;
-
     /**
      * 作者认证基础信息
      *

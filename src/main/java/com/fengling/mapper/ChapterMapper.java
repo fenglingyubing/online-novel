@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.entity.ChapterInfo;
 import com.fengling.entity.dto.AuthorDraftsRespDto;
 import com.fengling.entity.dto.ChapterContentRespDto;
+import com.fengling.entity.dto.ChapterEditInfoRespDto;
 import com.fengling.entity.dto.ChapterListRespDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -59,4 +60,8 @@ public interface ChapterMapper extends BaseMapper<ChapterInfo> {
      */
     Page<AuthorDraftsRespDto> listAuthorDrafts(Page<AuthorDraftsRespDto> draftsPage,
                                                @Param("bookIdList") List<Long> bookIdList);
+
+    ChapterEditInfoRespDto getChapterInfo(@Param("bookId") Long bookId,
+                                          @Param("chapterId") Long chapterId,
+                                          @Param("authorId") Long authorId);
 }

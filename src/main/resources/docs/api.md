@@ -4,6 +4,7 @@
 - 500 操作失败
 - 401 未登录或登录已失效
 - 403 无权限访问
+- 404 资源未找到
 - 1001 用户名已存在
 - 1002 用户名或密码错误
 - 1003 用户不存在
@@ -22,6 +23,7 @@
     /api/author/home
     /api/author/novels
     /api/author/drafts
+    /api/author/{bookId}/chapters/{chapterId}
 
 当前强制登录的功能：
     查询书架小说列表
@@ -33,6 +35,7 @@
     查询作家首页信息
     查询作家作品管理页面列表
     查询作家草稿箱列表
+    查询作家某本小说的某个章节信息
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -281,7 +284,7 @@ pages -> 一共有几页
     Authorization: Bearer token值
 参数：
     pageNum -> 当前是第几页，默认1
-    pageSize -> 每页有多少条数据，默认10
+    pageSize -> 每页有多少条数据，默认6
 响应数据：
     {
         "code": 200,
@@ -341,6 +344,61 @@ pages -> 一共有几页
     4. 只查询当前登录作家自己作品下的草稿章节
     5. 只返回草稿状态章节，按更新时间倒序排列
     6. 如果当前作家暂无作品或暂无草稿，records为空数组，total为0
+```
+
+## 作家章节编辑信息查询
+```text
+请求路径：
+/api/author/{bookId}/chapters/{chapterId}
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    bookId -> 小说id
+    chapterId -> 章节id
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "id": 1,
+            "bookName": "碧阳仙门",
+            "chapterName": "第一章 碧阳仙门",
+            "chapterContent": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。",
+            "wordCount": 4200
+        }
+    }
+id -> 章节id
+bookName -> 小说名称
+chapterName -> 章节名称
+chapterContent -> 章节正文
+wordCount -> 章节字数
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    章节不存在或不属于当前作家：
+    {
+        "code": 404,
+        "message": "章节信息未找到",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只查询当前登录作家自己作品下的章节
+    5. bookId、chapterId和当前作家id必须同时匹配才会返回章节信息
 ```
 ## 登录接口
 ```text
@@ -834,4 +892,3 @@ pages -> 一共有几页
     3. 只会删除当前登录用户书架中bookIdList对应的小说记录
     4. 如果列表中的小说不在当前用户书架中，不会产生影响
 ```
-

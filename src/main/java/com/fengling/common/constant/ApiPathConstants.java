@@ -35,4 +35,9 @@ public final class ApiPathConstants {
      * 作家注册前缀
      */
     public static final String AUTHOR = API + "/author";
+
+    /**
+     * 章节请求前缀
+     */
+    public static final String CHAPTERS = "/chapters";
 }
