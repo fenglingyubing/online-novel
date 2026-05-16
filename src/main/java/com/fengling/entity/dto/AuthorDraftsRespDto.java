@@ -20,6 +20,11 @@ public class AuthorDraftsRespDto {
     private Long id;
 
     /**
+     * 小说id
+     */
+    private Long bookId;
+    
+    /**
      * 章节名称
      */
     private String chapterName;

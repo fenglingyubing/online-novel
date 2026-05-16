@@ -61,6 +61,14 @@ public interface ChapterMapper extends BaseMapper<ChapterInfo> {
     Page<AuthorDraftsRespDto> listAuthorDrafts(Page<AuthorDraftsRespDto> draftsPage,
                                                @Param("bookIdList") List<Long> bookIdList);
 
+    /**
+     * 作家章节编辑信息查询
+     *
+     * @param bookId    小说id
+     * @param chapterId 章节id
+     * @param authorId  作者id
+     * @return 章节信息
+     */
     ChapterEditInfoRespDto getChapterInfo(@Param("bookId") Long bookId,
                                           @Param("chapterId") Long chapterId,
                                           @Param("authorId") Long authorId);

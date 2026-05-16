@@ -48,6 +48,7 @@
     <!--获取某作家下的所有草稿-->
     <select id="listAuthorDrafts" resultType="com.fengling.entity.dto.AuthorDraftsRespDto">
         select bc.id,
+               bc.book_id           as bookId,
                bc.chapter_name      as chapterName,
                bi.book_name         as bookName,
                bc.chapter_content   as chapterContent,

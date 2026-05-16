@@ -293,6 +293,7 @@ pages -> 一共有几页
             "records": [
                 {
                     "id": 1,
+                    "bookId": 1,
                     "chapterName": "第一章 碧阳仙门",
                     "bookName": "碧阳仙门",
                     "chapterContent": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土……",
@@ -301,6 +302,7 @@ pages -> 一共有几页
                 },
                 {
                     "id": 2,
+                    "bookId": 1,
                     "chapterName": "第二章 入门",
                     "bookName": "碧阳仙门",
                     "chapterContent": "山门之前，少年抬头望向云雾深处……",
@@ -315,6 +317,7 @@ pages -> 一共有几页
         }
     }
 id -> 草稿章节id
+bookId -> 小说id
 chapterName -> 章节名称
 bookName -> 小说名称
 chapterContent -> 章节正文摘要，超过100字时会截断
