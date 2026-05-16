@@ -1,6 +1,8 @@
 package com.fengling.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CacheConstants;
@@ -27,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Slf4j
 @Service
@@ -142,8 +145,26 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public CommonResult<PageRespDto<AuthorNovelsListRespDto>> listAuthorNovelsList(PageReqDto pageReqDto) {
-        log.info("------------------进入----------------------------");
+        if (pageReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.FAIL);
+        }
+        Long pageNum = pageReqDto.getPageNum();
+        Long pageSize = pageReqDto.getPageSize();
+        if (pageNum == null || pageNum <= 0 || pageSize == null || pageSize <= 0) {
+            throw new BusinessException(ResultCodeEnum.FAIL);
+        }
         UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
+        String key = CacheConstants.WORKS + userInfoDto.getId() + ":" + pageNum + ":" + pageSize;
+        // 从redis获取
+        String jsonStr = redisUtil.getValueForKey(key);
+        if (jsonStr != null && !jsonStr.isBlank()) {
+            PageRespDto<AuthorNovelsListRespDto> respDto = JSONUtil.toBean(
+                    jsonStr,
+                    new TypeReference<>() {},
+                    false
+            );
+            return CommonResult.success(respDto);
+        }
         AuthorInfo authorInfo = authorMapper.selectOne(
                 new LambdaQueryWrapper<AuthorInfo>()
                         .select(AuthorInfo::getId)
@@ -152,15 +173,22 @@ public class AuthorServiceImpl implements AuthorService {
         if (authorInfo == null) {
             throw new BusinessException(ResultCodeEnum.FORBIDDEN, "当前用户不是作家");
         }
-
         Page<AuthorNovelsListRespDto> page = new Page<>(
-                pageReqDto.getPageNum(),
-                pageReqDto.getPageSize()
+                pageNum,
+                pageSize
         );
         Page<AuthorNovelsListRespDto> pageAuthorNovels = bookMapper.listAuthorNovelsList(
                 page,
                 authorInfo.getId()
         );
-        return CommonResult.success(PageRespDto.of(pageAuthorNovels));
+        // 缓存到redis
+        PageRespDto<AuthorNovelsListRespDto> pageRespDto = PageRespDto.of(pageAuthorNovels);
+        String valueStr = JSONUtil.toJsonStr(pageRespDto);
+        redisUtil.addRedisCache(
+                key,
+                valueStr,
+                CacheConstants.WORKS_TTL
+        );
+        return CommonResult.success(pageRespDto);
     }
 }
