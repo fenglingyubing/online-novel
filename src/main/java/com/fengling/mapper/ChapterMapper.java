@@ -1,7 +1,9 @@
 package com.fengling.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.entity.ChapterInfo;
+import com.fengling.entity.dto.AuthorDraftsRespDto;
 import com.fengling.entity.dto.ChapterContentRespDto;
 import com.fengling.entity.dto.ChapterListRespDto;
 import org.apache.ibatis.annotations.Mapper;
@@ -31,7 +33,7 @@ public interface ChapterMapper extends BaseMapper<ChapterInfo> {
     /**
      * 获取上一章id
      *
-     * @param bookId  小说章节id
+     * @param bookId     小说章节id
      * @param chapterNum 小说章节数
      * @return 上一章id
      */
@@ -41,10 +43,20 @@ public interface ChapterMapper extends BaseMapper<ChapterInfo> {
     /**
      * 获取上一章id
      *
-     * @param bookId  小说章节id
+     * @param bookId     小说章节id
      * @param chapterNum 小说章节数
      * @return 上一章id
      */
     Long getNextChapterId(@Param("bookId") Long bookId,
                           @Param("chapterNum") Integer chapterNum);
+
+    /**
+     * 查询作家草稿
+     *
+     * @param draftsPage 分页请求参数
+     * @param bookIdList 小说Id集合
+     * @return 草稿列表
+     */
+    Page<AuthorDraftsRespDto> listAuthorDrafts(Page<AuthorDraftsRespDto> draftsPage,
+                                               @Param("bookIdList") List<Long> bookIdList);
 }

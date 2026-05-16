@@ -44,4 +44,22 @@
         order by bc.chapter_num
         limit 1
     </select>
+
+    <!--获取某作家下的所有草稿-->
+    <select id="listAuthorDrafts" resultType="com.fengling.entity.dto.AuthorDraftsRespDto">
+        select bc.id,
+               bc.chapter_name      as chapterName,
+               bi.book_name         as bookName,
+               bc.chapter_content   as chapterContent,
+               bc.word_count        as wordCount,
+               bc.update_time       as updateTime
+        from book_chapter bc
+        left join book_info bi on bc.book_id = bi.id
+        where bc.book_id in
+        <foreach collection="bookIdList" item="bookId" open="(" separator="," close=")">
+            #{bookId}
+        </foreach>
+        and bc.chapter_status = 0
+        order by bc.update_time desc
+    </select>
 </mapper>

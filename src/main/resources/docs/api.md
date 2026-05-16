@@ -21,6 +21,7 @@
     /api/user/uploadphoto
     /api/author/home
     /api/author/novels
+    /api/author/drafts
 
 当前强制登录的功能：
     查询书架小说列表
@@ -31,6 +32,7 @@
     上传用户头像
     查询作家首页信息
     查询作家作品管理页面列表
+    查询作家草稿箱列表
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -267,6 +269,78 @@ pages -> 一共有几页
     3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
     4. 只查询当前登录作家自己的作品
     5. 作品按修改时间倒序排列
+```
+
+## 作家草稿箱列表查询
+```text
+请求路径：
+/api/author/drafts?pageNum=1&pageSize=5
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认10
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "chapterName": "第一章 碧阳仙门",
+                    "bookName": "碧阳仙门",
+                    "chapterContent": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土……",
+                    "wordCount": 4200,
+                    "updateTime": "2026-05-11T12:00:00"
+                },
+                {
+                    "id": 2,
+                    "chapterName": "第二章 入门",
+                    "bookName": "碧阳仙门",
+                    "chapterContent": "山门之前，少年抬头望向云雾深处……",
+                    "wordCount": 3800,
+                    "updateTime": "2026-05-10T12:00:00"
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 5,
+            "pages": 1
+        }
+    }
+id -> 草稿章节id
+chapterName -> 章节名称
+bookName -> 小说名称
+chapterContent -> 章节正文摘要，超过100字时会截断
+wordCount -> 章节字数
+updateTime -> 草稿更新时间
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只查询当前登录作家自己作品下的草稿章节
+    5. 只返回草稿状态章节，按更新时间倒序排列
+    6. 如果当前作家暂无作品或暂无草稿，records为空数组，total为0
 ```
 ## 登录接口
 ```text

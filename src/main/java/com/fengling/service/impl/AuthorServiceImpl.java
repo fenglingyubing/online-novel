@@ -12,16 +12,14 @@ import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.common.util.AuthorAuthUtil;
-import com.fengling.common.util.JWTUtil;
-import com.fengling.common.util.RedisUtil;
-import com.fengling.common.util.RegisterUtil;
+import com.fengling.common.util.*;
 import com.fengling.entity.AuthorInfo;
 import com.fengling.entity.BookInfo;
 import com.fengling.entity.UserInfo;
 import com.fengling.entity.dto.*;
 import com.fengling.mapper.AuthorMapper;
 import com.fengling.mapper.BookMapper;
+import com.fengling.mapper.ChapterMapper;
 import com.fengling.mapper.UserMapper;
 import com.fengling.service.AuthorService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Slf4j
@@ -44,6 +44,8 @@ public class AuthorServiceImpl implements AuthorService {
     private final RedisUtil redisUtil;
     private final BookMapper bookMapper;
     private final AuthorAuthUtil authorAuthUtil;
+    private final ChapterMapper chapterMapper;
+    private final PageAuthUtil pageAuthUtil;
 
     @Transactional
     @Override
@@ -145,22 +147,18 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public CommonResult<PageRespDto<AuthorNovelsListRespDto>> listAuthorNovelsList(PageReqDto pageReqDto) {
-        if (pageReqDto == null) {
-            throw new BusinessException(ResultCodeEnum.FAIL);
-        }
+        pageAuthUtil.pageAuth(pageReqDto);
+        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
         Long pageNum = pageReqDto.getPageNum();
         Long pageSize = pageReqDto.getPageSize();
-        if (pageNum == null || pageNum <= 0 || pageSize == null || pageSize <= 0) {
-            throw new BusinessException(ResultCodeEnum.FAIL);
-        }
-        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
         String key = CacheConstants.WORKS + userInfoDto.getId() + ":" + pageNum + ":" + pageSize;
         // 从redis获取
         String jsonStr = redisUtil.getValueForKey(key);
         if (jsonStr != null && !jsonStr.isBlank()) {
             PageRespDto<AuthorNovelsListRespDto> respDto = JSONUtil.toBean(
                     jsonStr,
-                    new TypeReference<>() {},
+                    new TypeReference<>() {
+                    },
                     false
             );
             return CommonResult.success(respDto);
@@ -190,5 +188,55 @@ public class AuthorServiceImpl implements AuthorService {
                 CacheConstants.WORKS_TTL
         );
         return CommonResult.success(pageRespDto);
+    }
+
+    @Override
+    public CommonResult<PageRespDto<AuthorDraftsRespDto>> listAuthorDrafts(PageReqDto page) {
+        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
+        // 查询作家下的全部小说id
+        AuthorInfo authorInfo = authorMapper.selectOne(
+                new LambdaQueryWrapper<AuthorInfo>()
+                        .select(AuthorInfo::getId)
+                        .eq(AuthorInfo::getUserId, userInfoDto.getId())
+        );
+        if(authorInfo == null){
+            throw new BusinessException(ResultCodeEnum.FORBIDDEN);
+        }
+        pageAuthUtil.pageAuth(page);
+        Long pageNum = page.getPageNum();
+        Long pageSize = page.getPageSize();
+        List<BookInfo> bookInfos = bookMapper.selectList(
+                new LambdaQueryWrapper<BookInfo>()
+                        .select(BookInfo::getId)
+                        .eq(BookInfo::getAuthorId, authorInfo.getId())
+        );
+        if (bookInfos.isEmpty()) {
+            Page<AuthorDraftsRespDto> emptyPage = new Page<>(pageNum, pageSize);
+            return CommonResult.success(PageRespDto.of(emptyPage));
+        }
+        List<Long> bookIdList = bookInfos.stream().map(BookInfo::getId).toList();
+
+        // 根据小说id查询
+        Page<AuthorDraftsRespDto> draftsPage = new Page<>(pageNum, pageSize);
+        Page<AuthorDraftsRespDto> chaptersPage = chapterMapper.listAuthorDrafts(draftsPage, bookIdList);
+        chaptersPage.getRecords().forEach(
+                chapter -> chapter.setChapterContent(
+                        shortContent(chapter.getChapterContent())
+                )
+        );
+        return CommonResult.success(PageRespDto.of(chaptersPage));
+    }
+
+    /**
+     * 压缩小说正文
+     *
+     * @param content 小说正文
+     * @return 压缩后的小说正文
+     */
+    private String shortContent(String content) {
+        if (content == null || content.isBlank() || content.length() <= 100) {
+            return content;
+        }
+        return content.substring(0, 99) + "……";
     }
 }

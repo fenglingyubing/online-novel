@@ -4,10 +4,7 @@ import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.AuthorHomeRespDto;
-import com.fengling.entity.dto.AuthorNovelsListRespDto;
-import com.fengling.entity.dto.AuthorReqDto;
-import com.fengling.entity.dto.UserAuthRespDto;
+import com.fengling.entity.dto.*;
 import com.fengling.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +37,25 @@ public class AuthorController {
         return authorService.getAuthorHomeInfo();
     }
 
+    /**
+     * 作家后人作品管理查询
+     *
+     * @param pageReqDto 分页请求参数
+     * @return 作品列表
+     */
     @GetMapping("/novels")
-    public CommonResult<PageRespDto<AuthorNovelsListRespDto>> listAuthorNovelsList(PageReqDto pageReqDto){
+    public CommonResult<PageRespDto<AuthorNovelsListRespDto>> listAuthorNovelsList(PageReqDto pageReqDto) {
         return authorService.listAuthorNovelsList(pageReqDto);
+    }
+
+    /**
+     * 作家所有草稿查询
+     *
+     * @param page 分页请求参数
+     * @return 草稿列表
+     */
+    @GetMapping("/drafts")
+    public CommonResult<PageRespDto<AuthorDraftsRespDto>> listAuthorDrafts(PageReqDto page) {
+        return authorService.listAuthorDrafts(page);
     }
 }
