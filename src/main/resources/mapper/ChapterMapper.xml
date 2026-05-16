@@ -52,12 +52,12 @@
     <!--获取某作家下的所有草稿-->
     <select id="listAuthorDrafts" resultType="com.fengling.entity.dto.AuthorDraftsRespDto">
         select bc.id,
-               bc.book_id           as bookId,
-               bc.chapter_name      as chapterName,
-               bi.book_name         as bookName,
-               bc.chapter_content   as chapterContent,
-               bc.word_count        as wordCount,
-               bc.update_time       as updateTime
+        bc.book_id as bookId,
+        bc.chapter_name as chapterName,
+        bi.book_name as bookName,
+        bc.chapter_content as chapterContent,
+        bc.word_count as wordCount,
+        bc.update_time as updateTime
         from book_chapter bc
         left join book_info bi on bc.book_id = bi.id
         where bc.book_id in
@@ -88,14 +88,24 @@
         inner join book_info bi on bc.book_id = bi.id
         <set>
             <if test="chapterUpdateReqDto.chapterName != null">
-                bc.chapter_name = #{chapterUpdateReqDto.chapterName},
+                bc.chapter_name =
+                #{chapterUpdateReqDto.chapterName},
             </if>
             <if test="chapterUpdateReqDto.chapterContent != null">
-                bc.chapter_content = #{chapterUpdateReqDto.chapterContent},
-                bc.word_count = char_length(#{chapterUpdateReqDto.chapterContent}),
+                bc.chapter_content =
+                #{chapterUpdateReqDto.chapterContent},
+                bc
+                .
+                word_count
+                =
+                char_length
+                (
+                #{chapterUpdateReqDto.chapterContent}
+                ),
             </if>
             <if test="chapterUpdateReqDto.chapterStatus != null">
-                bc.chapter_status = #{chapterUpdateReqDto.chapterStatus},
+                bc.chapter_status =
+                #{chapterUpdateReqDto.chapterStatus},
             </if>
             bc.update_time = now()
         </set>
@@ -103,4 +113,36 @@
         and bc.book_id = #{bookId}
         and bi.author_id = #{authorId}
     </update>
+
+    <!--新增章节信息-->
+    <insert id="saveChapterInfo"
+            useGeneratedKeys="true"
+            keyProperty="chapterInfo.id"
+            keyColumn="id"
+    >
+        insert into book_chapter(
+            book_id,
+            chapter_num,
+            chapter_name,
+            chapter_content,
+            word_count,
+            chapter_status,
+            publish_time,
+            create_time,
+            update_time
+        ) select
+            #{bookId},
+            #{chapterInfo.chapterNum},
+            #{chapterInfo.chapterName},
+            #{chapterInfo.chapterContent},
+            char_length(#{chapterInfo.chapterContent}),
+            #{chapterInfo.chapterStatus},
+            #{chapterInfo.publishTime},
+            now(),
+            now()
+        from book_info bi
+        where bi.id = #{bookId}
+        and bi.author_id = #{authorId}
+    </insert>
+
 </mapper>

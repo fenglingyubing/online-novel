@@ -6,6 +6,8 @@ import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.*;
 
+import java.util.List;
+
 public interface AuthorService {
 
     /**
@@ -38,4 +40,12 @@ public interface AuthorService {
      * @return 草稿列表
      */
     CommonResult<PageRespDto<AuthorDraftsRespDto>> listAuthorDrafts(PageReqDto page);
+
+    /**
+     * 编辑页小说列表获取
+     *
+     * @return 小说列表
+     */
+    CommonResult<List<AuthorEditBookListResp>> listAuthorEditBook();
+
 }

@@ -23,6 +23,8 @@
     /api/author/home
     /api/author/novels
     /api/author/drafts
+    /api/author/edit/booklist
+    /api/author/{bookId}/chapters
     /api/author/{bookId}/chapters/{chapterId}
 
 当前强制登录的功能：
@@ -35,6 +37,8 @@
     查询作家首页信息
     查询作家作品管理页面列表
     查询作家草稿箱列表
+    查询作家编辑页小说列表
+    新增作家章节信息
     查询作家某本小说的某个章节信息
 
 当前可选登录解析的接口：
@@ -349,6 +353,54 @@ pages -> 一共有几页
     6. 如果当前作家暂无作品或暂无草稿，records为空数组，total为0
 ```
 
+## 编辑页小说列表获取
+```text
+请求路径：
+/api/author/edit/booklist
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    无
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": [
+            {
+                "id": 1,
+                "bookName": "碧阳仙门"
+            },
+            {
+                "id": 2,
+                "bookName": "修仙界唯一出马仙"
+            }
+        ]
+    }
+id -> 小说id
+bookName -> 小说名称
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只查询当前登录作家自己的小说
+    5. 如果当前作家暂无作品，data为空数组
+```
+
 ## 作家章节编辑信息查询
 ```text
 请求路径：
@@ -469,6 +521,83 @@ chapterStatus -> 章节状态（0-草稿，1-已发布，2-下架，3-审核中�
     5. bookId、chapterId和当前作家id必须同时匹配才会更新成功
     6. 前端不需要传wordCount，章节字数由后端根据chapterContent计算
     7. 如果请求体为空对象，则只更新章节更新时间
+```
+
+## 作家章节信息新增
+```text
+请求路径：
+/api/author/{bookId}/chapters
+请求方式：
+    POST
+请求头：
+    Authorization: Bearer token值
+参数：
+    bookId -> 小说id
+请求体：
+    {
+        "chapterName": "第一章 碧阳仙门",
+        "chapterContent": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。",
+        "chapterStatus": 0
+    }
+chapterName -> 章节名称
+chapterContent -> 章节正文
+chapterStatus -> 章节状态（0-草稿，3-审核中），不传则默认草稿
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "id": 1
+        }
+    }
+id -> 新增后的章节id
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    请求参数为空：
+    {
+        "code": 500,
+        "message": "章节信息为空",
+        "data": null
+    }
+    章节状态不合法：
+    {
+        "code": 500,
+        "message": "章节状态不对",
+        "data": null
+    }
+    小说不存在或不属于当前作家：
+    {
+        "code": 404,
+        "message": "未找到该小说",
+        "data": null
+    }
+    新增失败：
+    {
+        "code": 500,
+        "message": "新增章节失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只允许给当前登录作家自己的小说新增章节
+    5. 新增章节的章节序号由后端按当前小说最大章节序号自动加1
+    6. 新增章节只允许保存为草稿（0）或提交审核（3），不传chapterStatus时默认为草稿（0）
+    7. 前端不需要传wordCount，章节字数由后端根据chapterContent计算
+    8. 草稿和审核中章节不会设置publishTime
+    9. 新增成功后会返回新增章节id
 ```
 
 ## 登录接口

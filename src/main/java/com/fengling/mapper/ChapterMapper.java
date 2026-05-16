@@ -70,9 +70,21 @@ public interface ChapterMapper extends BaseMapper<ChapterInfo> {
                                           @Param("chapterId") Long chapterId,
                                           @Param("authorId") Long authorId);
 
+    /**
+     * 更新章节信息
+     *
+     * @param bookId              小说id
+     * @param chapterId           章节id
+     * @param authorId            作家id
+     * @param chapterUpdateReqDto 小说更新参数
+     * @return 更新条数
+     */
     int updateChapterInfo(@Param("bookId") Long bookId,
                           @Param("chapterId") Long chapterId,
                           @Param("authorId") Long authorId,
                           @Param("chapterUpdateReqDto") ChapterUpdateReqDto chapterUpdateReqDto);
 
+    int saveChapterInfo(@Param("bookId") Long bookId,
+                        @Param("authorId") Long authorId,
+                        @Param("chapterInfo") ChapterInfo chapterInfo);
 }

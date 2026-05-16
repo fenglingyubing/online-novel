@@ -9,6 +9,8 @@ import com.fengling.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(ApiPathConstants.AUTHOR)
 @RequiredArgsConstructor
@@ -57,5 +59,15 @@ public class AuthorController {
     @GetMapping("/drafts")
     public CommonResult<PageRespDto<AuthorDraftsRespDto>> listAuthorDrafts(PageReqDto page) {
         return authorService.listAuthorDrafts(page);
+    }
+
+    /**
+     * 编辑页小说列表获取
+     *
+     * @return 小说列表
+     */
+    @GetMapping("/edit/booklist")
+    public CommonResult<List<AuthorEditBookListResp>> listAuthorEditBook(){
+        return authorService.listAuthorEditBook();
     }
 }

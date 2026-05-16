@@ -3,6 +3,8 @@ package com.fengling.controller.author;
 import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.ChapterEditInfoRespDto;
+import com.fengling.entity.dto.ChapterSaveReqDto;
+import com.fengling.entity.dto.ChapterSaveRespDto;
 import com.fengling.entity.dto.ChapterUpdateReqDto;
 import com.fengling.service.ChapterService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,14 @@ public class ChapterController {
         return chapterService.getChapterInfo(bookId, chapterId);
     }
 
+    /**
+     * 更新章节信息
+     *
+     * @param bookId              小说id
+     * @param chapterId           章节id
+     * @param chapterUpdateReqDto 章节更新请求参数
+     * @return 无
+     */
     @PutMapping("/{bookId}" + ApiPathConstants.CHAPTERS + "/{chapterId}")
     public CommonResult<Void> updateChapterInfo(
             @PathVariable("bookId") Long bookId,
@@ -37,5 +47,13 @@ public class ChapterController {
             @RequestBody ChapterUpdateReqDto chapterUpdateReqDto
     ) {
         return chapterService.updateChapterInfo(bookId, chapterId, chapterUpdateReqDto);
+    }
+
+    @PostMapping("/{bookId}/chapters")
+    public CommonResult<ChapterSaveRespDto> saveChapterInfo(
+            @PathVariable("bookId") Long bookId,
+            @RequestBody ChapterSaveReqDto chapterSaveReqDto
+    ){
+        return chapterService.saveChapterInfo(bookId, chapterSaveReqDto);
     }
 }

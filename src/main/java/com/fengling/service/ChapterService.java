@@ -2,6 +2,8 @@ package com.fengling.service;
 
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.ChapterEditInfoRespDto;
+import com.fengling.entity.dto.ChapterSaveReqDto;
+import com.fengling.entity.dto.ChapterSaveRespDto;
 import com.fengling.entity.dto.ChapterUpdateReqDto;
 
 public interface ChapterService {
@@ -15,5 +17,15 @@ public interface ChapterService {
      */
     CommonResult<ChapterEditInfoRespDto> getChapterInfo(Long bookId, Long chapterId);
 
+    /**
+     * 更新章节信息
+     *
+     * @param bookId              小说id
+     * @param chapterId           章节id
+     * @param chapterUpdateReqDto 章节更新请求参数
+     * @return 无
+     */
     CommonResult<Void> updateChapterInfo(Long bookId, Long chapterId, ChapterUpdateReqDto chapterUpdateReqDto);
+
+    CommonResult<ChapterSaveRespDto> saveChapterInfo(Long bookId, ChapterSaveReqDto chapterInfo);
 }

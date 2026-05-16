@@ -199,7 +199,7 @@ public class AuthorServiceImpl implements AuthorService {
                         .select(AuthorInfo::getId)
                         .eq(AuthorInfo::getUserId, userInfoDto.getId())
         );
-        if(authorInfo == null){
+        if (authorInfo == null) {
             throw new BusinessException(ResultCodeEnum.FORBIDDEN);
         }
         pageAuthUtil.pageAuth(page);
@@ -225,6 +225,33 @@ public class AuthorServiceImpl implements AuthorService {
                 )
         );
         return CommonResult.success(PageRespDto.of(chaptersPage));
+    }
+
+    @Override
+    public CommonResult<List<AuthorEditBookListResp>> listAuthorEditBook() {
+        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
+        AuthorInfo authorInfo = authorMapper.selectOne(
+                new LambdaQueryWrapper<AuthorInfo>()
+                        .select(AuthorInfo::getId)
+                        .eq(AuthorInfo::getUserId, userInfoDto.getId())
+        );
+        if (authorInfo == null) {
+            throw new BusinessException(ResultCodeEnum.FORBIDDEN);
+        }
+        List<BookInfo> bookInfos = bookMapper.selectList(
+                new LambdaQueryWrapper<BookInfo>()
+                        .select(BookInfo::getId, BookInfo::getBookName)
+                        .eq(BookInfo::getAuthorId, authorInfo.getId())
+                        .orderByDesc(BookInfo::getUpdateTime)
+        );
+        List<AuthorEditBookListResp> bookList = bookInfos.stream()
+                .map(
+                        bookInfo -> new AuthorEditBookListResp(
+                                bookInfo.getId(),
+                                bookInfo.getBookName()
+                        )
+                ).toList();
+        return CommonResult.success(bookList);
     }
 
     /**

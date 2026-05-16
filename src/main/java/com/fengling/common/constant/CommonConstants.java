@@ -60,4 +60,14 @@ public class CommonConstants {
      * 首页最新上架小说的数量
      */
     public static final Integer NOVEL_RECENT_LIMIT = 4;
+
+    /**
+     * 新增章节状态：草稿
+     */
+    public static final Integer CHAPTER_STATUS_DRAFTS = 0;
+
+    /**
+     * 新增章节状态：审核中
+     */
+    public static final Integer CHAPTER_STATUS_AUDIT = 3;
 }
