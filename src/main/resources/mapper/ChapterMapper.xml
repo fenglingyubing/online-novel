@@ -4,11 +4,13 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.fengling.mapper.ChapterMapper">
+
     <select id="getChapterListByBookId" resultType="com.fengling.entity.dto.ChapterListRespDto">
         select bc.id,
                bc.chapter_name as chapterName
         from book_chapter as bc
         where book_id = #{bookId}
+          and bc.chapter_status = 1
         order by chapter_num asc
     </select>
 
@@ -22,7 +24,7 @@
         from book_chapter as bc
         where bc.id = #{chapterId}
           and bc.book_id = #{bookId}
-          and bc.publish_time = 1
+          and bc.chapter_status = 1
     </select>
 
     <!--获取上一章id-->
@@ -31,6 +33,7 @@
         from book_chapter
         where book_id = #{bookId}
           and chapter_num &lt; #{chapterNum}
+          and chapter_status = 1
         order by chapter_num desc
         limit 1
     </select>
@@ -41,6 +44,7 @@
         from book_chapter as bc
         where bc.book_id = #{bookId}
           and bc.chapter_num &gt; #{chapterNum}
+          and chapter_status = 1
         order by bc.chapter_num
         limit 1
     </select>
@@ -77,4 +81,26 @@
           and bc.book_id = #{bookId}
           and bi.author_id = #{authorId}
     </select>
+
+    <!--更新章节信息-->
+    <update id="updateChapterInfo">
+        update book_chapter bc
+        inner join book_info bi on bc.book_id = bi.id
+        <set>
+            <if test="chapterUpdateReqDto.chapterName != null">
+                bc.chapter_name = #{chapterUpdateReqDto.chapterName},
+            </if>
+            <if test="chapterUpdateReqDto.chapterContent != null">
+                bc.chapter_content = #{chapterUpdateReqDto.chapterContent},
+                bc.word_count = char_length(#{chapterUpdateReqDto.chapterContent}),
+            </if>
+            <if test="chapterUpdateReqDto.chapterStatus != null">
+                bc.chapter_status = #{chapterUpdateReqDto.chapterStatus},
+            </if>
+            bc.update_time = now()
+        </set>
+        where bc.id = #{chapterId}
+        and bc.book_id = #{bookId}
+        and bi.author_id = #{authorId}
+    </update>
 </mapper>

@@ -31,7 +31,7 @@ public class ChapterInfo {
      */
     private Integer wordCount;
     /**
-     * 章节状态（0-草稿，1-已发布，2-下架）
+     * 章节状态（0-草稿，1-已发布，2-下架，3-审核中）
      */
     private Integer chapterStatus;
     /**

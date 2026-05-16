@@ -61,7 +61,7 @@ CREATE TABLE book_chapter (
                               chapter_name VARCHAR(255) NOT NULL COMMENT '小说章节名',
                               chapter_content MEDIUMTEXT NOT NULL COMMENT '小说正文',
                               word_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '章节字数',
-                              chapter_status TINYINT NOT NULL DEFAULT 1 COMMENT '章节状态：0-草稿，1-已发布，2-下架',
+                              chapter_status TINYINT NOT NULL DEFAULT 1 COMMENT '章节状态：0-草稿，1-已发布，2-下架，3-审核中',
                               publish_time DATETIME DEFAULT NULL COMMENT '发布时间',
                               create_time DATETIME NOT NULL COMMENT '创建时间',
                               update_time DATETIME NOT NULL COMMENT '修改时间',

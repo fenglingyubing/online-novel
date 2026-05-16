@@ -3,10 +3,7 @@ package com.fengling.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.entity.ChapterInfo;
-import com.fengling.entity.dto.AuthorDraftsRespDto;
-import com.fengling.entity.dto.ChapterContentRespDto;
-import com.fengling.entity.dto.ChapterEditInfoRespDto;
-import com.fengling.entity.dto.ChapterListRespDto;
+import com.fengling.entity.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -72,4 +69,10 @@ public interface ChapterMapper extends BaseMapper<ChapterInfo> {
     ChapterEditInfoRespDto getChapterInfo(@Param("bookId") Long bookId,
                                           @Param("chapterId") Long chapterId,
                                           @Param("authorId") Long authorId);
+
+    int updateChapterInfo(@Param("bookId") Long bookId,
+                          @Param("chapterId") Long chapterId,
+                          @Param("authorId") Long authorId,
+                          @Param("chapterUpdateReqDto") ChapterUpdateReqDto chapterUpdateReqDto);
+
 }

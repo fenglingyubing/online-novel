@@ -403,6 +403,74 @@ wordCount -> 章节字数
     4. 只查询当前登录作家自己作品下的章节
     5. bookId、chapterId和当前作家id必须同时匹配才会返回章节信息
 ```
+
+## 作家章节信息更新
+```text
+请求路径：
+/api/author/{bookId}/chapters/{chapterId}
+请求方式：
+    PUT
+请求头：
+    Authorization: Bearer token值
+参数：
+    bookId -> 小说id
+    chapterId -> 章节id
+请求体：
+    {
+        "chapterName": "第一章 碧阳仙门",
+        "chapterContent": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。",
+        "chapterStatus": 3
+    }
+chapterName -> 章节名称，不传则不修改
+chapterContent -> 章节正文，不传则不修改；传入后后端会重新计算章节字数
+chapterStatus -> 章节状态（0-草稿，1-已发布，2-下架，3-审核中），不传则不修改
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    请求参数为空：
+    {
+        "code": 500,
+        "message": "请求参数不能为空",
+        "data": null
+    }
+    章节状态不合法：
+    {
+        "code": 500,
+        "message": "章节状态不合法",
+        "data": null
+    }
+    更新失败：
+    {
+        "code": 500,
+        "message": "更新失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只允许更新当前登录作家自己作品下的章节
+    5. bookId、chapterId和当前作家id必须同时匹配才会更新成功
+    6. 前端不需要传wordCount，章节字数由后端根据chapterContent计算
+    7. 如果请求体为空对象，则只更新章节更新时间
+```
+
 ## 登录接口
 ```text
 请求路径：

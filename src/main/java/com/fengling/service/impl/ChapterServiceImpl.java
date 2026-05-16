@@ -7,6 +7,7 @@ import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.AuthorAuthUtil;
 import com.fengling.entity.AuthorInfo;
 import com.fengling.entity.dto.ChapterEditInfoRespDto;
+import com.fengling.entity.dto.ChapterUpdateReqDto;
 import com.fengling.entity.dto.UserInfoDto;
 import com.fengling.mapper.AuthorMapper;
 import com.fengling.mapper.ChapterMapper;
@@ -39,5 +40,36 @@ public class ChapterServiceImpl implements ChapterService {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND, "章节信息未找到");
         }
         return CommonResult.success(chapterInfo);
+    }
+
+    @Override
+    public CommonResult<Void> updateChapterInfo(Long bookId, Long chapterId, ChapterUpdateReqDto chapterUpdateReqDto) {
+        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
+        AuthorInfo authorInfo = authorMapper.selectOne(
+                new LambdaQueryWrapper<AuthorInfo>()
+                        .select(AuthorInfo::getId)
+                        .eq(AuthorInfo::getUserId, userInfoDto.getId())
+        );
+        if (authorInfo == null) {
+            throw new BusinessException(ResultCodeEnum.FORBIDDEN);
+        }
+
+        if (chapterUpdateReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "请求参数不能为空");
+        }
+        Integer chapterStatus = chapterUpdateReqDto.getChapterStatus();
+        if (chapterStatus != null && (chapterStatus < 0 || chapterStatus > 3)) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "章节状态不合法");
+        }
+        int i = chapterMapper.updateChapterInfo(
+                bookId,
+                chapterId,
+                authorInfo.getId(),
+                chapterUpdateReqDto
+        );
+        if (i != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "更新失败");
+        }
+        return CommonResult.success();
     }
 }
