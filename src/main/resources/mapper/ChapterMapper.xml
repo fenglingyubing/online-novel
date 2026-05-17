@@ -145,4 +145,16 @@
         and bi.author_id = #{authorId}
     </insert>
 
+    <!--删除章节-->
+    <delete id="deleteChapters">
+        delete bc
+        from book_chapter bc
+        inner join book_info bi on bc.book_id = bi.id
+        where bc.book_id = #{bookId}
+        and bi.author_id = #{authorId}
+        and bc.id in
+        <foreach collection="chapterIdList" item="chapterId" open="(" separator="," close=")">
+            #{chapterId}
+        </foreach>
+    </delete>
 </mapper>

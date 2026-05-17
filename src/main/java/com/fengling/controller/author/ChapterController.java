@@ -2,13 +2,12 @@ package com.fengling.controller.author;
 
 import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.ChapterEditInfoRespDto;
-import com.fengling.entity.dto.ChapterSaveReqDto;
-import com.fengling.entity.dto.ChapterSaveRespDto;
-import com.fengling.entity.dto.ChapterUpdateReqDto;
+import com.fengling.entity.dto.*;
 import com.fengling.service.ChapterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(ApiPathConstants.AUTHOR)
@@ -49,11 +48,26 @@ public class ChapterController {
         return chapterService.updateChapterInfo(bookId, chapterId, chapterUpdateReqDto);
     }
 
+    /**
+     * 新增章节
+     *
+     * @param bookId            小说id
+     * @param chapterSaveReqDto 新增章节参数
+     * @return 章节id
+     */
     @PostMapping("/{bookId}/chapters")
     public CommonResult<ChapterSaveRespDto> saveChapterInfo(
             @PathVariable("bookId") Long bookId,
             @RequestBody ChapterSaveReqDto chapterSaveReqDto
-    ){
+    ) {
         return chapterService.saveChapterInfo(bookId, chapterSaveReqDto);
+    }
+
+    @DeleteMapping("/{bookId}/chapters")
+    public CommonResult<Void> deleteChapters(
+            @PathVariable("bookId") Long bookId,
+            @RequestBody List<Long> chapterIdList
+    ) {
+        return chapterService.deleteChapters(bookId, chapterIdList);
     }
 }

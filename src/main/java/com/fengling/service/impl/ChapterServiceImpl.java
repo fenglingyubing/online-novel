@@ -17,6 +17,10 @@ import com.fengling.mapper.ChapterMapper;
 import com.fengling.service.ChapterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -29,17 +33,8 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public CommonResult<ChapterEditInfoRespDto> getChapterInfo(Long bookId, Long chapterId) {
-        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
-        // 获取当前作家id
-        AuthorInfo authorInfo = authorMapper.selectOne(
-                new LambdaQueryWrapper<AuthorInfo>()
-                        .select(AuthorInfo::getId)
-                        .eq(AuthorInfo::getUserId, userInfoDto.getId())
-        );
-        if (authorInfo == null) {
-            throw new BusinessException(ResultCodeEnum.FORBIDDEN);
-        }
-        ChapterEditInfoRespDto chapterInfo = chapterMapper.getChapterInfo(bookId, chapterId, authorInfo.getId());
+        Long authorId = getCurrentAuthorId();
+        ChapterEditInfoRespDto chapterInfo = chapterMapper.getChapterInfo(bookId, chapterId, authorId);
         if (chapterInfo == null) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND, "章节信息未找到");
         }
@@ -48,15 +43,7 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public CommonResult<Void> updateChapterInfo(Long bookId, Long chapterId, ChapterUpdateReqDto chapterUpdateReqDto) {
-        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
-        AuthorInfo authorInfo = authorMapper.selectOne(
-                new LambdaQueryWrapper<AuthorInfo>()
-                        .select(AuthorInfo::getId)
-                        .eq(AuthorInfo::getUserId, userInfoDto.getId())
-        );
-        if (authorInfo == null) {
-            throw new BusinessException(ResultCodeEnum.FORBIDDEN);
-        }
+        Long authorId = getCurrentAuthorId();
 
         if (chapterUpdateReqDto == null) {
             throw new BusinessException(ResultCodeEnum.FAIL, "请求参数不能为空");
@@ -68,7 +55,7 @@ public class ChapterServiceImpl implements ChapterService {
         int i = chapterMapper.updateChapterInfo(
                 bookId,
                 chapterId,
-                authorInfo.getId(),
+                authorId,
                 chapterUpdateReqDto
         );
         if (i != 1) {
@@ -79,15 +66,7 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public CommonResult<ChapterSaveRespDto> saveChapterInfo(Long bookId, ChapterSaveReqDto chapterSaveReqDto) {
-        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
-        AuthorInfo authorInfo = authorMapper.selectOne(
-                new LambdaQueryWrapper<AuthorInfo>()
-                        .select(AuthorInfo::getId)
-                        .eq(AuthorInfo::getUserId, userInfoDto.getId())
-        );
-        if (authorInfo == null) {
-            throw new BusinessException(ResultCodeEnum.FORBIDDEN);
-        }
+        Long authorId = getCurrentAuthorId();
         if (chapterSaveReqDto == null) {
             throw new BusinessException(ResultCodeEnum.FAIL, "章节信息为空");
         }
@@ -96,11 +75,11 @@ public class ChapterServiceImpl implements ChapterService {
             chapterStatus = CommonConstants.CHAPTER_STATUS_DRAFTS;
         } else if (
                 !CommonConstants.CHAPTER_STATUS_DRAFTS.equals(chapterStatus) &&
-                !CommonConstants.CHAPTER_STATUS_AUDIT.equals(chapterStatus)
+                        !CommonConstants.CHAPTER_STATUS_AUDIT.equals(chapterStatus)
         ) {
             throw new BusinessException(ResultCodeEnum.FAIL, "章节状态不对");
         }
-        Long authorId = authorInfo.getId();
+
         BookInfo bookInfo = bookMapper.selectOne(
                 new LambdaQueryWrapper<BookInfo>()
                         .select(BookInfo::getId)
@@ -133,5 +112,41 @@ public class ChapterServiceImpl implements ChapterService {
             throw new BusinessException(ResultCodeEnum.FAIL, "新增章节失败");
         }
         return CommonResult.success(new ChapterSaveRespDto(chapterInfo.getId()));
+    }
+
+    @Override
+    @Transactional
+    public CommonResult<Void> deleteChapters(Long bookId, List<Long> chapterIdList) {
+        if (chapterIdList == null || chapterIdList.isEmpty()) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "章节id为空");
+        }
+        if (chapterIdList.stream().anyMatch(Objects::isNull)) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "章节id为空");
+        }
+        Long currentAuthorId = getCurrentAuthorId();
+        long chapterCount = chapterIdList.stream().distinct().count();
+        int i = chapterMapper.deleteChapters(bookId, currentAuthorId, chapterIdList);
+        if (i != chapterCount) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "删除失败");
+        }
+        return CommonResult.success();
+    }
+
+    /**
+     * 验证当前登录用户作者身份，并获取作者id
+     *
+     * @return 当前登录作者id
+     */
+    private Long getCurrentAuthorId() {
+        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
+        AuthorInfo authorInfo = authorMapper.selectOne(
+                new LambdaQueryWrapper<AuthorInfo>()
+                        .select(AuthorInfo::getId)
+                        .eq(AuthorInfo::getUserId, userInfoDto.getId())
+        );
+        if (authorInfo == null) {
+            throw new BusinessException(ResultCodeEnum.FORBIDDEN);
+        }
+        return authorInfo.getId();
     }
 }

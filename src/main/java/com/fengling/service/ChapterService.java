@@ -6,6 +6,8 @@ import com.fengling.entity.dto.ChapterSaveReqDto;
 import com.fengling.entity.dto.ChapterSaveRespDto;
 import com.fengling.entity.dto.ChapterUpdateReqDto;
 
+import java.util.List;
+
 public interface ChapterService {
 
     /**
@@ -27,5 +29,14 @@ public interface ChapterService {
      */
     CommonResult<Void> updateChapterInfo(Long bookId, Long chapterId, ChapterUpdateReqDto chapterUpdateReqDto);
 
+    /**
+     * 新增章节
+     *
+     * @param bookId      小说id
+     * @param chapterInfo 章节请求参数
+     * @return 新增章节id
+     */
     CommonResult<ChapterSaveRespDto> saveChapterInfo(Long bookId, ChapterSaveReqDto chapterInfo);
+
+    CommonResult<Void> deleteChapters(Long bookId, List<Long> chapterIdList);
 }
