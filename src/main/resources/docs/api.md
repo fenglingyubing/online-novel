@@ -22,7 +22,9 @@
     /api/user/uploadphoto
     /api/author/home
     /api/author/novels
+    /api/author/{bookId}
     /api/author/drafts
+    /api/author/audit/list
     /api/author/edit/booklist
     /api/author/{bookId}/chapters
     /api/author/{bookId}/chapters/{chapterId}
@@ -36,7 +38,9 @@
     上传用户头像
     查询作家首页信息
     查询作家作品管理页面列表
+    查询作家某本小说详情
     查询作家草稿箱列表
+    查询作家审核章节列表
     查询作家编辑页小说列表
     新增作家章节信息
     查询作家某本小说的某个章节信息
@@ -278,6 +282,100 @@ pages -> 一共有几页
     5. 作品按修改时间倒序排列
 ```
 
+## 作家某本小说详情查询
+```text
+请求路径：
+/api/author/{bookId}?pageNum=1&pageSize=10
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    bookId -> 小说id
+    pageNum -> 章节目录当前是第几页，默认1
+    pageSize -> 章节目录每页有多少条数据，默认10
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "id": 1,
+            "bookName": "碧阳仙门",
+            "coverUrl": "https://bookcover.yuewen.com/qdbimg/349573/1048992740/600.webp",
+            "categoryName": "玄幻",
+            "publishStatus": 1,
+            "updateStatus": 0,
+            "bookIntro": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。",
+            "bookChapterList": {
+                "records": [
+                    {
+                        "id": 1,
+                        "chapterName": "第一章 碧阳仙门",
+                        "chapterNum": 1,
+                        "wordCount": 4200,
+                        "chapterStatus": 1
+                    },
+                    {
+                        "id": 2,
+                        "chapterName": "第二章 入门",
+                        "chapterNum": 2,
+                        "wordCount": 3800,
+                        "chapterStatus": 0
+                    }
+                ],
+                "total": 2,
+                "pageNum": 1,
+                "pageSize": 10,
+                "pages": 1
+            }
+        }
+    }
+id -> 小说id
+bookName -> 小说名称
+coverUrl -> 小说封面链接
+categoryName -> 小说分类名称
+publishStatus -> 发布状态（0-下架，1-上架）
+updateStatus -> 更新状态（0-连载中，1-已完结）
+bookIntro -> 小说简介
+bookChapterList -> 小说章节目录分页数据
+bookChapterList.records.id -> 章节id
+bookChapterList.records.chapterName -> 章节名称
+bookChapterList.records.chapterNum -> 章节序号
+bookChapterList.records.wordCount -> 章节字数
+bookChapterList.records.chapterStatus -> 章节状态（0-草稿，1-已发布，2-下架，3-审核中）
+bookChapterList.total -> 一共有多少条章节数据
+bookChapterList.pageNum -> 当前是第几页
+bookChapterList.pageSize -> 当前页有多少条章节数据
+bookChapterList.pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    小说不存在或不属于当前作家：
+    {
+        "code": 404,
+        "message": "小说信息不存在",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只允许查询当前登录作家自己的小说详情
+    5. bookId和当前作家id必须同时匹配才会返回小说信息
+    6. 章节目录按章节序号升序排列
+    7. 如果该小说暂无章节，bookChapterList.records为空数组，total为0
+```
+
 ## 作家草稿箱列表查询
 ```text
 请求路径：
@@ -351,6 +449,75 @@ pages -> 一共有几页
     4. 只查询当前登录作家自己作品下的草稿章节
     5. 只返回草稿状态章节，按更新时间倒序排列
     6. 如果当前作家暂无作品或暂无草稿，records为空数组，total为0
+```
+
+## 作家审核章节列表查询
+```text
+请求路径：
+/api/author/audit/list?pageNum=1&pageSize=5
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认10
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "chapterName": "第一章 碧阳仙门",
+                    "bookName": "碧阳仙门",
+                    "wordCount": 4200,
+                    "applicationTime": "2026-05-11T12:00:00"
+                },
+                {
+                    "id": 2,
+                    "chapterName": "第二章 入门",
+                    "bookName": "碧阳仙门",
+                    "wordCount": 3800,
+                    "applicationTime": "2026-05-10T12:00:00"
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 5,
+            "pages": 1
+        }
+    }
+id -> 审核中章节id
+chapterName -> 章节名称
+bookName -> 小说名称
+wordCount -> 章节字数
+applicationTime -> 提交审核时间，当前取章节更新时间
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只查询当前登录作家自己作品下的审核中章节
+    5. 只返回审核中状态章节，按提交审核时间倒序排列
+    6. 如果当前作家暂无审核中章节，records为空数组，total为0
 ```
 
 ## 编辑页小说列表获取

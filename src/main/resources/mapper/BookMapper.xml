@@ -90,4 +90,19 @@
         order by bi.update_time desc
     </select>
 
+    <!--查询作家下的某小说详情-->
+    <select id="getAuthorBookInfo" resultType="com.fengling.entity.dto.AuthorBookInfoRespDto">
+        select bi.id,
+               bi.book_name      as bookName,
+               bi.cover_url      as coverUrl,
+               bc.category_name  as categoryName,
+               bi.publish_status as publishStatus,
+               bi.update_status  as updateStatus,
+               bi.book_intro     as bookIntro
+        from book_info bi
+                 inner join book_category bc on bi.category_id = bc.id
+        where bi.id = #{bookId}
+          and bi.author_id = #{authorId}
+    </select>
+
 </mapper>

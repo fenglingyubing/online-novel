@@ -15,6 +15,7 @@ import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.*;
 import com.fengling.entity.AuthorInfo;
 import com.fengling.entity.BookInfo;
+import com.fengling.entity.ChapterInfo;
 import com.fengling.entity.UserInfo;
 import com.fengling.entity.dto.*;
 import com.fengling.mapper.AuthorMapper;
@@ -127,14 +128,22 @@ public class AuthorServiceImpl implements AuthorService {
                                 BookInfo::getId,
                                 BookInfo::getBookName,
                                 BookInfo::getCoverUrl,
-                                BookInfo::getWordCount,
-                                BookInfo::getLatestChapterName,
-                                BookInfo::getLastChapterTime
+                                BookInfo::getWordCount
                         )
                         .eq(BookInfo::getAuthorId, authorHomeRespDto.getId())
                         .orderByDesc(BookInfo::getLastChapterTime)
                         .last("limit 1")
         );
+        ChapterInfo chapterInfo = chapterMapper.selectOne(
+                new LambdaQueryWrapper<ChapterInfo>()
+                        .select(ChapterInfo::getChapterName, ChapterInfo::getUpdateTime)
+                        .eq(ChapterInfo::getBookId, bookInfo.getId())
+                        .eq(ChapterInfo::getChapterStatus, CommonConstants.CHAPTER_STATUS_RELEASE)
+                        .orderByDesc(ChapterInfo::getUpdateTime)
+                        .last("limit 1")
+        );
+        bookInfo.setLatestChapterName(chapterInfo.getChapterName());
+        bookInfo.setLastChapterTime(chapterInfo.getUpdateTime());
         if (bookInfo != null) {
             AuthorRecentNovelRespDto recentNovelRespDto = BeanUtil.copyProperties(
                     bookInfo,
@@ -252,6 +261,20 @@ public class AuthorServiceImpl implements AuthorService {
                         )
                 ).toList();
         return CommonResult.success(bookList);
+    }
+
+    @Override
+    public CommonResult<PageRespDto<AuthorAuditListRespDto>> listAudits(PageReqDto pageReqDto) {
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
+        Page<AuthorAuditListRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        Page<AuthorAuditListRespDto> pageList = chapterMapper.listAudits(
+                page,
+                authorId
+        );
+        return CommonResult.success(PageRespDto.of(pageList));
     }
 
     /**

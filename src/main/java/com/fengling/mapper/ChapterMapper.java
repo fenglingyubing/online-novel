@@ -107,4 +107,26 @@ public interface ChapterMapper extends BaseMapper<ChapterInfo> {
     int deleteChapters(@Param("bookId") Long bookId,
                        @Param("authorId") Long authorId,
                        @Param("chapterIdList") List<Long> chapterIdList);
+
+    /**
+     * 查询审核中的章节
+     *
+     * @param page     分页请求参数
+     * @param authorId 作家id
+     * @return 审核章节列表
+     */
+    Page<AuthorAuditListRespDto> listAudits(Page<AuthorAuditListRespDto> page,
+                                            @Param("authorId") Long authorId);
+
+    /**
+     * 查询作家下某作品详情的小说目录
+     *
+     * @param page     分页参数
+     * @param bookId   小说id
+     * @param authorId 作家id
+     * @return 目录列表
+     */
+    Page<BookChapterListRespDto> listChapters(Page<BookChapterListRespDto> page,
+                                              @Param("bookId") Long bookId,
+                                              @Param("authorId") Long authorId);
 }

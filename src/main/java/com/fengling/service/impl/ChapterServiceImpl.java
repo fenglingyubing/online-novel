@@ -28,12 +28,11 @@ public class ChapterServiceImpl implements ChapterService {
 
     private final ChapterMapper chapterMapper;
     private final AuthorAuthUtil authorAuthUtil;
-    private final AuthorMapper authorMapper;
     private final BookMapper bookMapper;
 
     @Override
     public CommonResult<ChapterEditInfoRespDto> getChapterInfo(Long bookId, Long chapterId) {
-        Long authorId = getCurrentAuthorId();
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
         ChapterEditInfoRespDto chapterInfo = chapterMapper.getChapterInfo(bookId, chapterId, authorId);
         if (chapterInfo == null) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND, "章节信息未找到");
@@ -43,7 +42,7 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public CommonResult<Void> updateChapterInfo(Long bookId, Long chapterId, ChapterUpdateReqDto chapterUpdateReqDto) {
-        Long authorId = getCurrentAuthorId();
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
 
         if (chapterUpdateReqDto == null) {
             throw new BusinessException(ResultCodeEnum.FAIL, "请求参数不能为空");
@@ -66,7 +65,7 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public CommonResult<ChapterSaveRespDto> saveChapterInfo(Long bookId, ChapterSaveReqDto chapterSaveReqDto) {
-        Long authorId = getCurrentAuthorId();
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
         if (chapterSaveReqDto == null) {
             throw new BusinessException(ResultCodeEnum.FAIL, "章节信息为空");
         }
@@ -123,30 +122,12 @@ public class ChapterServiceImpl implements ChapterService {
         if (chapterIdList.stream().anyMatch(Objects::isNull)) {
             throw new BusinessException(ResultCodeEnum.FAIL, "章节id为空");
         }
-        Long currentAuthorId = getCurrentAuthorId();
+        Long currentAuthorId = authorAuthUtil.getCurrentAuthorId();
         long chapterCount = chapterIdList.stream().distinct().count();
         int i = chapterMapper.deleteChapters(bookId, currentAuthorId, chapterIdList);
         if (i != chapterCount) {
             throw new BusinessException(ResultCodeEnum.FAIL, "删除失败");
         }
         return CommonResult.success();
-    }
-
-    /**
-     * 验证当前登录用户作者身份，并获取作者id
-     *
-     * @return 当前登录作者id
-     */
-    private Long getCurrentAuthorId() {
-        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
-        AuthorInfo authorInfo = authorMapper.selectOne(
-                new LambdaQueryWrapper<AuthorInfo>()
-                        .select(AuthorInfo::getId)
-                        .eq(AuthorInfo::getUserId, userInfoDto.getId())
-        );
-        if (authorInfo == null) {
-            throw new BusinessException(ResultCodeEnum.FORBIDDEN);
-        }
-        return authorInfo.getId();
     }
 }

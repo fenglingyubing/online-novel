@@ -3,10 +3,7 @@ package com.fengling.service;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.BookInfoRespDto;
-import com.fengling.entity.dto.BookListRespDto;
-import com.fengling.entity.dto.BookRecentListRespDto;
-import com.fengling.entity.dto.ChapterContentRespDto;
+import com.fengling.entity.dto.*;
 
 import java.util.List;
 
@@ -43,4 +40,13 @@ public interface BookService {
      * @return 最新小说列表
      */
     CommonResult<List<BookRecentListRespDto>> listRecentBookList();
+
+    /**
+     * 作家下的某个小说详情查询
+     *
+     * @param bookId     小说id
+     * @param pageReqDto
+     * @return 小说详情
+     */
+    CommonResult<AuthorBookInfoRespDto> getAuthorBookInfo(Long bookId, PageReqDto pageReqDto);
 }

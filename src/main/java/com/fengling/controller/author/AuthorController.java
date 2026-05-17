@@ -67,7 +67,18 @@ public class AuthorController {
      * @return 小说列表
      */
     @GetMapping("/edit/booklist")
-    public CommonResult<List<AuthorEditBookListResp>> listAuthorEditBook(){
+    public CommonResult<List<AuthorEditBookListResp>> listAuthorEditBook() {
         return authorService.listAuthorEditBook();
+    }
+
+    /**
+     * 审核列表查询
+     *
+     * @param pageReqDto 分页请求参数
+     * @return 审核列表
+     */
+    @GetMapping("/audit" + ApiPathConstants.LIST)
+    public CommonResult<PageRespDto<AuthorAuditListRespDto>> listAudits(PageReqDto pageReqDto) {
+        return authorService.listAudits(pageReqDto);
     }
 }

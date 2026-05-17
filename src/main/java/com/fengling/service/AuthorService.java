@@ -48,4 +48,11 @@ public interface AuthorService {
      */
     CommonResult<List<AuthorEditBookListResp>> listAuthorEditBook();
 
+    /**
+     * 获取审核中的章节列表
+     *
+     * @param pageReqDto 分页请求参数
+     * @return 作家审核章节响应结果
+     */
+    CommonResult<PageRespDto<AuthorAuditListRespDto>> listAudits(PageReqDto pageReqDto);
 }

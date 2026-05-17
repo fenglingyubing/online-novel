@@ -82,6 +82,33 @@
           and bi.author_id = #{authorId}
     </select>
 
+    <!--查询审核章节-->
+    <select id="listAudits" resultType="com.fengling.entity.dto.AuthorAuditListRespDto">
+        select bc.id,
+               bc.chapter_name as chapterName,
+               bi.book_name    as bookName,
+               bc.word_count   as wordCount,
+               bc.update_time  as applicationTime
+        from book_chapter bc
+                 inner join book_info bi on bc.book_id = bi.id
+        where bi.author_id = #{authorId}
+          and bc.chapter_status = 3
+        order by bc.update_time desc
+    </select>
+
+    <!--查询作家下某作品详情的小说目录-->
+    <select id="listChapters" resultType="com.fengling.entity.dto.BookChapterListRespDto">
+        select bc.id,
+               bc.chapter_name as chapterName,
+               bc.chapter_num as chapterNum,
+               bc.word_count as wordCount,
+               bc.chapter_status as chapterStatus
+        from book_chapter bc
+        inner join book_info bi on bc.book_id = bi.id
+        where bc.book_id = #{bookId} and bi.author_id = #{authorId}
+        order by bc.chapter_num
+    </select>
+
     <!--更新章节信息-->
     <update id="updateChapterInfo">
         update book_chapter bc

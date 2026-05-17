@@ -62,12 +62,17 @@ public class CommonConstants {
     public static final Integer NOVEL_RECENT_LIMIT = 4;
 
     /**
-     * 新增章节状态：草稿
+     * 章节状态：草稿
      */
     public static final Integer CHAPTER_STATUS_DRAFTS = 0;
 
     /**
-     * 新增章节状态：审核中
+     * 章节状态：审核中
      */
     public static final Integer CHAPTER_STATUS_AUDIT = 3;
+
+    /**
+     * 章节状态：已发布
+     */
+    public static final Integer CHAPTER_STATUS_RELEASE = 1;
 }

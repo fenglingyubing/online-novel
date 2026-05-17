@@ -3,10 +3,7 @@ package com.fengling.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.entity.BookInfo;
-import com.fengling.entity.dto.AuthorNovelsListRespDto;
-import com.fengling.entity.dto.BookInfoRespDto;
-import com.fengling.entity.dto.BookListRespDto;
-import com.fengling.entity.dto.BookRecentListRespDto;
+import com.fengling.entity.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -51,12 +48,22 @@ public interface BookMapper extends BaseMapper<BookInfo> {
     /**
      * 查询作家的所有作品
      *
-     * @param page 分页对象
-     * @param authorId   作家id
+     * @param page     分页对象
+     * @param authorId 作家id
      * @return 作家作品管理页面响应结果
      */
     Page<AuthorNovelsListRespDto> listAuthorNovelsList(
             Page<AuthorNovelsListRespDto> page,
             @Param("authorId") Long authorId
     );
+
+    /**
+     * 查询作家下某小说详情
+     *
+     * @param bookId   小说id
+     * @param authorId 作家id
+     * @return 小说详情
+     */
+    AuthorBookInfoRespDto getAuthorBookInfo(@Param("bookId") Long bookId,
+                                            @Param("authorId") Long authorId);
 }

@@ -12,6 +12,7 @@ import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.common.util.AuthorAuthUtil;
 import com.fengling.common.util.RedisUtil;
 import com.fengling.entity.BookShelf;
 import com.fengling.entity.dto.*;
@@ -33,6 +34,7 @@ public class BookServiceImpl implements BookService {
     private final ChapterMapper chapterMapper;
     private final BookShelfMapper bookShelfMapper;
     private final RedisUtil redisUtil;
+    private final AuthorAuthUtil authorAuthUtil;
 
     @Override
     public CommonResult<PageRespDto<BookListRespDto>> listCategoryNovel(Integer categoryId, PageReqDto pageReqDto) {
@@ -123,6 +125,22 @@ public class BookServiceImpl implements BookService {
                 CacheConstants.NOVEL_RECENT_TTL
         );
         return CommonResult.success(recentBookList);
+    }
+
+    @Override
+    public CommonResult<AuthorBookInfoRespDto> getAuthorBookInfo(Long bookId, PageReqDto pageReqDto) {
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
+        AuthorBookInfoRespDto bookInfo = bookMapper.getAuthorBookInfo(bookId, authorId);
+        if (bookInfo == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "小说信息不存在");
+        }
+        Page<BookChapterListRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        Page<BookChapterListRespDto> chapterPage = chapterMapper.listChapters(page,bookId,authorId);
+        bookInfo.setBookChapterList(PageRespDto.of(chapterPage));
+        return CommonResult.success(bookInfo);
     }
 
     /**
