@@ -50,6 +50,11 @@ public class BookInfoChange {
     private String coverUrl;
 
     /**
+     * 发布状态（只有下架到上架才需要审核 0->1 ）
+     */
+    private Integer publishStatus;
+
+    /**
      * 审核状态（0-待审核，1-已通过，2-已驳回）
      */
     private Integer auditStatus;

@@ -111,6 +111,7 @@ CREATE TABLE `book_info_change` (
                                     `book_name` VARCHAR(500) DEFAULT NULL COMMENT '变更小说名称',
                                     `book_intro` TEXT DEFAULT NULL COMMENT '变更小说简介',
                                     `cover_url` VARCHAR(255) DEFAULT NULL COMMENT '变更图片链接',
+                                    `publish_status` tinyint DEFAULT NULL COMMENT '变更发布状态（只有从下架到上架需要审核）',
                                     `audit_status` TINYINT NOT NULL DEFAULT 0 COMMENT '审核状态：0-待审核，1-已通过，2-已驳回',
                                     `apply_status` TINYINT NOT NULL DEFAULT 0 COMMENT '应用状态：0-未应用，1-已应用',
                                     `audit_remark` VARCHAR(500) DEFAULT NULL COMMENT '审核备注',

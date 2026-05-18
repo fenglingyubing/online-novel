@@ -76,4 +76,18 @@ public interface BookService {
      * @return 审核信息列表
      */
     CommonResult<PageRespDto<AuthorBookInfoAuditRespDto>> listBookInfoAudits(PageReqDto pageReqDto);
+
+    /**
+     * 作家更新小说信息-无需审核
+     *
+     * @param bookId                 小说id
+     * @param bookInfoNotAuditReqDto 更新信息参数
+     * @param pageReqDto             分页请求参数
+     * @return 无
+     */
+    CommonResult<Void> updateAuthorBookInfo(
+            Long bookId,
+            AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto,
+            PageReqDto pageReqDto
+    );
 }

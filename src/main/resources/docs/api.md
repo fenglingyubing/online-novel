@@ -42,6 +42,7 @@
     查询作家作品管理页面列表
     查询作家某本小说详情
     提交小说信息变更审核
+    更新作家小说状态
     提交小说封面变更审核
     查询小说变更信息审核列表
     查询作家草稿箱列表
@@ -223,7 +224,7 @@ recentNovelRespDto.lastChapterTime -> 最新章节更新时间
     Authorization: Bearer token值
 参数：
     pageNum -> 当前是第几页，默认1
-    pageSize -> 每页有多少条数据，默认10
+    pageSize -> 每页有多少条数据，默认5
 响应数据：
     {
         "code": 200,
@@ -394,10 +395,12 @@ bookChapterList.pages -> 一共有几页
 请求体：
     {
         "bookName": "碧阳仙门新版",
-        "bookIntro": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。"
+        "bookIntro": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。",
+        "publishStatus": 1
     }
 bookName -> 变更后的小说名称，不传则不修改
 bookIntro -> 变更后的小说简介，不传则不修改
+publishStatus -> 发布状态，仅用于提交上架审核；当前小说为下架状态且传1时表示申请上架，不传则不修改
 响应数据：
     {
         "code": 200,
@@ -423,6 +426,12 @@ bookIntro -> 变更后的小说简介，不传则不修改
         "message": "小说信息不存在",
         "data": null
     }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
     提交失败：
     {
         "code": 500,
@@ -439,7 +448,72 @@ bookIntro -> 变更后的小说简介，不传则不修改
     7. 如果该小说已有待审核的信息变更申请，本次提交会合并到原申请中
     8. 请求体中字段为null或未传时表示不修改该字段，不会覆盖已有待审核内容
     9. 已通过或已驳回的历史申请不会被修改，会生成新的待审核申请
-    10. 小说封面变更请调用 /api/author/{bookId}/uploadcover 接口
+    10. publishStatus只支持下架到上架审核：当前小说publishStatus为0且请求体传1时，会提交上架审核
+    11. 直接下架不走审核，请调用 PUT /api/author/{bookId} 并传publishStatus为0
+    12. 如果只传publishStatus为0，或当前小说已经上架仍传publishStatus为1，会返回参数无效
+    13. 小说封面变更请调用 /api/author/{bookId}/uploadcover 接口
+```
+
+## 作家小说状态更新
+```text
+请求路径：
+/api/author/{bookId}?pageNum=1&pageSize=5
+请求方式：
+    PUT
+请求头：
+    Authorization: Bearer token值
+参数：
+    bookId -> 小说id
+    pageNum -> 当前作品列表页码，默认1，用于删除对应分页的作品列表缓存
+    pageSize -> 当前作品列表每页数量，默认5，用于删除对应分页的作品列表缓存
+请求体：
+    {
+        "publishStatus": 0,
+        "updateStatus": 0
+    }
+publishStatus -> 发布状态，仅允许传0表示直接下架；上架需要提交审核，不传则不修改
+updateStatus -> 更新状态（0-连载中，1-已完结），不传则不修改
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    更新失败：
+    {
+        "code": 500,
+        "message": "更新失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只允许更新当前登录作家自己的小说状态
+    5. publishStatus和updateStatus可以只传一个，但不能都不传
+    6. updateStatus传入时只能为0或1
+    7. publishStatus传入时只能为0，用于直接下架；publishStatus为1的上架操作需要调用 POST /api/author/{bookId} 提交审核
+    8. 更新失败可能表示小说不存在或不属于当前作家
+    9. pageNum和pageSize用于定位并删除作家作品管理列表缓存key，不参与小说状态更新
 ```
 
 ## 小说封面变更审核提交
@@ -535,6 +609,7 @@ bookIntro -> 变更后的小说简介，不传则不修改
                     "bookNameChange": "碧阳仙门新版",
                     "bookIntro": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。",
                     "coverUrl": "https://xxx.com/book-cover.png",
+                    "publishStatus": 1,
                     "auditStatus": 0,
                     "adminName": null,
                     "submitTime": "2026-05-11T12:00:00",
@@ -548,6 +623,7 @@ bookIntro -> 变更后的小说简介，不传则不修改
                     "bookNameChange": null,
                     "bookIntro": null,
                     "coverUrl": "https://xxx.com/book-cover-2.png",
+                    "publishStatus": null,
                     "auditStatus": 1,
                     "adminName": "管理员",
                     "submitTime": "2026-05-10T12:00:00",
@@ -567,6 +643,7 @@ bookName -> 当前小说名称
 bookNameChange -> 变更后的小说名称，未变更时为null
 bookIntro -> 变更后的小说简介，未变更时为null
 coverUrl -> 变更后的小说封面链接，未变更时为null
+publishStatus -> 变更后的发布状态，当前仅上架审核时为1，未变更时为null
 auditStatus -> 审核状态（0-待审核，1-已通过，2-已驳回）
 adminName -> 审核人昵称，未审核时为null
 submitTime -> 提交时间，当前取审核记录更新时间
@@ -682,7 +759,7 @@ pages -> 一共有几页
     Authorization: Bearer token值
 参数：
     pageNum -> 当前是第几页，默认1
-    pageSize -> 每页有多少条数据，默认10
+    pageSize -> 每页有多少条数据，默认5
 响应数据：
     {
         "code": 200,

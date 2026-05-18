@@ -40,7 +40,7 @@ public class AuthorController {
     }
 
     /**
-     * 作家后人作品管理查询
+     * 作家后台作品管理查询
      *
      * @param pageReqDto 分页请求参数
      * @return 作品列表

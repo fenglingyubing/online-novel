@@ -16,6 +16,7 @@ import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.AuthorAuthUtil;
 import com.fengling.common.util.OSSUtil;
+import com.fengling.common.util.PageAuthUtil;
 import com.fengling.common.util.RedisUtil;
 import com.fengling.entity.BookInfo;
 import com.fengling.entity.BookInfoChange;
@@ -46,6 +47,7 @@ public class BookServiceImpl implements BookService {
     private final AuthorAuthUtil authorAuthUtil;
     private final BookInfoChangeMapper bookInfoChangeMapper;
     private final OSSUtil ossUtil;
+    private final PageAuthUtil pageAuthUtil;
 
     @Override
     public CommonResult<PageRespDto<BookListRespDto>> listCategoryNovel(Integer categoryId, PageReqDto pageReqDto) {
@@ -158,23 +160,47 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public CommonResult<Void> saveChangeBookInfo(Long bookId, AuthorBookInfoReqDto bookInfoReqDto) {
-        boolean hasChange = bookInfoReqDto != null
-                && (bookInfoReqDto.getBookName() != null
-                || bookInfoReqDto.getBookIntro() != null);
-
-        if (!hasChange) {
-            throw new BusinessException(ResultCodeEnum.FAIL, "变更信息不能为空");
+        if (bookInfoReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
         }
         Long authorId = authorAuthUtil.getCurrentAuthorId();
+
         BookInfo bookInfo = bookMapper.selectOne(
                 new LambdaQueryWrapper<BookInfo>()
-                        .select(BookInfo::getId)
+                        .select(BookInfo::getPublishStatus)
                         .eq(BookInfo::getId, bookId)
                         .eq(BookInfo::getAuthorId, authorId)
         );
+
+        Integer publishStatus = bookInfoReqDto.getPublishStatus();
+        Integer auditPublishStatus = null;
+
         if (bookInfo == null) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND, "小说信息不存在");
         }
+
+        if (publishStatus != null) {
+            if (publishStatus < 0 || publishStatus > 1) {
+                throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+            }
+
+            if (
+                    CommonConstants.PUBLISH_STATUS_UNDERCARRIAGE.equals(bookInfo.getPublishStatus()) &&
+                            CommonConstants.PUBLISH_STATUS_SHELVES.equals(publishStatus)
+            ) {
+                auditPublishStatus = CommonConstants.PUBLISH_STATUS_SHELVES;
+            }
+        }
+
+        boolean hasChange = bookInfoReqDto.getBookName() != null
+                || bookInfoReqDto.getBookIntro() != null
+                || auditPublishStatus != null;
+
+
+        if (!hasChange) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
         BookInfoChange isExist = bookInfoChangeMapper.selectOne(
                 new LambdaQueryWrapper<BookInfoChange>()
                         .select(BookInfoChange::getId)
@@ -184,7 +210,7 @@ public class BookServiceImpl implements BookService {
         );
 
         if (isExist != null) {
-            bookInfoChangeMapper.update(
+            int update = bookInfoChangeMapper.update(
                     new LambdaUpdateWrapper<BookInfoChange>()
                             .set(
                                     bookInfoReqDto.getBookName() != null,
@@ -196,13 +222,25 @@ public class BookServiceImpl implements BookService {
                                     BookInfoChange::getBookIntro,
                                     bookInfoReqDto.getBookIntro()
                             )
+                            .set(auditPublishStatus != null,
+                                    BookInfoChange::getPublishStatus,
+                                    auditPublishStatus)
+
                             .eq(BookInfoChange::getId, isExist.getId())
             );
+            if (update != 1) {
+                throw new BusinessException(ResultCodeEnum.FAIL, "申请失败");
+            }
             return CommonResult.success();
         }
-        BookInfoChange bookInfoChange = BeanUtil.copyProperties(bookInfoReqDto, BookInfoChange.class);
+
+        BookInfoChange bookInfoChange = new BookInfoChange();
         bookInfoChange.setBookId(bookId);
         bookInfoChange.setAuthorId(authorId);
+        bookInfoChange.setBookName(bookInfoReqDto.getBookName());
+        bookInfoChange.setBookIntro(bookInfoReqDto.getBookIntro());
+        bookInfoChange.setPublishStatus(auditPublishStatus);
+
         int i = bookInfoChangeMapper.insert(bookInfoChange);
         if (i != 1) {
             throw new BusinessException(ResultCodeEnum.FAIL, "申请失败");
@@ -218,15 +256,7 @@ public class BookServiceImpl implements BookService {
             throw new BusinessException(ResultCodeEnum.FAIL, "请选择一种图片上传方式");
         }
         Long authorId = authorAuthUtil.getCurrentAuthorId();
-        BookInfo bookInfo = bookMapper.selectOne(
-                new LambdaQueryWrapper<BookInfo>()
-                        .select(BookInfo::getId)
-                        .eq(BookInfo::getId, bookId)
-                        .eq(BookInfo::getAuthorId, authorId)
-        );
-        if (bookInfo == null) {
-            throw new BusinessException(ResultCodeEnum.FAIL, "小说信息不存在");
-        }
+        validateBookOwnership(authorId, bookId);
         String novelCover;
         if (hasFile) {
             novelCover = ossUtil.upload(file, "novelCover");
@@ -253,8 +283,74 @@ public class BookServiceImpl implements BookService {
                 pageReqDto.getPageNum(),
                 pageReqDto.getPageSize()
         );
-        Page<AuthorBookInfoAuditRespDto> pageBookInfoChangeMapper = bookInfoChangeMapper.listBookInfoAudits(page, authorId);
-        return CommonResult.success(PageRespDto.of(pageBookInfoChangeMapper));
+        Page<AuthorBookInfoAuditRespDto> pageBookInfoChange = bookInfoChangeMapper.listBookInfoAudits(page, authorId);
+        pageBookInfoChange.getRecords().forEach(
+                bookInfo ->
+                        bookInfo.setBookIntro(shortBookIntro(bookInfo.getBookIntro()))
+        );
+        return CommonResult.success(PageRespDto.of(pageBookInfoChange));
+    }
+
+    @Override
+    public CommonResult<Void> updateAuthorBookInfo(
+            Long bookId,
+            AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto,
+            PageReqDto pageReqDto
+    ) {
+        pageAuthUtil.pageAuth(pageReqDto);
+        if (bookInfoNotAuditReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+        Integer updateStatus = bookInfoNotAuditReqDto.getUpdateStatus();
+        Integer publishStatus = bookInfoNotAuditReqDto.getPublishStatus();
+        if (updateStatus == null && publishStatus == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+        if (
+                (updateStatus != null && (updateStatus < CommonConstants.UPDATE_STATUS_SERIALIZED ||
+                        updateStatus > CommonConstants.UPDATE_STATUS_CLOSED)) ||
+                        (publishStatus != null && !CommonConstants.PUBLISH_STATUS_UNDERCARRIAGE.equals(publishStatus))
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
+        int i = bookMapper.update(
+                new LambdaUpdateWrapper<BookInfo>()
+                        .set(updateStatus != null, BookInfo::getUpdateStatus, updateStatus)
+                        .set(publishStatus != null, BookInfo::getPublishStatus, publishStatus)
+                        .eq(BookInfo::getId, bookId)
+                        .eq(BookInfo::getAuthorId, authorId)
+        );
+        if (i != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "更新失败");
+        }
+        String key = CacheConstants.WORKS + userInfoDto.getId() +
+                ":" + pageReqDto.getPageNum() + ":" + pageReqDto.getPageSize();
+        redisUtil.deleteKey(key);
+        return CommonResult.success();
+    }
+
+    /**
+     * 验证小说是否属于当前作者
+     *
+     * @param authorId 作家id
+     * @param bookId   小说id
+     */
+    private void validateBookOwnership(Long authorId, Long bookId) {
+        if (authorId == null || bookId == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        BookInfo bookInfo = bookMapper.selectOne(
+                new LambdaQueryWrapper<BookInfo>()
+                        .select(BookInfo::getId)
+                        .eq(BookInfo::getId, bookId)
+                        .eq(BookInfo::getAuthorId, authorId)
+        );
+        if (bookInfo == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "小说信息不存在");
+        }
     }
 
     /**

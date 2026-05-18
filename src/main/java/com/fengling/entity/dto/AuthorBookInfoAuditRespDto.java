@@ -45,6 +45,11 @@ public class AuthorBookInfoAuditRespDto {
     private String coverUrl;
 
     /**
+     * 发布状态
+     */
+    private Integer publishStatus;
+
+    /**
      * 审核状态（0-待审核，1-已通过，2-已驳回）
      */
     private Integer auditStatus;

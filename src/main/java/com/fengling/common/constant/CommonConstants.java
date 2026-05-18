@@ -80,4 +80,25 @@ public class CommonConstants {
      * 作品审核状态:待审核
      */
     public static final Integer AUDIT_STATUS_AUDIT = 0;
+
+    /**
+     * 作品发布状态：上架
+     */
+    public static final Integer PUBLISH_STATUS_SHELVES = 1;
+
+    /**
+     * 作品发布状态：下架
+     */
+    public static final Integer PUBLISH_STATUS_UNDERCARRIAGE = 0;
+
+    /**
+     * 作品更新状态：连载中
+     */
+    public static final Integer UPDATE_STATUS_SERIALIZED = 0;
+
+    /**
+     * 作品更新状态：已完结
+     */
+    public static final Integer UPDATE_STATUS_CLOSED = 1;
+
 }

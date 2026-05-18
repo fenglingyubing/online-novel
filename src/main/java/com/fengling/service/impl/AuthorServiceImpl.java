@@ -160,6 +160,7 @@ public class AuthorServiceImpl implements AuthorService {
         UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
         Long pageNum = pageReqDto.getPageNum();
         Long pageSize = pageReqDto.getPageSize();
+        // key = novels:author:works:用户id:分页参数(1):分页大小(5)
         String key = CacheConstants.WORKS + userInfoDto.getId() + ":" + pageNum + ":" + pageSize;
         // 从redis获取
         String jsonStr = redisUtil.getValueForKey(key);

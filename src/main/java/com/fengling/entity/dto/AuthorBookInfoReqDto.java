@@ -21,4 +21,9 @@ public class AuthorBookInfoReqDto {
      * 小说简介
      */
     private String bookIntro;
+
+    /**
+     * 发布状态（0-下架，1-上架）
+     */
+    private Integer publishStatus;
 }

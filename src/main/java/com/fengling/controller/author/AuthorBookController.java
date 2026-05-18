@@ -5,6 +5,7 @@ import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.AuthorBookInfoAuditRespDto;
+import com.fengling.entity.dto.AuthorBookInfoNotAuditReqDto;
 import com.fengling.entity.dto.AuthorBookInfoReqDto;
 import com.fengling.entity.dto.AuthorBookInfoRespDto;
 import com.fengling.service.BookService;
@@ -73,5 +74,20 @@ public class AuthorBookController {
     @GetMapping("/bookinfo/audit")
     public CommonResult<PageRespDto<AuthorBookInfoAuditRespDto>> listBookInfoAudits(PageReqDto pageReqDto) {
         return bookService.listBookInfoAudits(pageReqDto);
+    }
+
+    /**
+     * 作家更新小说信息-无需审核
+     *
+     * @param bookInfoNotAuditReqDto 更新信息参数
+     * @return 无
+     */
+    @PutMapping("/{bookId}")
+    public CommonResult<Void> updateAuthorBookInfo(
+            @PathVariable("bookId") Long bookId,
+            @RequestBody AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto,
+            PageReqDto PageReqDto
+    ) {
+        return bookService.updateAuthorBookInfo(bookId, bookInfoNotAuditReqDto, PageReqDto);
     }
 }
