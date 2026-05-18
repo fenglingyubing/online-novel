@@ -24,6 +24,7 @@
     /api/author/novels
     /api/author/{bookId}
     /api/author/{bookId}/uploadcover
+    /api/author/bookinfo/audit
     /api/author/drafts
     /api/author/audit/list
     /api/author/edit/booklist
@@ -42,6 +43,7 @@
     查询作家某本小说详情
     提交小说信息变更审核
     提交小说封面变更审核
+    查询小说变更信息审核列表
     查询作家草稿箱列表
     查询作家审核章节列表
     查询作家编辑页小说列表
@@ -507,6 +509,92 @@ bookIntro -> 变更后的小说简介，不传则不修改
     6. 已通过或已驳回的历史申请不会被修改，会生成新的待审核申请
     7. 本地文件上传成功但审核记录保存失败时，后端会删除本次新上传的OSS文件
     8. 覆盖已有待审核封面后，后端会尝试删除旧的待审核封面；删除失败不影响本次提交
+```
+
+## 小说变更信息审核列表查询
+```text
+请求路径：
+/api/author/bookinfo/audit?pageNum=1&pageSize=10
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认5
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "bookId": 1,
+                    "bookName": "碧阳仙门",
+                    "bookNameChange": "碧阳仙门新版",
+                    "bookIntro": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。",
+                    "coverUrl": "https://xxx.com/book-cover.png",
+                    "auditStatus": 0,
+                    "adminName": null,
+                    "submitTime": "2026-05-11T12:00:00",
+                    "auditTime": null,
+                    "auditRemark": null
+                },
+                {
+                    "id": 2,
+                    "bookId": 2,
+                    "bookName": "修仙界唯一出马仙",
+                    "bookNameChange": null,
+                    "bookIntro": null,
+                    "coverUrl": "https://xxx.com/book-cover-2.png",
+                    "auditStatus": 1,
+                    "adminName": "管理员",
+                    "submitTime": "2026-05-10T12:00:00",
+                    "auditTime": "2026-05-10T13:00:00",
+                    "auditRemark": "通过"
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 10,
+            "pages": 1
+        }
+    }
+id -> 审核记录id
+bookId -> 小说id
+bookName -> 当前小说名称
+bookNameChange -> 变更后的小说名称，未变更时为null
+bookIntro -> 变更后的小说简介，未变更时为null
+coverUrl -> 变更后的小说封面链接，未变更时为null
+auditStatus -> 审核状态（0-待审核，1-已通过，2-已驳回）
+adminName -> 审核人昵称，未审核时为null
+submitTime -> 提交时间，当前取审核记录更新时间
+auditTime -> 审核时间，未审核时为null
+auditRemark -> 审核备注，无备注时为null
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只查询当前登录作家自己的小说变更审核记录
+    5. 如果当前作家暂无小说变更审核记录，records为空数组，total为0
 ```
 
 ## 作家草稿箱列表查询

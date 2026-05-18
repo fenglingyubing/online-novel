@@ -2,12 +2,13 @@ package com.fengling.controller.author;
 
 import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.dto.PageReqDto;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.entity.dto.AuthorBookInfoAuditRespDto;
 import com.fengling.entity.dto.AuthorBookInfoReqDto;
 import com.fengling.entity.dto.AuthorBookInfoRespDto;
 import com.fengling.service.BookService;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,5 +63,15 @@ public class AuthorBookController {
             @RequestParam(value = "coverUrl", required = false) String coverUrl
     ) {
         return bookService.saveBookCoverUrl(bookId, file, coverUrl);
+    }
+
+    /**
+     * 查询小说变更信息审核列表
+     *
+     * @return 审核信息列表
+     */
+    @GetMapping("/bookinfo/audit")
+    public CommonResult<PageRespDto<AuthorBookInfoAuditRespDto>> listBookInfoAudits(PageReqDto pageReqDto) {
+        return bookService.listBookInfoAudits(pageReqDto);
     }
 }

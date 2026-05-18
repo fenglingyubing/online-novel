@@ -246,6 +246,25 @@ public class BookServiceImpl implements BookService {
         return CommonResult.success();
     }
 
+    @Override
+    public CommonResult<PageRespDto<AuthorBookInfoAuditRespDto>> listBookInfoAudits(PageReqDto pageReqDto) {
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
+        Page<AuthorBookInfoAuditRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        Page<AuthorBookInfoAuditRespDto> pageBookInfoChangeMapper = bookInfoChangeMapper.listBookInfoAudits(page, authorId);
+        return CommonResult.success(PageRespDto.of(pageBookInfoChangeMapper));
+    }
+
+    /**
+     * 保存变更小说封面
+     *
+     * @param bookId     小说id
+     * @param authorId   作家id
+     * @param novelCover 小说封面链接
+     * @return 小说变更旧封面
+     */
     private String saveBookCoverChange(Long bookId, Long authorId, String novelCover) {
         BookInfoChange isExist = bookInfoChangeMapper.selectOne(
                 new LambdaQueryWrapper<BookInfoChange>()
@@ -276,6 +295,11 @@ public class BookServiceImpl implements BookService {
         return null;
     }
 
+    /**
+     * 删除小说旧封面
+     *
+     * @param oldCoverUrl 旧封面链接
+     */
     private void deleteOldCover(String oldCoverUrl) {
         if (oldCoverUrl != null) {
             try {

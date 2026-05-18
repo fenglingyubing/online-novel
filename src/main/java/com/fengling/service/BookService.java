@@ -69,4 +69,11 @@ public interface BookService {
      * @return 无
      */
     CommonResult<Void> saveBookCoverUrl(Long bookId, MultipartFile file, String coverUrl);
+
+    /**
+     * 查询小说变更信息审核列表
+     *
+     * @return 审核信息列表
+     */
+    CommonResult<PageRespDto<AuthorBookInfoAuditRespDto>> listBookInfoAudits(PageReqDto pageReqDto);
 }

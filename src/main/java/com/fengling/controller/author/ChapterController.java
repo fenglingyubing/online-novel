@@ -63,6 +63,13 @@ public class ChapterController {
         return chapterService.saveChapterInfo(bookId, chapterSaveReqDto);
     }
 
+    /**
+     * 删除章节草稿
+     *
+     * @param bookId        小说id
+     * @param chapterIdList 章节id列表
+     * @return 无
+     */
     @DeleteMapping("/{bookId}/chapters")
     public CommonResult<Void> deleteChapters(
             @PathVariable("bookId") Long bookId,
