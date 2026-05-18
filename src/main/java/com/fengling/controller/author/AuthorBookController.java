@@ -3,13 +3,13 @@ package com.fengling.controller.author;
 import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.entity.dto.AuthorBookInfoReqDto;
 import com.fengling.entity.dto.AuthorBookInfoRespDto;
 import com.fengling.service.BookService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.Value;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(ApiPathConstants.AUTHOR)
@@ -31,5 +31,36 @@ public class AuthorBookController {
             PageReqDto pageReqDto
     ) {
         return bookService.getAuthorBookInfo(bookId, pageReqDto);
+    }
+
+    /**
+     * 小说变更信息提交审核
+     *
+     * @param bookId         小说id
+     * @param bookInfoReqDto 小说变更请求参数
+     * @return 无
+     */
+    @PostMapping("/{bookId}")
+    public CommonResult<Void> saveChangeBookInfo(
+            @PathVariable("bookId") Long bookId,
+            @RequestBody AuthorBookInfoReqDto bookInfoReqDto
+    ) {
+        return bookService.saveChangeBookInfo(bookId, bookInfoReqDto);
+    }
+
+    /**
+     * 小说封面变更
+     *
+     * @param file     上传文件
+     * @param coverUrl 封面链接
+     * @return 无
+     */
+    @PostMapping("/{bookId}/uploadcover")
+    public CommonResult<Void> saveBookCoverUrl(
+            @PathVariable("bookId") Long bookId,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(value = "coverUrl", required = false) String coverUrl
+    ) {
+        return bookService.saveBookCoverUrl(bookId, file, coverUrl);
     }
 }

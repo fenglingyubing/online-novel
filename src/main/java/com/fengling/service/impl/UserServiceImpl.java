@@ -150,7 +150,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public CommonResult<Void> updateUserInfo(UserInfoMineReqDto userInfoMineReqDto) {
-        log.info("进入 updateUserInfo 接口");
         UserInfo userInfo = new UserInfo();
         Long userId = UserContext.getUserId();
         userInfo.setId(userId);

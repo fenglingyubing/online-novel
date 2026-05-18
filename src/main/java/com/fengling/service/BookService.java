@@ -4,6 +4,7 @@ import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -49,4 +50,23 @@ public interface BookService {
      * @return 小说详情
      */
     CommonResult<AuthorBookInfoRespDto> getAuthorBookInfo(Long bookId, PageReqDto pageReqDto);
+
+    /**
+     * 小说变更信息提交审核
+     *
+     * @param bookId         小说id
+     * @param bookInfoReqDto 变更信息请求参数
+     * @return 无
+     */
+    CommonResult<Void> saveChangeBookInfo(Long bookId, AuthorBookInfoReqDto bookInfoReqDto);
+
+    /**
+     * 小说封面变更
+     *
+     * @param bookId   小说id
+     * @param file     上传的文件
+     * @param coverUrl 图片链接
+     * @return 无
+     */
+    CommonResult<Void> saveBookCoverUrl(Long bookId, MultipartFile file, String coverUrl);
 }

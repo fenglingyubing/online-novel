@@ -75,4 +75,9 @@ public class CommonConstants {
      * 章节状态：已发布
      */
     public static final Integer CHAPTER_STATUS_RELEASE = 1;
+
+    /**
+     * 作品审核状态:待审核
+     */
+    public static final Integer AUDIT_STATUS_AUDIT = 0;
 }

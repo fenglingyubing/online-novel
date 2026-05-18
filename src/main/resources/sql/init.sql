@@ -102,3 +102,26 @@ CREATE TABLE book_shelf (
                             KEY idx_book_id (book_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='书架';
 
+-- 小说信息变更审核表
+CREATE TABLE `book_info_change` (
+                                    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '变更信息id',
+                                    `book_id` BIGINT NOT NULL COMMENT '变更小说id',
+                                    `author_id` BIGINT NOT NULL COMMENT '作者id',
+                                    `audit_admin_id` BIGINT DEFAULT NULL COMMENT '审核管理员id',
+                                    `book_name` VARCHAR(500) DEFAULT NULL COMMENT '变更小说名称',
+                                    `book_intro` TEXT DEFAULT NULL COMMENT '变更小说简介',
+                                    `cover_url` VARCHAR(255) DEFAULT NULL COMMENT '变更图片链接',
+                                    `audit_status` TINYINT NOT NULL DEFAULT 0 COMMENT '审核状态：0-待审核，1-已通过，2-已驳回',
+                                    `apply_status` TINYINT NOT NULL DEFAULT 0 COMMENT '应用状态：0-未应用，1-已应用',
+                                    `audit_remark` VARCHAR(500) DEFAULT NULL COMMENT '审核备注',
+                                    `audit_time` DATETIME DEFAULT NULL COMMENT '审核时间',
+                                    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+                                    PRIMARY KEY (`id`),
+                                    KEY `idx_book_id` (`book_id`),
+                                    KEY `idx_author_id` (`author_id`),
+                                    KEY `idx_audit_status` (`audit_status`),
+                                    KEY `idx_apply_status` (`apply_status`),
+                                    KEY `idx_book_audit_status` (`book_id`, `audit_status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='小说信息变更';
+

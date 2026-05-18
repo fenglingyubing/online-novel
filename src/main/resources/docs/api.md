@@ -23,6 +23,7 @@
     /api/author/home
     /api/author/novels
     /api/author/{bookId}
+    /api/author/{bookId}/uploadcover
     /api/author/drafts
     /api/author/audit/list
     /api/author/edit/booklist
@@ -39,6 +40,8 @@
     查询作家首页信息
     查询作家作品管理页面列表
     查询作家某本小说详情
+    提交小说信息变更审核
+    提交小说封面变更审核
     查询作家草稿箱列表
     查询作家审核章节列表
     查询作家编辑页小说列表
@@ -374,6 +377,136 @@ bookChapterList.pages -> 一共有几页
     5. bookId和当前作家id必须同时匹配才会返回小说信息
     6. 章节目录按章节序号升序排列
     7. 如果该小说暂无章节，bookChapterList.records为空数组，total为0
+```
+
+## 小说信息变更审核提交
+```text
+请求路径：
+/api/author/{bookId}
+请求方式：
+    POST
+请求头：
+    Authorization: Bearer token值
+参数：
+    bookId -> 小说id
+请求体：
+    {
+        "bookName": "碧阳仙门新版",
+        "bookIntro": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。"
+    }
+bookName -> 变更后的小说名称，不传则不修改
+bookIntro -> 变更后的小说简介，不传则不修改
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    小说不存在或不属于当前作家：
+    {
+        "code": 404,
+        "message": "小说信息不存在",
+        "data": null
+    }
+    提交失败：
+    {
+        "code": 500,
+        "message": "申请失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只允许提交当前登录作家自己小说的信息变更审核
+    5. bookId和当前作家id必须同时匹配才允许提交
+    6. 前端不需要在请求体中传bookId和authorId，后端分别从路径参数和token中获取
+    7. 如果该小说已有待审核的信息变更申请，本次提交会合并到原申请中
+    8. 请求体中字段为null或未传时表示不修改该字段，不会覆盖已有待审核内容
+    9. 已通过或已驳回的历史申请不会被修改，会生成新的待审核申请
+    10. 小说封面变更请调用 /api/author/{bookId}/uploadcover 接口
+```
+
+## 小说封面变更审核提交
+```text
+请求路径：
+/api/author/{bookId}/uploadcover
+请求方式：
+    POST
+请求头：
+    Authorization: Bearer token值
+参数：
+    bookId -> 小说id
+    file -> 本地封面图片文件
+    coverUrl -> 封面图片链接
+参数说明：
+    1. file和coverUrl必须二选一
+    2. file用于上传本地封面图片，使用multipart/form-data提交
+    3. coverUrl用于直接提交封面图片链接，使用Query参数或表单参数提交
+本地文件上传示例：
+    Content-Type: multipart/form-data
+    file: 选择本地图片文件
+图片链接提交示例：
+    /api/author/1/uploadcover?coverUrl=https://xxx.com/book-cover.png
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    未选择或同时选择两种上传方式：
+    {
+        "code": 500,
+        "message": "请选择一种图片上传方式",
+        "data": null
+    }
+    小说不存在或不属于当前作家：
+    {
+        "code": 500,
+        "message": "小说信息不存在",
+        "data": null
+    }
+    提交失败：
+    {
+        "code": 500,
+        "message": "申请失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只允许提交当前登录作家自己小说的封面变更审核
+    5. 如果该小说已有待审核的信息变更申请，本次提交会合并到原申请中
+    6. 已通过或已驳回的历史申请不会被修改，会生成新的待审核申请
+    7. 本地文件上传成功但审核记录保存失败时，后端会删除本次新上传的OSS文件
+    8. 覆盖已有待审核封面后，后端会尝试删除旧的待审核封面；删除失败不影响本次提交
 ```
 
 ## 作家草稿箱列表查询
