@@ -3,6 +3,7 @@ package com.fengling.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.entity.BookInfoChange;
+import com.fengling.entity.dto.AuthorAuditInfoRespDto;
 import com.fengling.entity.dto.AuthorBookInfoAuditRespDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -19,4 +20,14 @@ public interface BookInfoChangeMapper extends BaseMapper<BookInfoChange> {
      */
     Page<AuthorBookInfoAuditRespDto> listBookInfoAudits(Page<AuthorBookInfoAuditRespDto> page,
                                                         @Param("authorId") Long authorId);
+
+    /**
+     * 变更信息详情查询
+     *
+     * @param auditId  变更信息审核id
+     * @param authorId 作家id
+     * @return 变更信息详情
+     */
+    AuthorAuditInfoRespDto getAuditInfo(@Param("auditId") Long auditId,
+                                        @Param("authorId") Long authorId);
 }

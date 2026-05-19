@@ -422,10 +422,20 @@ public class BookServiceImpl implements BookService {
                         .eq(BookInfoChange::getAuthorId, authorId)
                         .eq(BookInfoChange::getAuditStatus, CommonConstants.AUDIT_STATUS_AUDIT)
         );
-        if (i != 1){
+        if (i != 1) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND, "审核信息不存在");
         }
         return CommonResult.success();
+    }
+
+    @Override
+    public CommonResult<AuthorAuditInfoRespDto> getAuditInfo(Long auditId) {
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
+        AuthorAuditInfoRespDto authorAuditInfoRespDto = bookInfoChangeMapper.getAuditInfo(auditId, authorId);
+        if (authorAuditInfoRespDto == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "审核信息不存在");
+        }
+        return CommonResult.success(authorAuditInfoRespDto);
     }
 
     /**

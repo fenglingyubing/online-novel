@@ -104,4 +104,12 @@ public interface BookService {
      * @return 无
      */
     CommonResult<Void> deleteAuditInfo(Long auditId);
+
+    /**
+     * 变更信息详情查看
+     *
+     * @param auditId 变更信息审核id
+     * @return 变更信息详情
+     */
+    CommonResult<AuthorAuditInfoRespDto> getAuditInfo(Long auditId);
 }

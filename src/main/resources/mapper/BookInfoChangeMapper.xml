@@ -25,4 +25,24 @@
         where bic.author_id = #{authorId}
         order by bi.update_time desc
     </select>
+
+    <!--变更信息详情查询-->
+    <select id="getAuditInfo" resultType="com.fengling.entity.dto.AuthorAuditInfoRespDto">
+        select bic.id,
+               bi.book_name       as bookName,
+               bic.book_name      as bookNameChange,
+               bic.book_intro     as bookIntro,
+               bic.cover_url      as coverUrl,
+               bic.publish_status as publishStatus,
+               bic.audit_status   as auditStatus,
+               bic.audit_type     as auditType,
+               bic.audit_remark   as auditRemark,
+               bic.audit_time     as auditTime,
+               ui.nick_name       as auditName
+        from book_info_change bic
+                 left join book_info bi on bic.book_id = bi.id
+                 left join user_info ui on bic.audit_admin_id = ui.id
+        where bic.id = #{auditId}
+          and bic.author_id = #{authorId}
+    </select>
 </mapper>

@@ -49,6 +49,7 @@
     提交小说封面变更审核
     提交作家新建作品审核
     查询小说变更信息审核列表
+    查询小说变更信息审核详情
     删除小说变更信息待审核记录
     查询作家草稿箱列表
     查询作家审核章节列表
@@ -774,6 +775,72 @@ pages -> 一共有几页
     3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
     4. 只查询当前登录作家自己的小说变更审核记录
     5. 如果当前作家暂无小说变更审核记录，records为空数组，total为0
+```
+
+## 小说变更信息审核详情查询
+```text
+请求路径：
+/api/author/bookinfo/audit/{auditId}
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    auditId -> 审核记录id
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "id": 1,
+            "bookName": "碧阳仙门",
+            "bookNameChange": "碧阳仙门新版",
+            "bookIntro": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。",
+            "coverUrl": "https://xxx.com/book-cover.png",
+            "publishStatus": 1,
+            "auditStatus": 0,
+            "auditType": 2,
+            "auditRemark": null,
+            "auditTime": null,
+            "auditName": null
+        }
+    }
+id -> 审核记录id
+bookName -> 当前小说名称，新建作品审核时为null
+bookNameChange -> 变更后的小说名称，未变更时为null
+bookIntro -> 变更后的小说简介，未变更时为null
+coverUrl -> 变更后的小说封面链接，未变更时为null
+publishStatus -> 变更后的发布状态，当前仅上架审核时为1，未变更时为null
+auditStatus -> 审核状态（0-待审核，1-已通过，2-已驳回）
+auditType -> 申请类型（1-作品创建，2-信息变更和作品上架）
+auditRemark -> 审核备注，无备注时为null
+auditTime -> 审核时间，未审核时为null
+auditName -> 审核人昵称，未审核时为null
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    审核信息不存在：
+    {
+        "code": 404,
+        "message": "审核信息不存在",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只允许查询当前登录作家自己的小说变更审核详情
+    5. auditId和当前作家id必须同时匹配才会返回审核详情
 ```
 
 ## 小说变更信息审核删除

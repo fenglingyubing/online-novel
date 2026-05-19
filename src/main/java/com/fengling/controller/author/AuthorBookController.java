@@ -115,4 +115,15 @@ public class AuthorBookController {
     public CommonResult<Void> deleteAuditInfo(@PathVariable("auditId") Long auditId){
         return bookService.deleteAuditInfo(auditId);
     }
+
+    /**
+     * 变更信息详情查看
+     *
+     * @param auditId 变更信息审核id
+     * @return 变更信息详情
+     */
+    @GetMapping("/bookinfo/audit/{auditId}")
+    public CommonResult<AuthorAuditInfoRespDto> getAuditInfo(@PathVariable("auditId") Long auditId){
+        return bookService.getAuditInfo(auditId);
+    }
 }
