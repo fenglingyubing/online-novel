@@ -45,4 +45,20 @@
         where bic.id = #{auditId}
           and bic.author_id = #{authorId}
     </select>
+    <select id="listAdminAuditList" resultType="com.fengling.entity.dto.AdminAuditListRespDto">
+        select bic.id,
+               bic.book_id     as bookId,
+               bic.author_id   as authorId,
+               ai.author_name  as authorName,
+               bi.book_name    as bookName,
+               bi.cover_url    as coverUrl,
+               bic.create_time as subTime,
+               bic.audit_type  as auditType
+        from book_info_change bic
+                 inner join book_info bi on bic.book_id = bi.id
+                 inner join author_info ai on bic.author_id = ai.id
+        where bic.audit_type = 2
+        and  bic.audit_status = #{auditStatus}
+        order by bic.create_time
+    </select>
 </mapper>

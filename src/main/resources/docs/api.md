@@ -33,6 +33,7 @@
     /api/author/{bookId}/chapters
     /api/author/{bookId}/chapters/{chapterId}
     /api/author/{bookId}/chapters/{chapterId}/cancel
+    /api/admin/list
 
 当前强制登录的功能：
     查询书架小说列表
@@ -57,6 +58,7 @@
     新增作家章节信息
     查询作家某本小说的某个章节信息
     撤回审核中的章节
+    管理员查询小说变更审核列表
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -338,7 +340,7 @@ pages -> 一共有几页
                 ],
                 "total": 2,
                 "pageNum": 1,
-                "pageSize": 10,
+                "pageSize": 5,
                 "pages": 1
             }
         }
@@ -735,7 +737,7 @@ Content-Type：
             ],
             "total": 2,
             "pageNum": 1,
-            "pageSize": 10,
+            "pageSize": 5,
             "pages": 1
         }
     }
@@ -885,6 +887,86 @@ auditName -> 审核人昵称，未审核时为null
     4. 只允许删除当前登录作家自己的小说变更审核记录
     5. 只允许删除待审核状态记录，auditStatus必须为0
     6. 已通过或已驳回的历史审核记录不能删除
+```
+
+## 管理员小说变更审核列表查询
+```text
+请求路径：
+/api/admin/list?pageNum=1&pageSize=5&auditStatus=0
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认5
+    auditStatus -> 审核状态（0-待审核，1-已通过，2-已驳回），必传
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "bookId": 1,
+                    "authorId": 1,
+                    "authorName": "风铃",
+                    "bookName": "碧阳仙门",
+                    "coverUrl": "https://xxx.com/book-cover.png",
+                    "subTime": "2026-05-11T12:00:00",
+                    "auditType": 2
+                },
+                {
+                    "id": 2,
+                    "bookId": 2,
+                    "authorId": 2,
+                    "authorName": "尼禄2077",
+                    "bookName": "修仙界唯一出马仙",
+                    "coverUrl": "https://xxx.com/book-cover-2.png",
+                    "subTime": "2026-05-12T12:00:00",
+                    "auditType": 2
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 5,
+            "pages": 1
+        }
+    }
+id -> 审核记录id
+bookId -> 小说id
+authorId -> 作家id
+authorName -> 作家笔名
+bookName -> 小说名称
+coverUrl -> 小说封面链接
+subTime -> 提交时间
+auditType -> 审核类型（2-信息变更和作品上架）
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 根据auditStatus查询小说信息变更和上架申请
+    5. auditStatus为0时表示待审核，1表示已通过，2表示已驳回
+    6. 列表按提交时间升序排列，先提交的申请排在前面
+    7. 如果暂无对应状态的审核记录，records为空数组，total为0
 ```
 
 ## 作家草稿箱列表查询
@@ -1815,7 +1897,7 @@ nextChapterId -> 下一章id，没有下一章时为null
             ],
             "total": 2,
             "pageNum": 1,
-            "pageSize": 10,
+            "pageSize": 5,
             "pages": 1
         }
     }

@@ -32,7 +32,7 @@ public final class ApiPathConstants {
     public static final String SHELF = API + "/shelf";
 
     /**
-     * 作家注册前缀
+     * 作家后台前缀
      */
     public static final String AUTHOR = API + "/author";
 
@@ -40,4 +40,9 @@ public final class ApiPathConstants {
      * 章节请求前缀
      */
     public static final String CHAPTERS = "/chapters";
+
+    /**
+     * 管理员后台请求前缀
+     */
+    public static final String ADMIN = API + "/admin";
 }

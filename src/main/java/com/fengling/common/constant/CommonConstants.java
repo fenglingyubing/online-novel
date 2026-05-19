@@ -1,6 +1,10 @@
 package com.fengling.common.constant;
 
 public class CommonConstants {
+    private CommonConstants() {
+        /* This utility class should not be instantiated */
+    }
+
     /**
      * 用户状态
      */
@@ -15,6 +19,11 @@ public class CommonConstants {
      * 用户角色-读者
      */
     public static final Integer USER_ROLE_READER = 1;
+
+    /**
+     * 用户角色-管理员
+     */
+    public static final Integer USER_ROLE_ADMIN = 0;
 
     /**
      * 用户余额
