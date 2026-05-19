@@ -130,4 +130,14 @@ public class ChapterServiceImpl implements ChapterService {
         }
         return CommonResult.success();
     }
+
+    @Override
+    public CommonResult<Void> updateChapterStatus(Long bookId, Long chapterId) {
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
+        int update = chapterMapper.updateChapterStatus(bookId, chapterId, authorId);
+        if (update != 1) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "审核章节不存在");
+        }
+        return CommonResult.success();
+    }
 }

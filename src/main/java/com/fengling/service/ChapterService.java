@@ -38,5 +38,21 @@ public interface ChapterService {
      */
     CommonResult<ChapterSaveRespDto> saveChapterInfo(Long bookId, ChapterSaveReqDto chapterInfo);
 
+    /**
+     * 删除章节草稿
+     *
+     * @param bookId        小说id
+     * @param chapterIdList 章节id列表
+     * @return 无
+     */
     CommonResult<Void> deleteChapters(Long bookId, List<Long> chapterIdList);
+
+    /**
+     * 撤回审核章节
+     *
+     * @param bookId    小说id
+     * @param chapterId 章节id
+     * @return 无
+     */
+    CommonResult<Void> updateChapterStatus(Long bookId, Long chapterId);
 }

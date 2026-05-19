@@ -141,6 +141,19 @@
         and bi.author_id = #{authorId}
     </update>
 
+    <!--撤回审核中的章节-->
+    <update id="updateChapterStatus">
+        update book_chapter bc
+        inner join book_info bi on bc.book_id = bi.id
+        set bc.chapter_status = 0,
+            bc.update_time = now()
+        where bc.id = #{chapterId}
+        and bc.book_id = #{bookId}
+        and bi.author_id = #{authorId}
+        and bc.chapter_status = 3
+
+    </update>
+
     <!--新增章节信息-->
     <insert id="saveChapterInfo"
             useGeneratedKeys="true"

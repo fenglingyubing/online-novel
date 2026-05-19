@@ -129,4 +129,16 @@ public interface ChapterMapper extends BaseMapper<ChapterInfo> {
     Page<BookChapterListRespDto> listChapters(Page<BookChapterListRespDto> page,
                                               @Param("bookId") Long bookId,
                                               @Param("authorId") Long authorId);
+
+    /**
+     * 撤回审核中的章节
+     *
+     * @param bookId    小说id
+     * @param chapterId 章节id
+     * @param authorId  作者id
+     * @return 影响行数
+     */
+    int updateChapterStatus(@Param("bookId") Long bookId,
+                            @Param("chapterId") Long chapterId,
+                            @Param("authorId") Long authorId);
 }

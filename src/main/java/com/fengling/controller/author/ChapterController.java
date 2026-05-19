@@ -55,7 +55,7 @@ public class ChapterController {
      * @param chapterSaveReqDto 新增章节参数
      * @return 章节id
      */
-    @PostMapping("/{bookId}/chapters")
+    @PostMapping("/{bookId}" + ApiPathConstants.CHAPTERS)
     public CommonResult<ChapterSaveRespDto> saveChapterInfo(
             @PathVariable("bookId") Long bookId,
             @RequestBody ChapterSaveReqDto chapterSaveReqDto
@@ -76,5 +76,20 @@ public class ChapterController {
             @RequestBody List<Long> chapterIdList
     ) {
         return chapterService.deleteChapters(bookId, chapterIdList);
+    }
+
+    /**
+     * 审核章节撤回
+     *
+     * @param bookId    小说id
+     * @param chapterId 章节id
+     * @return 无
+     */
+    @PutMapping("/{bookId}" + ApiPathConstants.CHAPTERS + "/{chapterId}" + "/cancel")
+    public CommonResult<Void> updateChapterStatus(
+            @PathVariable("bookId") Long bookId,
+            @PathVariable("chapterId") Long chapterId
+    ) {
+        return chapterService.updateChapterStatus(bookId, chapterId);
     }
 }
