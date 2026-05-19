@@ -413,6 +413,21 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    @Override
+    public CommonResult<Void> deleteAuditInfo(Long auditId) {
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
+        int i = bookInfoChangeMapper.delete(
+                new LambdaQueryWrapper<BookInfoChange>()
+                        .eq(BookInfoChange::getId, auditId)
+                        .eq(BookInfoChange::getAuthorId, authorId)
+                        .eq(BookInfoChange::getAuditStatus, CommonConstants.AUDIT_STATUS_AUDIT)
+        );
+        if (i != 1){
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "审核信息不存在");
+        }
+        return CommonResult.success();
+    }
+
     /**
      * 验证小说是否属于当前作者
      *

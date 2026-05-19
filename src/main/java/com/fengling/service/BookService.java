@@ -96,4 +96,12 @@ public interface BookService {
      * @return 无
      */
     CommonResult<Void> saveCreateBookInfo(AuthorCreateBookReqDto createBookReqDto, MultipartFile file, String coverUrl);
+
+    /**
+     * 删除信息变更
+     *
+     * @param auditId 审核信息id
+     * @return 无
+     */
+    CommonResult<Void> deleteAuditInfo(Long auditId);
 }

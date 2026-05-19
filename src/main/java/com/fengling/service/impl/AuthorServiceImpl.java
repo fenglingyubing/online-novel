@@ -13,15 +13,9 @@ import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.*;
-import com.fengling.entity.AuthorInfo;
-import com.fengling.entity.BookInfo;
-import com.fengling.entity.ChapterInfo;
-import com.fengling.entity.UserInfo;
+import com.fengling.entity.*;
 import com.fengling.entity.dto.*;
-import com.fengling.mapper.AuthorMapper;
-import com.fengling.mapper.BookMapper;
-import com.fengling.mapper.ChapterMapper;
-import com.fengling.mapper.UserMapper;
+import com.fengling.mapper.*;
 import com.fengling.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +41,7 @@ public class AuthorServiceImpl implements AuthorService {
     private final AuthorAuthUtil authorAuthUtil;
     private final ChapterMapper chapterMapper;
     private final PageAuthUtil pageAuthUtil;
+    private final BookInfoChangeMapper bookInfoChangeMapper;
 
     @Transactional
     @Override

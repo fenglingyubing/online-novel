@@ -104,4 +104,15 @@ public class AuthorBookController {
     ) {
         return bookService.saveCreateBookInfo(createBookReqDto, file, coverUrl);
     }
+
+    /**
+     * 删除信息变更
+     *
+     * @param auditId 审核信息id
+     * @return 无
+     */
+    @DeleteMapping("/bookinfo/audit/{auditId}")
+    public CommonResult<Void> deleteAuditInfo(@PathVariable("auditId") Long auditId){
+        return bookService.deleteAuditInfo(auditId);
+    }
 }

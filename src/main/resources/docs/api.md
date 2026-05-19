@@ -26,6 +26,7 @@
     /api/author/{bookId}/uploadcover
     /api/author/create
     /api/author/bookinfo/audit
+    /api/author/bookinfo/audit/{auditId}
     /api/author/drafts
     /api/author/audit/list
     /api/author/edit/booklist
@@ -47,6 +48,7 @@
     提交小说封面变更审核
     提交作家新建作品审核
     查询小说变更信息审核列表
+    删除小说变更信息待审核记录
     查询作家草稿箱列表
     查询作家审核章节列表
     查询作家编辑页小说列表
@@ -770,6 +772,50 @@ pages -> 一共有几页
     3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
     4. 只查询当前登录作家自己的小说变更审核记录
     5. 如果当前作家暂无小说变更审核记录，records为空数组，total为0
+```
+
+## 小说变更信息审核删除
+```text
+请求路径：
+/api/author/bookinfo/audit/{auditId}
+请求方式：
+    DELETE
+请求头：
+    Authorization: Bearer token值
+参数：
+    auditId -> 审核记录id
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    删除失败：
+    {
+        "code": 500,
+        "message": "删除失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只允许删除当前登录作家自己的小说变更审核记录
+    5. 只允许删除待审核状态记录，auditStatus必须为0
+    6. 已通过或已驳回的历史审核记录不能删除
 ```
 
 ## 作家草稿箱列表查询
