@@ -73,4 +73,9 @@ public class AuthorBookInfoAuditRespDto {
      * 审核备注
      */
     private String auditRemark;
+
+    /**
+     * 申请类型：（1-作品创建，2-信息变更和作品上架）
+     */
+    private Integer auditType;
 }

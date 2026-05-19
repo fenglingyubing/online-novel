@@ -101,4 +101,14 @@ public class CommonConstants {
      */
     public static final Integer UPDATE_STATUS_CLOSED = 1;
 
+    /**
+     * 审核类型：信息变更
+     */
+    public static final Integer AUDIT_TYPE_INFORMATION_CHANGE = 2;
+
+    /**
+     * 审核类型：新建作品
+     */
+    public static final Integer AUDIT_TYPE_CREATE_WORK = 1;
+
 }

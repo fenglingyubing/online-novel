@@ -4,10 +4,7 @@ import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.AuthorBookInfoAuditRespDto;
-import com.fengling.entity.dto.AuthorBookInfoNotAuditReqDto;
-import com.fengling.entity.dto.AuthorBookInfoReqDto;
-import com.fengling.entity.dto.AuthorBookInfoRespDto;
+import com.fengling.entity.dto.*;
 import com.fengling.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -89,5 +86,22 @@ public class AuthorBookController {
             PageReqDto PageReqDto
     ) {
         return bookService.updateAuthorBookInfo(bookId, bookInfoNotAuditReqDto, PageReqDto);
+    }
+
+    /**
+     * 作家新建作品
+     *
+     * @param createBookReqDto 新建作品请求参数
+     * @param file             上传的图片文件
+     * @param coverUrl         图片链接
+     * @return 无
+     */
+    @PostMapping("/create")
+    public CommonResult<Void> saveCreateBookInfo(
+            @ModelAttribute AuthorCreateBookReqDto createBookReqDto,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(value = "coverUrl", required = false) String coverUrl
+    ) {
+        return bookService.saveCreateBookInfo(createBookReqDto, file, coverUrl);
     }
 }

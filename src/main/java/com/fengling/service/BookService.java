@@ -85,9 +85,15 @@ public interface BookService {
      * @param pageReqDto             分页请求参数
      * @return 无
      */
-    CommonResult<Void> updateAuthorBookInfo(
-            Long bookId,
-            AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto,
-            PageReqDto pageReqDto
-    );
+    CommonResult<Void> updateAuthorBookInfo(Long bookId, AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto, PageReqDto pageReqDto);
+
+    /**
+     * 作家新建作品
+     *
+     * @param createBookReqDto 新建作品请求参数
+     * @param file             上传的图片文件
+     * @param coverUrl         图片链接
+     * @return 无
+     */
+    CommonResult<Void> saveCreateBookInfo(AuthorCreateBookReqDto createBookReqDto, MultipartFile file, String coverUrl);
 }

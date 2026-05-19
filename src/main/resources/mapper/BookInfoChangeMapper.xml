@@ -4,7 +4,7 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.fengling.mapper.BookInfoChangeMapper">
-
+    <!--查询审核列表-->
     <select id="listBookInfoAudits" resultType="com.fengling.entity.dto.AuthorBookInfoAuditRespDto">
         select bic.id,
                bic.book_id        as bookId,
@@ -17,9 +17,10 @@
                ui.nick_name       as adminName,
                bic.update_time    as submitTime,
                bic.audit_time     as auditTime,
-               bic.audit_remark   as auditRemark
+               bic.audit_remark   as auditRemark,
+               bic.audit_type     as auditType
         from book_info_change bic
-                 inner join book_info bi on bic.book_id = bi.id
+                 left join book_info bi on bic.book_id = bi.id
                  left join user_info ui on bic.audit_admin_id = ui.id
         where bic.author_id = #{authorId}
         order by bi.update_time desc

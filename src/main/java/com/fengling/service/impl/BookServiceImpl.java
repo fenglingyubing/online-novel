@@ -18,14 +18,12 @@ import com.fengling.common.util.AuthorAuthUtil;
 import com.fengling.common.util.OSSUtil;
 import com.fengling.common.util.PageAuthUtil;
 import com.fengling.common.util.RedisUtil;
+import com.fengling.entity.BookCategory;
 import com.fengling.entity.BookInfo;
 import com.fengling.entity.BookInfoChange;
 import com.fengling.entity.BookShelf;
 import com.fengling.entity.dto.*;
-import com.fengling.mapper.BookInfoChangeMapper;
-import com.fengling.mapper.BookMapper;
-import com.fengling.mapper.BookShelfMapper;
-import com.fengling.mapper.ChapterMapper;
+import com.fengling.mapper.*;
 import com.fengling.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +46,7 @@ public class BookServiceImpl implements BookService {
     private final BookInfoChangeMapper bookInfoChangeMapper;
     private final OSSUtil ossUtil;
     private final PageAuthUtil pageAuthUtil;
+    private final BookCategoryMapper bookCategoryMapper;
 
     @Override
     public CommonResult<PageRespDto<BookListRespDto>> listCategoryNovel(Integer categoryId, PageReqDto pageReqDto) {
@@ -240,6 +239,7 @@ public class BookServiceImpl implements BookService {
         bookInfoChange.setBookName(bookInfoReqDto.getBookName());
         bookInfoChange.setBookIntro(bookInfoReqDto.getBookIntro());
         bookInfoChange.setPublishStatus(auditPublishStatus);
+        bookInfoChange.setAuditType(CommonConstants.AUDIT_TYPE_INFORMATION_CHANGE);
 
         int i = bookInfoChangeMapper.insert(bookInfoChange);
         if (i != 1) {
@@ -329,6 +329,88 @@ public class BookServiceImpl implements BookService {
                 ":" + pageReqDto.getPageNum() + ":" + pageReqDto.getPageSize();
         redisUtil.deleteKey(key);
         return CommonResult.success();
+    }
+
+    @Override
+    public CommonResult<Void> saveCreateBookInfo(AuthorCreateBookReqDto createBookReqDto, MultipartFile file, String coverUrl) {
+        if (createBookReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        Integer categoryId = createBookReqDto.getCategoryId();
+        String bookName = createBookReqDto.getBookName();
+        String bookIntro = createBookReqDto.getBookIntro();
+        if (
+                bookName == null ||
+                        bookName.trim().isBlank() ||
+                        bookIntro == null ||
+                        bookIntro.isBlank() ||
+                        categoryId == null
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        BookCategory bookCategory = bookCategoryMapper.selectOne(
+                new LambdaQueryWrapper<BookCategory>()
+                        .select(BookCategory::getId)
+                        .eq(BookCategory::getId, categoryId)
+        );
+
+        if (bookCategory == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "分类id不存在");
+        }
+
+        Long authorId = authorAuthUtil.getCurrentAuthorId();
+        BookInfoChange isExist = bookInfoChangeMapper.selectOne(
+                new LambdaQueryWrapper<BookInfoChange>()
+                        .select(BookInfoChange::getId)
+                        .eq(BookInfoChange::getAuthorId, authorId)
+                        .eq(BookInfoChange::getBookName, bookName)
+                        .eq(BookInfoChange::getAuditType, CommonConstants.AUDIT_TYPE_CREATE_WORK)
+                        .eq(BookInfoChange::getAuditStatus, CommonConstants.AUDIT_STATUS_AUDIT)
+        );
+
+        if (isExist != null) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "不能重复创建");
+        }
+
+        boolean hasFile = file != null && !file.isEmpty();
+        boolean hasCoverUrl = coverUrl != null && !coverUrl.isBlank();
+        if (hasFile == hasCoverUrl) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID, "请选择一种图片上传方式");
+        }
+
+        // 上传图片
+        String novelCover;
+        if (hasFile) {
+            novelCover = ossUtil.upload(file, "novelCover");
+        } else {
+            novelCover = coverUrl;
+        }
+
+        try {
+            BookInfoChange bookInfoChange = new BookInfoChange();
+            bookInfoChange.setBookName(bookName.trim());
+            bookInfoChange.setBookIntro(bookIntro);
+            bookInfoChange.setCategoryId(categoryId);
+            bookInfoChange.setAuthorId(authorId);
+            bookInfoChange.setAuditType(CommonConstants.AUDIT_TYPE_CREATE_WORK);
+            bookInfoChange.setCoverUrl(novelCover);
+            int insert = bookInfoChangeMapper.insert(bookInfoChange);
+
+            if (insert != 1) {
+                throw new BusinessException(ResultCodeEnum.FAIL, "创建失败");
+            }
+
+            return CommonResult.success();
+        } catch (RuntimeException e) {
+            try {
+                ossUtil.delete(novelCover);
+            } catch (RuntimeException deleteException) {
+                log.warn("删除新建作品封面失败，coverUrl={}", novelCover, deleteException);
+            }
+            throw e;
+        }
     }
 
     /**

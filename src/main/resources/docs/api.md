@@ -24,6 +24,7 @@
     /api/author/novels
     /api/author/{bookId}
     /api/author/{bookId}/uploadcover
+    /api/author/create
     /api/author/bookinfo/audit
     /api/author/drafts
     /api/author/audit/list
@@ -44,6 +45,7 @@
     提交小说信息变更审核
     更新作家小说状态
     提交小说封面变更审核
+    提交作家新建作品审核
     查询小说变更信息审核列表
     查询作家草稿箱列表
     查询作家审核章节列表
@@ -585,6 +587,99 @@ updateStatus -> 更新状态（0-连载中，1-已完结），不传则不修改
     8. 覆盖已有待审核封面后，后端会尝试删除旧的待审核封面；删除失败不影响本次提交
 ```
 
+## 作家新建作品审核提交
+```text
+请求路径：
+/api/author/create
+请求方式：
+    POST
+请求头：
+    Authorization: Bearer token值
+Content-Type：
+    multipart/form-data
+参数：
+    bookName -> 小说名称
+    bookIntro -> 小说简介
+    categoryId -> 小说分类id
+    file -> 本地封面图片文件
+    coverUrl -> 封面图片链接
+参数说明：
+    1. bookName、bookIntro、categoryId必传，且bookName和bookIntro不能为空字符串
+    2. file和coverUrl必须二选一
+    3. file用于上传本地封面图片
+    4. coverUrl用于直接提交封面图片链接
+    5. 请求使用multipart/form-data提交，bookName、bookIntro、categoryId、coverUrl均作为表单字段提交
+本地文件上传示例：
+    Content-Type: multipart/form-data
+    bookName: 碧阳仙门
+    bookIntro: 自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。
+    categoryId: 1
+    file: 选择本地图片文件
+图片链接提交示例：
+    Content-Type: multipart/form-data
+    bookName: 碧阳仙门
+    bookIntro: 自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。
+    categoryId: 1
+    coverUrl: https://xxx.com/book-cover.png
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    分类不存在：
+    {
+        "code": 404,
+        "message": "分类id不存在",
+        "data": null
+    }
+    未选择或同时选择两种封面提交方式：
+    {
+        "code": 501,
+        "message": "请选择一种图片上传方式",
+        "data": null
+    }
+    重复提交：
+    {
+        "code": 500,
+        "message": "不能重复创建",
+        "data": null
+    }
+    创建失败：
+    {
+        "code": 500,
+        "message": "创建失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 新建作品不会直接写入正式小说表，会先写入小说信息变更审核表
+    5. 审核类型为新建作品审核，审核通过后再创建正式作品
+    6. 同一作者同名作品已有待审核的新建申请时，不能重复提交
+    7. 本地文件上传成功但审核记录保存失败时，后端会尝试删除本次新上传的封面
+```
+
 ## 小说变更信息审核列表查询
 ```text
 请求路径：
@@ -611,6 +706,7 @@ updateStatus -> 更新状态（0-连载中，1-已完结），不传则不修改
                     "coverUrl": "https://xxx.com/book-cover.png",
                     "publishStatus": 1,
                     "auditStatus": 0,
+                    "auditType": 2,
                     "adminName": null,
                     "submitTime": "2026-05-11T12:00:00",
                     "auditTime": null,
@@ -625,6 +721,7 @@ updateStatus -> 更新状态（0-连载中，1-已完结），不传则不修改
                     "coverUrl": "https://xxx.com/book-cover-2.png",
                     "publishStatus": null,
                     "auditStatus": 1,
+                    "auditType": 2,
                     "adminName": "管理员",
                     "submitTime": "2026-05-10T12:00:00",
                     "auditTime": "2026-05-10T13:00:00",
@@ -645,6 +742,7 @@ bookIntro -> 变更后的小说简介，未变更时为null
 coverUrl -> 变更后的小说封面链接，未变更时为null
 publishStatus -> 变更后的发布状态，当前仅上架审核时为1，未变更时为null
 auditStatus -> 审核状态（0-待审核，1-已通过，2-已驳回）
+auditType -> 申请类型（1-作品创建，2-信息变更和作品上架）
 adminName -> 审核人昵称，未审核时为null
 submitTime -> 提交时间，当前取审核记录更新时间
 auditTime -> 审核时间，未审核时为null

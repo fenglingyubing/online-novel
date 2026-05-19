@@ -55,6 +55,16 @@ public class BookInfoChange {
     private Integer publishStatus;
 
     /**
+     * 分类id
+     */
+    private Integer categoryId;
+
+    /**
+     * 审核类型（1-新建作品，2-变更信息和上架申请）
+     */
+    private Integer auditType;
+
+    /**
      * 审核状态（0-待审核，1-已通过，2-已驳回）
      */
     private Integer auditStatus;
