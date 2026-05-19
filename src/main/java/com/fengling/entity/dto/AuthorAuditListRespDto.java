@@ -21,6 +21,11 @@ public class AuthorAuditListRespDto {
     private Long id;
 
     /**
+     * 小说id
+     */
+    private Long bookId;
+
+    /**
      * 章节名
      */
     private String chapterName;

@@ -85,6 +85,7 @@
     <!--查询审核章节-->
     <select id="listAudits" resultType="com.fengling.entity.dto.AuthorAuditListRespDto">
         select bc.id,
+               bc.book_id      as bookId,
                bc.chapter_name as chapterName,
                bi.book_name    as bookName,
                bc.word_count   as wordCount,

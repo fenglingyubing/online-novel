@@ -914,6 +914,7 @@ pages -> 一共有几页
             "records": [
                 {
                     "id": 1,
+                    "bookId": 1,
                     "chapterName": "第一章 碧阳仙门",
                     "bookName": "碧阳仙门",
                     "wordCount": 4200,
@@ -921,6 +922,7 @@ pages -> 一共有几页
                 },
                 {
                     "id": 2,
+                    "bookId": 1,
                     "chapterName": "第二章 入门",
                     "bookName": "碧阳仙门",
                     "wordCount": 3800,
@@ -934,6 +936,7 @@ pages -> 一共有几页
         }
     }
 id -> 审核中章节id
+bookId -> 小说id
 chapterName -> 章节名称
 bookName -> 小说名称
 wordCount -> 章节字数
