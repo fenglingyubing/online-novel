@@ -1,22 +1,28 @@
 package com.fengling.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * 章节审核实体
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("book_chapter")
-public class ChapterInfo {
+public class ChapterAudit {
+
+    /**
+     * 审核id
+     */
+    private Long id;
 
     /**
      * 章节id
      */
-    private Long id;
+    private Long chapterId;
 
     /**
      * 小说id
@@ -24,34 +30,34 @@ public class ChapterInfo {
     private Long bookId;
 
     /**
-     * 章节序号
+     * 作家id
      */
-    private Integer chapterNum;
+    private Long authorId;
 
     /**
-     * 章节名称
+     * 审核人id
      */
-    private String chapterName;
+    private Long auditAdminId;
 
     /**
-     * 章节正文
+     * 审核备注
      */
-    private String chapterContent;
+    private String auditRemark;
 
     /**
-     * 章节字数
+     * 审核时间
      */
-    private Integer wordCount;
+    private LocalDateTime auditTime;
 
     /**
-     * 章节状态（0-草稿，1-已发布，2-下架，3-审核中）
+     * 审核状态
      */
-    private Integer chapterStatus;
+    private Integer auditStatus;
 
     /**
-     * 发布时间
+     * 应用状态
      */
-    private LocalDateTime publishTime;
+    private Integer applyStatus;
 
     /**
      * 创建时间

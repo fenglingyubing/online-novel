@@ -2,23 +2,25 @@ package com.fengling.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.AuthorAuthUtil;
-import com.fengling.entity.AuthorInfo;
 import com.fengling.entity.BookInfo;
+import com.fengling.entity.ChapterAudit;
 import com.fengling.entity.ChapterInfo;
 import com.fengling.entity.dto.*;
-import com.fengling.mapper.AuthorMapper;
 import com.fengling.mapper.BookMapper;
+import com.fengling.mapper.ChapterAuditMapper;
 import com.fengling.mapper.ChapterMapper;
 import com.fengling.service.ChapterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,6 +31,7 @@ public class ChapterServiceImpl implements ChapterService {
     private final ChapterMapper chapterMapper;
     private final AuthorAuthUtil authorAuthUtil;
     private final BookMapper bookMapper;
+    private final ChapterAuditMapper chapterAuditMapper;
 
     @Override
     public CommonResult<ChapterEditInfoRespDto> getChapterInfo(Long bookId, Long chapterId) {
@@ -41,16 +44,22 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
+    @Transactional
     public CommonResult<Void> updateChapterInfo(Long bookId, Long chapterId, ChapterUpdateReqDto chapterUpdateReqDto) {
         Long authorId = authorAuthUtil.getCurrentAuthorId();
 
         if (chapterUpdateReqDto == null) {
-            throw new BusinessException(ResultCodeEnum.FAIL, "请求参数不能为空");
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
         }
         Integer chapterStatus = chapterUpdateReqDto.getChapterStatus();
-        if (chapterStatus != null && (chapterStatus < 0 || chapterStatus > 3)) {
-            throw new BusinessException(ResultCodeEnum.FAIL, "章节状态不合法");
+        if (
+                chapterStatus != null &&
+                        !CommonConstants.CHAPTER_STATUS_DRAFTS.equals(chapterStatus) &&
+                        !CommonConstants.CHAPTER_STATUS_AUDIT.equals(chapterStatus)
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
         }
+
         int i = chapterMapper.updateChapterInfo(
                 bookId,
                 chapterId,
@@ -60,10 +69,45 @@ public class ChapterServiceImpl implements ChapterService {
         if (i != 1) {
             throw new BusinessException(ResultCodeEnum.FAIL, "更新失败");
         }
+        if (!CommonConstants.CHAPTER_STATUS_AUDIT.equals(chapterStatus)) {
+            return CommonResult.success();
+        }
+
+        ChapterAudit chapterAudit = chapterAuditMapper.selectOne(
+                new LambdaQueryWrapper<ChapterAudit>()
+                        .select(ChapterAudit::getId)
+                        .eq(ChapterAudit::getChapterId, chapterId)
+                        .eq(ChapterAudit::getBookId, bookId)
+                        .eq(ChapterAudit::getAuthorId, authorId)
+                        .eq(ChapterAudit::getAuditStatus, CommonConstants.CHAPTER_AUDIT_STATUS_AUDIT)
+        );
+        if (chapterAudit != null) {
+            int update = chapterAuditMapper.update(
+                    null,
+                    new LambdaUpdateWrapper<ChapterAudit>()
+                            .set(ChapterAudit::getUpdateTime, LocalDateTime.now())
+                            .eq(ChapterAudit::getId, chapterAudit.getId())
+            );
+
+            if (update != 1) {
+                throw new BusinessException(ResultCodeEnum.FAIL, "更新失败");
+            }
+            return CommonResult.success();
+        }
+
+        chapterAudit = new ChapterAudit();
+        chapterAudit.setChapterId(chapterId);
+        chapterAudit.setBookId(bookId);
+        chapterAudit.setAuthorId(authorId);
+        int insert = chapterAuditMapper.insert(chapterAudit);
+        if (insert != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "更新失败");
+        }
         return CommonResult.success();
     }
 
     @Override
+    @Transactional
     public CommonResult<ChapterSaveRespDto> saveChapterInfo(Long bookId, ChapterSaveReqDto chapterSaveReqDto) {
         Long authorId = authorAuthUtil.getCurrentAuthorId();
         if (chapterSaveReqDto == null) {
@@ -110,7 +154,23 @@ public class ChapterServiceImpl implements ChapterService {
         if (i != 1) {
             throw new BusinessException(ResultCodeEnum.FAIL, "新增章节失败");
         }
-        return CommonResult.success(new ChapterSaveRespDto(chapterInfo.getId()));
+
+        if (!CommonConstants.CHAPTER_STATUS_AUDIT.equals(chapterStatus)) {
+            return CommonResult.success(new ChapterSaveRespDto(chapterInfo.getId()));
+        }
+
+        Long chapterId = chapterInfo.getId();
+        ChapterAudit chapterAudit = new ChapterAudit();
+        chapterAudit.setChapterId(chapterId);
+        chapterAudit.setBookId(bookId);
+        chapterAudit.setAuthorId(authorId);
+        int insert = chapterAuditMapper.insert(chapterAudit);
+
+        if (insert != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "更新失败");
+        }
+
+        return CommonResult.success(new ChapterSaveRespDto(chapterId));
     }
 
     @Override

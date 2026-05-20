@@ -120,4 +120,8 @@ public class CommonConstants {
      */
     public static final Integer AUDIT_TYPE_CREATE_WORK = 1;
 
+    /**
+     * 章节审核类型：待审核
+     */
+    public static final Integer CHAPTER_AUDIT_STATUS_AUDIT = 0;
 }

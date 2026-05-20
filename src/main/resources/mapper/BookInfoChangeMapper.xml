@@ -77,4 +77,19 @@
           and bic.audit_status = #{auditStatus}
         order by bic.create_time
     </select>
+
+    <!--章节审核列表查询-->
+    <select id="listAdminAuditChaptersList" resultType="com.fengling.entity.dto.AdminAuditChaptersListRespDto">
+        select bc.id,
+               bi.book_name as bookName,
+               ai.author_name as authorName,
+               bc.chapter_name as chapterName,
+               bc.word_count as wordCount,
+               bc.update_time as subTime
+        from book_chapter bc
+        inner join book_info bi on bc.book_id = bi.id
+        inner join author_info ai on bi.author_id = ai.id
+        where chapter_status = #{auditStatus}
+        and
+    </select>
 </mapper>

@@ -4,6 +4,7 @@ import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.entity.dto.AdminAuditChaptersListRespDto;
 import com.fengling.entity.dto.AdminAuditCreateListRespDto;
 import com.fengling.entity.dto.AdminAuditListRespDto;
 import com.fengling.service.BookInfoChangeService;
@@ -47,5 +48,20 @@ public class AdminAuditController {
             @RequestParam("auditStatus") Integer auditStatus
     ) {
         return bookInfoChangeService.listAdminAuditCreateList(pageReqDto, auditStatus);
+    }
+
+    /**
+     * 章节审核列表查询
+     *
+     * @param pageReqDto  分页请求参数
+     * @param auditStatus 审核状态
+     * @return 章节审核列表
+     */
+    @GetMapping("/list/chapters")
+    public CommonResult<PageRespDto<AdminAuditChaptersListRespDto>> listAdminAuditChaptersList(
+            PageReqDto pageReqDto,
+            @RequestParam("auditStatus") Integer auditStatus
+    ) {
+        return bookInfoChangeService.listAdminAuditChaptersList(pageReqDto, auditStatus);
     }
 }

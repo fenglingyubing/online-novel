@@ -122,12 +122,7 @@
             <if test="chapterUpdateReqDto.chapterContent != null">
                 bc.chapter_content =
                 #{chapterUpdateReqDto.chapterContent},
-                bc
-                .
-                word_count
-                =
-                char_length
-                (
+                bc.word_count=char_length(
                 #{chapterUpdateReqDto.chapterContent}
                 ),
             </if>

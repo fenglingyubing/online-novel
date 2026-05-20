@@ -8,6 +8,7 @@ import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.AdminAuthUtil;
 import com.fengling.common.util.PageAuthUtil;
+import com.fengling.entity.dto.AdminAuditChaptersListRespDto;
 import com.fengling.entity.dto.AdminAuditCreateListRespDto;
 import com.fengling.entity.dto.AdminAuditListRespDto;
 import com.fengling.mapper.BookInfoChangeMapper;
@@ -25,13 +26,7 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
 
     @Override
     public CommonResult<PageRespDto<AdminAuditListRespDto>> listAdminAuditList(PageReqDto pageReqDto, Integer auditStatus) {
-        if (
-                auditStatus == null || auditStatus < 0 || auditStatus > 2
-        ) {
-            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
-        }
-        adminAuthUtil.adminAuth();
-        pageAuthUtil.pageAuth(pageReqDto);
+        argsAuth(pageReqDto, auditStatus);
         Page<AdminAuditListRespDto> page = new Page<>(
                 pageReqDto.getPageNum(),
                 pageReqDto.getPageSize()
@@ -42,13 +37,7 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
 
     @Override
     public CommonResult<PageRespDto<AdminAuditCreateListRespDto>> listAdminAuditCreateList(PageReqDto pageReqDto, Integer auditStatus) {
-        if (
-                auditStatus == null || auditStatus < 0 || auditStatus > 2
-        ) {
-            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
-        }
-        adminAuthUtil.adminAuth();
-        pageAuthUtil.pageAuth(pageReqDto);
+        argsAuth(pageReqDto, auditStatus);
         Page<AdminAuditCreateListRespDto> page = new Page<>(
                 pageReqDto.getPageNum(),
                 pageReqDto.getPageSize()
@@ -58,5 +47,35 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
                 auditStatus
         );
         return CommonResult.success(PageRespDto.of(pageAuditCreateList));
+    }
+
+    @Override
+    public CommonResult<PageRespDto<AdminAuditChaptersListRespDto>> listAdminAuditChaptersList(PageReqDto pageReqDto, Integer auditStatus) {
+        argsAuth(pageReqDto, auditStatus);
+        Page<AdminAuditChaptersListRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        Page<AdminAuditChaptersListRespDto> pageAuditChapters = bookInfoChangeMapper.listAdminAuditChaptersList(
+                page,
+                auditStatus
+        );
+        return null;
+    }
+
+    /**
+     * 审核列表参数校验
+     *
+     * @param pageReqDto  分页请求参数
+     * @param auditStatus 审核状态
+     */
+    private void argsAuth(PageReqDto pageReqDto, Integer auditStatus) {
+        if (
+                auditStatus == null || auditStatus < 0 || auditStatus > 2
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+        adminAuthUtil.adminAuth();
+        pageAuthUtil.pageAuth(pageReqDto);
     }
 }
