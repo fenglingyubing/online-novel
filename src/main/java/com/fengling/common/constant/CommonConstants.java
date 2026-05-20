@@ -124,4 +124,14 @@ public class CommonConstants {
      * 章节审核类型：待审核
      */
     public static final Integer CHAPTER_AUDIT_STATUS_AUDIT = 0;
+
+    /**
+     * 章节审核类型：已通过
+     */
+    public static final Integer CHAPTER_AUDIT_STATUS_PASS = 1;
+
+    /**
+     * 章节审核类型：已驳回
+     */
+    public static final Integer CHAPTER_AUDIT_STATUS_REJECTED = 2;
 }

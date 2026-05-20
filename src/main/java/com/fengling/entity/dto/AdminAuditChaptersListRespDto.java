@@ -15,9 +15,14 @@ import java.time.LocalDateTime;
 public class AdminAuditChaptersListRespDto {
 
     /**
-     * 章节id
+     * 章节审核id
      */
     private Long id;
+
+    /**
+     * 章节id
+     */
+    private Long chapterId;
 
     /**
      * 小说名

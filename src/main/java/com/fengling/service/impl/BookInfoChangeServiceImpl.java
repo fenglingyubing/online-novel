@@ -1,6 +1,7 @@
 package com.fengling.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
@@ -60,7 +61,7 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
                 page,
                 auditStatus
         );
-        return null;
+        return CommonResult.success(PageRespDto.of(pageAuditChapters));
     }
 
     /**
@@ -71,7 +72,9 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
      */
     private void argsAuth(PageReqDto pageReqDto, Integer auditStatus) {
         if (
-                auditStatus == null || auditStatus < 0 || auditStatus > 2
+                auditStatus == null ||
+                        auditStatus < CommonConstants.CHAPTER_AUDIT_STATUS_AUDIT ||
+                        auditStatus > CommonConstants.CHAPTER_AUDIT_STATUS_REJECTED
         ) {
             throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
         }

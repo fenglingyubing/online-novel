@@ -27,7 +27,7 @@ public class AdminAuditController {
      * @param pageReqDto 分页请求参数
      * @return 审核信息列表
      */
-    @GetMapping("/list")
+    @GetMapping(ApiPathConstants.LIST)
     public CommonResult<PageRespDto<AdminAuditListRespDto>> listAdminAuditList(
             PageReqDto pageReqDto,
             @RequestParam("auditStatus") Integer auditStatus
@@ -42,7 +42,7 @@ public class AdminAuditController {
      * @param auditStatus 审核状态
      * @return 新书审核列表
      */
-    @GetMapping("/list/create")
+    @GetMapping(ApiPathConstants.LIST + "/create")
     public CommonResult<PageRespDto<AdminAuditCreateListRespDto>> listAdminAuditCreateList(
             PageReqDto pageReqDto,
             @RequestParam("auditStatus") Integer auditStatus
@@ -57,7 +57,7 @@ public class AdminAuditController {
      * @param auditStatus 审核状态
      * @return 章节审核列表
      */
-    @GetMapping("/list/chapters")
+    @GetMapping(ApiPathConstants.LIST + ApiPathConstants.CHAPTERS)
     public CommonResult<PageRespDto<AdminAuditChaptersListRespDto>> listAdminAuditChaptersList(
             PageReqDto pageReqDto,
             @RequestParam("auditStatus") Integer auditStatus

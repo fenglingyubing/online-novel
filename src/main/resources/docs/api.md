@@ -35,6 +35,7 @@
     /api/author/{bookId}/chapters/{chapterId}/cancel
     /api/admin/list
     /api/admin/list/create
+    /api/admin/list/chapters
 
 当前强制登录的功能：
     查询书架小说列表
@@ -61,6 +62,7 @@
     撤回审核中的章节
     管理员查询小说变更审核列表
     管理员查询新书审核列表
+    管理员查询章节审核列表
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -1052,6 +1054,89 @@ pages -> 一共有几页
     5. auditStatus为0时表示待审核，1表示已通过，2表示已驳回
     6. 列表按提交时间升序排列，先提交的申请排在前面
     7. 如果暂无对应状态的新书审核记录，records为空数组，total为0
+```
+
+## 管理员章节审核列表查询
+```text
+请求路径：
+/api/admin/list/chapters?pageNum=1&pageSize=5&auditStatus=0
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认5
+    auditStatus -> 审核状态（0-待审核，1-已通过，2-已驳回），必传
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "chapterId": 1,
+                    "bookName": "碧阳仙门",
+                    "authorName": "风铃",
+                    "chapterName": "第一章 碧阳仙门",
+                    "wordCount": 4200,
+                    "subTime": "2026-05-11T12:00:00"
+                },
+                {
+                    "id": 2,
+                    "chapterId": 2,
+                    "bookName": "修仙界唯一出马仙",
+                    "authorName": "尼禄2077",
+                    "chapterName": "第二章 入门",
+                    "wordCount": 3800,
+                    "subTime": "2026-05-12T12:00:00"
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 5,
+            "pages": 1
+        }
+    }
+id -> 章节审核记录id
+chapterId -> 章节id
+bookName -> 小说名称
+authorName -> 作家笔名
+chapterName -> 章节名称
+wordCount -> 章节字数
+subTime -> 提交时间，当前取章节审核记录更新时间
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 根据auditStatus查询章节审核申请
+    5. auditStatus为0时表示待审核，1表示已通过，2表示已驳回
+    6. 列表按提交时间倒序排列，最近提交或更新的申请排在前面
+    7. 如果暂无对应状态的章节审核记录，records为空数组，total为0
 ```
 
 ## 作家草稿箱列表查询
