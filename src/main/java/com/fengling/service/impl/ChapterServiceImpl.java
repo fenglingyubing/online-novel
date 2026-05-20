@@ -192,11 +192,28 @@ public class ChapterServiceImpl implements ChapterService {
     }
 
     @Override
+    @Transactional
     public CommonResult<Void> updateChapterStatus(Long bookId, Long chapterId) {
         Long authorId = authorAuthUtil.getCurrentAuthorId();
         int update = chapterMapper.updateChapterStatus(bookId, chapterId, authorId);
         if (update != 1) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND, "审核章节不存在");
+        }
+        ChapterAudit chapterAudit = chapterAuditMapper.selectOne(
+                new LambdaQueryWrapper<ChapterAudit>()
+                        .select(ChapterAudit::getId)
+                        .eq(ChapterAudit::getChapterId, chapterId)
+                        .eq(ChapterAudit::getBookId, bookId)
+                        .eq(ChapterAudit::getAuthorId, authorId)
+                        .eq(ChapterAudit::getAuditStatus, CommonConstants.CHAPTER_AUDIT_STATUS_AUDIT)
+        );
+        if (chapterAudit == null) {
+            // 兼容新增章节审核表之前的历史审核中章节
+            return CommonResult.success();
+        }
+        int i = chapterAuditMapper.deleteById(chapterAudit.getId());
+        if (i != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "撤回失败");
         }
         return CommonResult.success();
     }
