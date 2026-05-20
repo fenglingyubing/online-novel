@@ -61,4 +61,20 @@
         and  bic.audit_status = #{auditStatus}
         order by bic.create_time
     </select>
+
+    <!--查询新建作品审核列表-->
+    <select id="listAdminAuditCreateList" resultType="com.fengling.entity.dto.AdminAuditCreateListRespDto">
+        select bic.id,
+               bic.book_id     as bookId,
+               bic.book_name   as bookName,
+               bic.cover_url   as coverUrl,
+               bic.author_id   as authorId,
+               ai.author_name  as authorName,
+               bic.create_time as subTime
+        from book_info_change bic
+                 inner join author_info ai on bic.author_id = ai.id
+        where bic.audit_type = 1
+          and bic.audit_status = #{auditStatus}
+        order by bic.create_time
+    </select>
 </mapper>
