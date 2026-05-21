@@ -9,6 +9,7 @@ import com.fengling.entity.dto.AdminAuditCreateListRespDto;
 import com.fengling.entity.dto.AdminAuditInfoReqDto;
 import com.fengling.entity.dto.AdminAuditListRespDto;
 import com.fengling.service.BookInfoChangeService;
+import com.fengling.service.ChapterAuditService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminAuditController {
 
     private final BookInfoChangeService bookInfoChangeService;
+    private final ChapterAuditService chapterAuditService;
 
     /**
      * 管理后台-查询变更信息审核列表
@@ -90,5 +92,20 @@ public class AdminAuditController {
             @RequestBody AdminAuditInfoReqDto adminAuditInfoReqDto
     ) {
         return bookInfoChangeService.updateAdminAuditCreateStatus(auditId, adminAuditInfoReqDto);
+    }
+
+    /**
+     * 章节审核状态更新
+     *
+     * @param auditId         审核Id
+     * @param auditInfoReqDto 审核请求参数
+     * @return 无
+     */
+    @PutMapping(ApiPathConstants.LIST + "/audit/{auditId}" + ApiPathConstants.CHAPTERS)
+    public CommonResult<Void> updateAdminAuditChaptersStatus(
+            @PathVariable("auditId") Long auditId,
+            @RequestBody AdminAuditInfoReqDto auditInfoReqDto
+    ) {
+        return chapterAuditService.updateAdminAuditChaptersStatus(auditId, auditInfoReqDto);
     }
 }
