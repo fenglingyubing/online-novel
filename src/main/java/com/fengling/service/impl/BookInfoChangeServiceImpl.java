@@ -13,10 +13,7 @@ import com.fengling.common.util.AdminAuthUtil;
 import com.fengling.common.util.PageAuthUtil;
 import com.fengling.entity.BookInfo;
 import com.fengling.entity.BookInfoChange;
-import com.fengling.entity.dto.AdminAuditChaptersListRespDto;
-import com.fengling.entity.dto.AdminAuditCreateListRespDto;
-import com.fengling.entity.dto.AdminAuditListRespDto;
-import com.fengling.entity.dto.AdminInfoDto;
+import com.fengling.entity.dto.*;
 import com.fengling.mapper.BookInfoChangeMapper;
 import com.fengling.mapper.BookMapper;
 import com.fengling.service.BookInfoChangeService;
@@ -155,6 +152,88 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
                         .set(BookInfoChange::getApplyStatus, CommonConstants.APPLY_STATUS_APPLY)
                         .eq(BookInfoChange::getId, auditId)
                         .eq(BookInfoChange::getAuditStatus, CommonConstants.INFO_CHANGE_PASS)
+                        .eq(BookInfoChange::getApplyStatus, CommonConstants.APPLY_STATUS_NOT_APPLY)
+        );
+
+        if (j != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "审核失败");
+        }
+        return CommonResult.success();
+    }
+
+    @Override
+    @Transactional
+    public CommonResult<Void> updateAdminAuditCreateStatus(Long auditId, AdminAuditInfoReqDto auditInfoReqDto) {
+        if (auditInfoReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        Integer auditStatus = auditInfoReqDto.getAuditStatus();
+        if (auditStatus == null ||
+                (!CommonConstants.NEW_BOOK_CHANGE_PASS.equals(auditStatus) &&
+                        !CommonConstants.NEW_BOOK_CHANGE_REJECTED.equals(auditStatus))
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        AdminInfoDto adminInfoDto = adminAuthUtil.adminAuth();
+        LocalDateTime now = LocalDateTime.now();
+        int update = bookInfoChangeMapper.update(
+                new LambdaUpdateWrapper<BookInfoChange>()
+                        .set(BookInfoChange::getAuditAdminId, adminInfoDto.getId())
+                        .set(BookInfoChange::getAuditStatus, auditStatus)
+                        .set(BookInfoChange::getAuditTime, now)
+                        .set(BookInfoChange::getAuditRemark, auditInfoReqDto.getAuditRemark())
+                        .eq(BookInfoChange::getId, auditId)
+                        .eq(BookInfoChange::getAuditType, CommonConstants.AUDIT_TYPE_CREATE_WORK)
+                        .eq(BookInfoChange::getAuditStatus, CommonConstants.NEW_BOOK_CHANGE_AUDIT)
+                        .eq(BookInfoChange::getApplyStatus, CommonConstants.APPLY_STATUS_NOT_APPLY)
+        );
+
+        if (update != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "审核失败");
+        }
+
+        if (CommonConstants.NEW_BOOK_CHANGE_REJECTED.equals(auditStatus)) {
+            return CommonResult.success();
+        }
+
+        BookInfoChange bookInfoChange = bookInfoChangeMapper.selectOne(
+                new LambdaQueryWrapper<BookInfoChange>()
+                        .select(
+                                BookInfoChange::getAuthorId,
+                                BookInfoChange::getBookName,
+                                BookInfoChange::getBookIntro,
+                                BookInfoChange::getCoverUrl,
+                                BookInfoChange::getCategoryId
+                        )
+                        .eq(BookInfoChange::getId, auditId)
+                        .eq(BookInfoChange::getAuditStatus, CommonConstants.NEW_BOOK_CHANGE_PASS)
+                        .eq(BookInfoChange::getApplyStatus, CommonConstants.APPLY_STATUS_NOT_APPLY)
+
+        );
+
+        BookInfo bookInfo = new BookInfo();
+        bookInfo.setBookName(bookInfoChange.getBookName());
+        bookInfo.setCoverUrl(bookInfoChange.getCoverUrl());
+        bookInfo.setAuthorId(bookInfoChange.getAuthorId());
+        bookInfo.setCategoryId(bookInfoChange.getCategoryId());
+        bookInfo.setPublishStatus(CommonConstants.PUBLISH_STATUS_SHELVES);
+        bookInfo.setBookIntro(bookInfoChange.getBookIntro());
+        bookInfo.setCreateTime(now);
+        bookInfo.setUpdateTime(now);
+        int insert = bookMapper.insert(bookInfo);
+
+        if (insert != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "审核失败");
+        }
+
+        int j = bookInfoChangeMapper.update(
+                new LambdaUpdateWrapper<BookInfoChange>()
+                        .set(BookInfoChange::getBookId, bookInfo.getId())
+                        .set(BookInfoChange::getApplyStatus, CommonConstants.APPLY_STATUS_APPLY)
+                        .eq(BookInfoChange::getId, auditId)
+                        .eq(BookInfoChange::getAuditStatus, CommonConstants.NEW_BOOK_CHANGE_PASS)
                         .eq(BookInfoChange::getApplyStatus, CommonConstants.APPLY_STATUS_NOT_APPLY)
         );
 

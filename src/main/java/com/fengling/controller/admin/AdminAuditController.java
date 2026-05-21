@@ -6,6 +6,7 @@ import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.AdminAuditChaptersListRespDto;
 import com.fengling.entity.dto.AdminAuditCreateListRespDto;
+import com.fengling.entity.dto.AdminAuditInfoReqDto;
 import com.fengling.entity.dto.AdminAuditListRespDto;
 import com.fengling.service.BookInfoChangeService;
 import lombok.RequiredArgsConstructor;
@@ -74,5 +75,20 @@ public class AdminAuditController {
             @RequestParam("auditStatus") Integer auditStatus
     ) {
         return bookInfoChangeService.updateAdminAuditStatus(auditId, auditStatus);
+    }
+
+    /**
+     * 修改新建作品状态
+     *
+     * @param auditId              审核id
+     * @param adminAuditInfoReqDto 审核信息请求参数
+     * @return 无
+     */
+    @PutMapping(ApiPathConstants.LIST + "/audit/{auditId}/create")
+    public CommonResult<Void> updateAdminAuditCreateStatus(
+            @PathVariable("auditId") Long auditId,
+            @RequestBody AdminAuditInfoReqDto adminAuditInfoReqDto
+    ) {
+        return bookInfoChangeService.updateAdminAuditCreateStatus(auditId, adminAuditInfoReqDto);
     }
 }

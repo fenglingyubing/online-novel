@@ -159,4 +159,19 @@ public class CommonConstants {
      * 应用状态：未应用
      */
     public static final Integer APPLY_STATUS_NOT_APPLY = 0;
+
+    /**
+     * 新书审核审核状态：待审核
+     */
+    public static final Integer NEW_BOOK_CHANGE_AUDIT = 0;
+
+    /**
+     * 新书审核审核状态：已通过
+     */
+    public static final Integer NEW_BOOK_CHANGE_PASS = 1;
+
+    /**
+     * 新书审核审核状态：已驳回
+     */
+    public static final Integer NEW_BOOK_CHANGE_REJECTED = 2;
 }

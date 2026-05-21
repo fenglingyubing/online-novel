@@ -35,6 +35,7 @@
     /api/author/{bookId}/chapters/{chapterId}/cancel
     /api/admin/list
     /api/admin/list/audit/{auditId}
+    /api/admin/list/audit/{auditId}/create
     /api/admin/list/create
     /api/admin/list/chapters
 
@@ -63,6 +64,7 @@
     撤回审核中的章节
     管理员查询小说变更审核列表
     管理员审核小说变更申请
+    管理员审核新建作品申请
     管理员查询新书审核列表
     管理员查询章节审核列表
 
@@ -1108,6 +1110,67 @@ pages -> 一共有几页
     5. auditStatus为0时表示待审核，1表示已通过，2表示已驳回
     6. 列表按提交时间升序排列，先提交的申请排在前面
     7. 如果暂无对应状态的新书审核记录，records为空数组，total为0
+```
+
+## 管理员新书审核状态更新
+```text
+请求路径：
+/api/admin/list/audit/{auditId}/create
+请求方式：
+    PUT
+请求头：
+    Authorization: Bearer token值
+参数：
+    auditId -> 审核记录id
+请求体：
+    {
+        "auditStatus": 1,
+        "auditRemark": "通过"
+    }
+auditStatus -> 审核状态（1-通过，2-驳回），必传
+auditRemark -> 审核备注，不传或为null时表示无备注
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    审核失败：
+    {
+        "code": 500,
+        "message": "审核失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 该接口只处理新建作品审核，不处理小说信息变更和章节审核
+    5. auditStatus只能传1或2；1表示审核通过，2表示审核驳回
+    6. 只有待审核且未应用的新建作品审核记录可以被更新
+    7. 审核通过后，会根据审核记录创建正式作品，并将新作品id回写到审核记录bookId
+    8. 审核驳回后，只更新审核状态、审核备注和审核时间，不会创建正式作品
+    9. 审核成功后会记录审核管理员、审核备注和审核时间
+    10. 审核通过并创建正式作品成功后，审核记录会标记为已应用
 ```
 
 ## 管理员章节审核列表查询
