@@ -42,11 +42,11 @@ public interface BookInfoChangeService {
     /**
      * 修改变更信息状态
      *
-     * @param auditId     审核id
-     * @param auditStatus
+     * @param auditId         审核id
+     * @param auditInfoReqDto 审核信息请求实体
      * @return 无
      */
-    CommonResult<Void> updateAdminAuditStatus(Long auditId, Integer auditStatus);
+    CommonResult<Void> updateAdminAuditStatus(Long auditId, AdminAuditInfoReqDto auditInfoReqDto);
 
     /**
      * 修改新建作品状态

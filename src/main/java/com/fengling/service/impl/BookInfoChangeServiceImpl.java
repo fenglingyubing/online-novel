@@ -75,8 +75,13 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
     @Transactional
     public CommonResult<Void> updateAdminAuditStatus(
             Long auditId,
-            Integer auditStatus
+            AdminAuditInfoReqDto auditInfoReqDto
     ) {
+        if (auditInfoReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        Integer auditStatus = auditInfoReqDto.getAuditStatus();
         if (
                 auditStatus == null ||
                         (!CommonConstants.INFO_CHANGE_PASS.equals(auditStatus) &&
@@ -90,6 +95,7 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
                         .set(BookInfoChange::getAuditAdminId, adminInfoDto.getId())
                         .set(BookInfoChange::getAuditStatus, auditStatus)
                         .set(BookInfoChange::getAuditTime, LocalDateTime.now())
+                        .set(BookInfoChange::getAuditRemark, auditInfoReqDto.getAuditRemark())
                         .eq(BookInfoChange::getId, auditId)
                         .eq(BookInfoChange::getAuditType, CommonConstants.AUDIT_TYPE_INFORMATION_CHANGE)
                         .eq(BookInfoChange::getAuditStatus, CommonConstants.INFO_CHANGE_AUDIT)

@@ -72,9 +72,9 @@ public class AdminAuditController {
     @PutMapping(ApiPathConstants.LIST + "/audit/{auditId}")
     public CommonResult<Void> updateAdminAuditStatus(
             @PathVariable("auditId") Long auditId,
-            @RequestParam("auditStatus") Integer auditStatus
+            @RequestBody AdminAuditInfoReqDto adminAuditInfoReqDto
     ) {
-        return bookInfoChangeService.updateAdminAuditStatus(auditId, auditStatus);
+        return bookInfoChangeService.updateAdminAuditStatus(auditId, adminAuditInfoReqDto);
     }
 
     /**
