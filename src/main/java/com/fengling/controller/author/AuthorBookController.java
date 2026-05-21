@@ -82,10 +82,9 @@ public class AuthorBookController {
     @PutMapping("/{bookId}")
     public CommonResult<Void> updateAuthorBookInfo(
             @PathVariable("bookId") Long bookId,
-            @RequestBody AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto,
-            PageReqDto PageReqDto
+            @RequestBody AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto
     ) {
-        return bookService.updateAuthorBookInfo(bookId, bookInfoNotAuditReqDto, PageReqDto);
+        return bookService.updateAuthorBookInfo(bookId, bookInfoNotAuditReqDto);
     }
 
     /**

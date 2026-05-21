@@ -294,10 +294,8 @@ public class BookServiceImpl implements BookService {
     @Override
     public CommonResult<Void> updateAuthorBookInfo(
             Long bookId,
-            AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto,
-            PageReqDto pageReqDto
+            AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto
     ) {
-        pageAuthUtil.pageAuth(pageReqDto);
         if (bookInfoNotAuditReqDto == null) {
             throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
         }
@@ -313,7 +311,6 @@ public class BookServiceImpl implements BookService {
         ) {
             throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
         }
-        UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
         Long authorId = authorAuthUtil.getCurrentAuthorId();
         int i = bookMapper.update(
                 new LambdaUpdateWrapper<BookInfo>()
@@ -325,9 +322,6 @@ public class BookServiceImpl implements BookService {
         if (i != 1) {
             throw new BusinessException(ResultCodeEnum.FAIL, "更新失败");
         }
-        String key = CacheConstants.WORKS + userInfoDto.getId() +
-                ":" + pageReqDto.getPageNum() + ":" + pageReqDto.getPageSize();
-        redisUtil.deleteKey(key);
         return CommonResult.success();
     }
 

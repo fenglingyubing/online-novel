@@ -37,4 +37,13 @@ public interface BookInfoChangeService {
      */
     CommonResult<PageRespDto<AdminAuditChaptersListRespDto>> listAdminAuditChaptersList(PageReqDto pageReqDto,
                                                                                         Integer auditStatus);
+
+    /**
+     * 修改变更信息状态
+     *
+     * @param auditId     审核id
+     * @param auditStatus
+     * @return 无
+     */
+    CommonResult<Void> updateAdminAuditStatus(Long auditId, Integer auditStatus);
 }

@@ -134,4 +134,29 @@ public class CommonConstants {
      * 章节审核类型：已驳回
      */
     public static final Integer CHAPTER_AUDIT_STATUS_REJECTED = 2;
+
+    /**
+     * 信息变更审核状态：待审核
+     */
+    public static final Integer INFO_CHANGE_AUDIT = 0;
+
+    /**
+     * 信息变更审核状态：已通过
+     */
+    public static final Integer INFO_CHANGE_PASS = 1;
+
+    /**
+     * 信息变更审核状态：已驳回
+     */
+    public static final Integer INFO_CHANGE_REJECTED = 2;
+
+    /**
+     * 应用状态：已应用
+     */
+    public static final Integer APPLY_STATUS_APPLY = 1;
+
+    /**
+     * 应用状态：未应用
+     */
+    public static final Integer APPLY_STATUS_NOT_APPLY = 0;
 }

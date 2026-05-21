@@ -1,5 +1,7 @@
 package com.fengling.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
@@ -9,13 +11,20 @@ import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.AdminAuthUtil;
 import com.fengling.common.util.PageAuthUtil;
+import com.fengling.entity.BookInfo;
+import com.fengling.entity.BookInfoChange;
 import com.fengling.entity.dto.AdminAuditChaptersListRespDto;
 import com.fengling.entity.dto.AdminAuditCreateListRespDto;
 import com.fengling.entity.dto.AdminAuditListRespDto;
+import com.fengling.entity.dto.AdminInfoDto;
 import com.fengling.mapper.BookInfoChangeMapper;
+import com.fengling.mapper.BookMapper;
 import com.fengling.service.BookInfoChangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +33,7 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
     private final AdminAuthUtil adminAuthUtil;
     private final BookInfoChangeMapper bookInfoChangeMapper;
     private final PageAuthUtil pageAuthUtil;
+    private final BookMapper bookMapper;
 
     @Override
     public CommonResult<PageRespDto<AdminAuditListRespDto>> listAdminAuditList(PageReqDto pageReqDto, Integer auditStatus) {
@@ -62,6 +72,96 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
                 auditStatus
         );
         return CommonResult.success(PageRespDto.of(pageAuditChapters));
+    }
+
+    @Override
+    @Transactional
+    public CommonResult<Void> updateAdminAuditStatus(
+            Long auditId,
+            Integer auditStatus
+    ) {
+        if (
+                auditStatus == null ||
+                        (!CommonConstants.INFO_CHANGE_PASS.equals(auditStatus) &&
+                                !CommonConstants.INFO_CHANGE_REJECTED.equals(auditStatus))
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+        AdminInfoDto adminInfoDto = adminAuthUtil.adminAuth();
+        int update = bookInfoChangeMapper.update(
+                new LambdaUpdateWrapper<BookInfoChange>()
+                        .set(BookInfoChange::getAuditAdminId, adminInfoDto.getId())
+                        .set(BookInfoChange::getAuditStatus, auditStatus)
+                        .set(BookInfoChange::getAuditTime, LocalDateTime.now())
+                        .eq(BookInfoChange::getId, auditId)
+                        .eq(BookInfoChange::getAuditType, CommonConstants.AUDIT_TYPE_INFORMATION_CHANGE)
+                        .eq(BookInfoChange::getAuditStatus, CommonConstants.INFO_CHANGE_AUDIT)
+                        .eq(BookInfoChange::getApplyStatus, CommonConstants.APPLY_STATUS_NOT_APPLY)
+        );
+
+        if (update != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "审核失败");
+        }
+
+        if (CommonConstants.INFO_CHANGE_REJECTED.equals(auditStatus)) {
+            return CommonResult.success();
+        }
+
+        BookInfoChange bookInfoChange = bookInfoChangeMapper.selectOne(
+                new LambdaQueryWrapper<BookInfoChange>()
+                        .select(
+                                BookInfoChange::getBookId,
+                                BookInfoChange::getAuthorId,
+                                BookInfoChange::getBookName,
+                                BookInfoChange::getBookIntro,
+                                BookInfoChange::getCoverUrl,
+                                BookInfoChange::getPublishStatus
+                        )
+                        .eq(BookInfoChange::getId, auditId)
+        );
+
+        int i = bookMapper.update(
+                new LambdaUpdateWrapper<BookInfo>()
+                        .set(
+                                bookInfoChange.getBookName() != null,
+                                BookInfo::getBookName,
+                                bookInfoChange.getBookName()
+                        )
+                        .set(
+                                bookInfoChange.getBookIntro() != null,
+                                BookInfo::getBookIntro,
+                                bookInfoChange.getBookIntro()
+                        )
+                        .set(
+                                bookInfoChange.getCoverUrl() != null,
+                                BookInfo::getCoverUrl,
+                                bookInfoChange.getCoverUrl()
+                        )
+                        .set(
+                                bookInfoChange.getPublishStatus() != null,
+                                BookInfo::getPublishStatus,
+                                bookInfoChange.getPublishStatus()
+                        )
+                        .eq(BookInfo::getId, bookInfoChange.getBookId())
+                        .eq(BookInfo::getAuthorId, bookInfoChange.getAuthorId())
+        );
+
+        if (i != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "审核失败");
+        }
+
+        int j = bookInfoChangeMapper.update(
+                new LambdaUpdateWrapper<BookInfoChange>()
+                        .set(BookInfoChange::getApplyStatus, CommonConstants.APPLY_STATUS_APPLY)
+                        .eq(BookInfoChange::getId, auditId)
+                        .eq(BookInfoChange::getAuditStatus, CommonConstants.INFO_CHANGE_PASS)
+                        .eq(BookInfoChange::getApplyStatus, CommonConstants.APPLY_STATUS_NOT_APPLY)
+        );
+
+        if (j != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "审核失败");
+        }
+        return CommonResult.success();
     }
 
     /**

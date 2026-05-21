@@ -37,16 +37,6 @@ public class CacheConstants {
     public static final String AUTHOR = "author:";
 
     /**
-     * 作家后台作品管理前缀
-     */
-    public static final String WORKS = REDIS_PREFIX + AUTHOR + "works:";
-
-    /**
-     * 作家后台作品管理缓存时间
-     */
-    public static final Long WORKS_TTL = 1000 * 60 * 30L;
-
-    /**
      * 作家后台草稿箱前缀
      */
     public static final String DRAFTS = REDIS_PREFIX + AUTHOR + "drafts:";

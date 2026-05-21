@@ -9,10 +9,7 @@ import com.fengling.entity.dto.AdminAuditCreateListRespDto;
 import com.fengling.entity.dto.AdminAuditListRespDto;
 import com.fengling.service.BookInfoChangeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(ApiPathConstants.ADMIN)
@@ -63,5 +60,19 @@ public class AdminAuditController {
             @RequestParam("auditStatus") Integer auditStatus
     ) {
         return bookInfoChangeService.listAdminAuditChaptersList(pageReqDto, auditStatus);
+    }
+
+    /**
+     * 修改变更信息状态
+     *
+     * @param auditId 审核id
+     * @return 无
+     */
+    @PutMapping(ApiPathConstants.LIST + "/audit/{auditId}")
+    public CommonResult<Void> updateAdminAuditStatus(
+            @PathVariable("auditId") Long auditId,
+            @RequestParam("auditStatus") Integer auditStatus
+    ) {
+        return bookInfoChangeService.updateAdminAuditStatus(auditId, auditStatus);
     }
 }

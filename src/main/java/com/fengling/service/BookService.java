@@ -82,10 +82,9 @@ public interface BookService {
      *
      * @param bookId                 小说id
      * @param bookInfoNotAuditReqDto 更新信息参数
-     * @param pageReqDto             分页请求参数
      * @return 无
      */
-    CommonResult<Void> updateAuthorBookInfo(Long bookId, AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto, PageReqDto pageReqDto);
+    CommonResult<Void> updateAuthorBookInfo(Long bookId, AuthorBookInfoNotAuditReqDto bookInfoNotAuditReqDto);
 
     /**
      * 作家新建作品

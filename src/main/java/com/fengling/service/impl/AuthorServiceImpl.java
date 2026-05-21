@@ -1,8 +1,6 @@
 package com.fengling.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.TypeReference;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CacheConstants;
@@ -155,19 +153,6 @@ public class AuthorServiceImpl implements AuthorService {
         UserInfoDto userInfoDto = authorAuthUtil.authorAuth();
         Long pageNum = pageReqDto.getPageNum();
         Long pageSize = pageReqDto.getPageSize();
-        // key = novels:author:works:用户id:分页参数(1):分页大小(5)
-        String key = CacheConstants.WORKS + userInfoDto.getId() + ":" + pageNum + ":" + pageSize;
-        // 从redis获取
-        String jsonStr = redisUtil.getValueForKey(key);
-        if (jsonStr != null && !jsonStr.isBlank()) {
-            PageRespDto<AuthorNovelsListRespDto> respDto = JSONUtil.toBean(
-                    jsonStr,
-                    new TypeReference<>() {
-                    },
-                    false
-            );
-            return CommonResult.success(respDto);
-        }
         AuthorInfo authorInfo = authorMapper.selectOne(
                 new LambdaQueryWrapper<AuthorInfo>()
                         .select(AuthorInfo::getId)
@@ -184,15 +169,7 @@ public class AuthorServiceImpl implements AuthorService {
                 page,
                 authorInfo.getId()
         );
-        // 缓存到redis
-        PageRespDto<AuthorNovelsListRespDto> pageRespDto = PageRespDto.of(pageAuthorNovels);
-        String valueStr = JSONUtil.toJsonStr(pageRespDto);
-        redisUtil.addRedisCache(
-                key,
-                valueStr,
-                CacheConstants.WORKS_TTL
-        );
-        return CommonResult.success(pageRespDto);
+        return CommonResult.success(PageRespDto.of(pageAuthorNovels));
     }
 
     @Override
