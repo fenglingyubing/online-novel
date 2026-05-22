@@ -94,4 +94,27 @@
         where ca.audit_status = #{auditStatus}
         order by ca.update_time desc
     </select>
+
+    <!--变更信息审核信息详情查询-->
+    <select id="getAdminAuditInfo" resultType="com.fengling.entity.dto.AdminAuditInfoRespDto">
+        select bic.id,
+               bi.book_name       as bookName,
+               ai.author_name     as authorName,
+               bic.book_name      as bookNameChange,
+               bic.book_intro     as bookIntro,
+               bic.cover_url      as coverUrl,
+               bic.publish_status as publishStatus,
+               bic.audit_type     as auditType,
+               bic.audit_status   as auditStatus,
+               bic.audit_remark   as auditRemark,
+               bic.audit_time     as auditTime,
+               bic.create_time    as subTime
+        from book_info_change bic
+                 inner join book_info bi on bic.book_id = bi.id
+                 inner join author_info ai on bic.author_id = ai.id
+        where bic.id = #{auditId}
+          and bic.book_id = #{bookId}
+          and bic.author_id = #{authorId}
+          and bic.audit_status = #{auditStatus}
+    </select>
 </mapper>

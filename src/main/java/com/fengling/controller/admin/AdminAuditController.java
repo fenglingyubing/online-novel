@@ -4,10 +4,7 @@ import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.AdminAuditChaptersListRespDto;
-import com.fengling.entity.dto.AdminAuditCreateListRespDto;
-import com.fengling.entity.dto.AdminAuditInfoReqDto;
-import com.fengling.entity.dto.AdminAuditListRespDto;
+import com.fengling.entity.dto.*;
 import com.fengling.service.BookInfoChangeService;
 import com.fengling.service.ChapterAuditService;
 import lombok.RequiredArgsConstructor;
@@ -107,5 +104,22 @@ public class AdminAuditController {
             @RequestBody AdminAuditInfoReqDto auditInfoReqDto
     ) {
         return chapterAuditService.updateAdminAuditChaptersStatus(auditId, auditInfoReqDto);
+    }
+
+    /**
+     * 变更信息审核信息详情查询
+     *
+     * @param auditId     审核id
+     * @param auditStatus 审核状态
+     * @return 审核信息详情
+     */
+    @GetMapping("/{auditId}/info/{authorId}/{bookId}")
+    public CommonResult<AdminAuditInfoRespDto> getAuditInfo(
+            @PathVariable("auditId") Long auditId,
+            @PathVariable("authorId") Long authorId,
+            @PathVariable("bookId") Long bookId,
+            @RequestParam("auditStatus") Integer auditStatus
+    ) {
+        return bookInfoChangeService.getAuditInfo(auditId, authorId, bookId, auditStatus);
     }
 }

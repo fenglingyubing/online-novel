@@ -3,10 +3,7 @@ package com.fengling.service;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.AdminAuditChaptersListRespDto;
-import com.fengling.entity.dto.AdminAuditCreateListRespDto;
-import com.fengling.entity.dto.AdminAuditInfoReqDto;
-import com.fengling.entity.dto.AdminAuditListRespDto;
+import com.fengling.entity.dto.*;
 
 public interface BookInfoChangeService {
 
@@ -56,4 +53,15 @@ public interface BookInfoChangeService {
      * @return 无
      */
     CommonResult<Void> updateAdminAuditCreateStatus(Long auditId, AdminAuditInfoReqDto adminAuditInfoReqDto);
+
+    /**
+     * 变更信息审核信息详情查询
+     *
+     * @param auditId     审核id
+     * @param authorId    作家id
+     * @param bookId      小说id
+     * @param auditStatus 审核状态
+     * @return 审核信息详情
+     */
+    CommonResult<AdminAuditInfoRespDto> getAuditInfo(Long auditId, Long authorId, Long bookId, Integer auditStatus);
 }
