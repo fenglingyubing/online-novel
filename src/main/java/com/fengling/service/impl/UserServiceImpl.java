@@ -3,12 +3,12 @@ package com.fengling.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CacheConstants;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.context.UserContext;
-import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -233,6 +233,37 @@ public class UserServiceImpl implements UserService {
                 reqDto.getUserStatus()
         );
         return CommonResult.success(PageRespDto.of(pageUserManage));
+    }
+
+    @Override
+    public CommonResult<Void> updateUserStatus(Long userId, Integer userStatus) {
+        AdminInfoDto adminInfoDto = adminAuthUtil.adminAuth();
+
+        if (userId == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        if (
+                !CommonConstants.USER_STATUS_NORMAL.equals(userStatus) &&
+                        !CommonConstants.USER_STATUS_DISABLE.equals(userStatus)
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        if (userId.equals(adminInfoDto.getId())) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "不能修改自己的状态");
+        }
+
+        int update = userMapper.update(
+                new LambdaUpdateWrapper<UserInfo>()
+                        .set(UserInfo::getUserStatus, userStatus)
+                        .set(UserInfo::getUpdateTime, LocalDateTime.now())
+                        .eq(UserInfo::getId, userId)
+        );
+        if (update != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "操作失败");
+        }
+        return CommonResult.success();
     }
 
     private void userManageReqAuth(AdminUserManageListReqDto reqDto) {

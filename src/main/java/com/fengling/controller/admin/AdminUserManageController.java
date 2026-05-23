@@ -7,9 +7,7 @@ import com.fengling.entity.dto.AdminUserManageListReqDto;
 import com.fengling.entity.dto.AdminUserManageListRespDto;
 import com.fengling.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(ApiPathConstants.USER_MANAGE)
@@ -29,5 +27,20 @@ public class AdminUserManageController {
             AdminUserManageListReqDto reqDto
     ) {
         return userService.listUserManage(reqDto);
+    }
+
+    /**
+     * 用户状态更新
+     *
+     * @param userId     用户id
+     * @param userStatus 用户状态
+     * @return 无
+     */
+    @PutMapping("/update/status/{userId}/{userStatus}")
+    public CommonResult<Void> updateUserStatus(
+            @PathVariable("userId") Long userId,
+            @PathVariable("userStatus") Integer userStatus
+    ) {
+        return userService.updateUserStatus(userId, userStatus);
     }
 }

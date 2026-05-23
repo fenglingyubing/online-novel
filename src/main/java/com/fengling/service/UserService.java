@@ -1,6 +1,5 @@
 package com.fengling.service;
 
-import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.*;
@@ -61,4 +60,13 @@ public interface UserService {
      * @return 用户管理列表
      */
     CommonResult<PageRespDto<AdminUserManageListRespDto>> listUserManage(AdminUserManageListReqDto reqDto);
+
+    /**
+     * 用户状态更新
+     *
+     * @param userId     用户id
+     * @param userStatus 用户状态
+     * @return 无
+     */
+    CommonResult<Void> updateUserStatus(Long userId, Integer userStatus);
 }

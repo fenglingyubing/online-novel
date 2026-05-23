@@ -9,6 +9,7 @@
 - 1001 用户名已存在
 - 1002 用户名或密码错误
 - 1003 用户不存在
+- 1004 用户已被禁用
 
 ## 登录认证说明
 ```text
@@ -44,6 +45,7 @@
     /api/admin/{auditId}/info/chapter
     /api/admin/list/audit/{auditId}/chapters
     /api/admin/user/list
+    /api/admin/user/update/status/{userId}/{userStatus}
 
 当前强制登录的功能：
     查询书架小说列表
@@ -78,6 +80,7 @@
     管理员查询章节审核详情
     管理员审核章节申请
     管理员查询用户管理列表
+    管理员更新用户状态
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -92,13 +95,23 @@
         "data": null
     }
 
+账号禁用响应：
+    {
+        "code": 1004,
+        "message": "用户已被禁用",
+        "data": null
+    }
+
 说明：
     1. token由注册或登录接口返回
     2. Authorization必须以"Bearer "开头
     3. Bearer后面需要跟一个空格，再拼接token值
     4. 用户id由后端从token中解析，前端不需要传userId
     5. 强制登录接口未携带token或token无效会返回401
-    6. 可选登录接口未携带token仍可访问；携带有效token时，后端会识别当前用户
+    6. 强制登录接口携带有效token但账号已被禁用时会返回1004，并清除该用户Redis中的登录token
+    7. 可选登录接口未携带token仍可访问；携带有效token且账号状态正常时，后端会识别当前用户
+    8. 可选登录接口携带无效token、已失效token、用户不存在或账号已被禁用时，均按未登录处理，不会阻断接口访问
+    9. 可选登录接口识别到账号已被禁用时，会清除该用户Redis中的登录token
 ```
 
 ## 注册接口
@@ -1664,6 +1677,65 @@ pages -> 一共有几页
     9. 如果暂无用户数据，records为空数组，total为0
 ```
 
+## 管理员用户状态更新
+```text
+请求路径：
+/api/admin/user/update/status/{userId}/{userStatus}
+请求方式：
+    PUT
+请求头：
+    Authorization: Bearer token值
+参数：
+    userId -> 被修改状态的用户id
+    userStatus -> 用户状态（0-正常，1-禁用）
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    修改自己的状态：
+    {
+        "code": 500,
+        "message": "不能修改自己的状态",
+        "data": null
+    }
+    更新失败：
+    {
+        "code": 500,
+        "message": "操作失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传当前管理员id或userRole
+    4. userId为路径参数，表示需要被更新状态的用户id
+    5. userStatus只允许传0或1，0表示正常，1表示禁用
+    6. 管理员不能修改自己的状态
+    7. 更新成功后会同步更新用户信息的updateTime
+    8. 用户不存在或更新失败时返回操作失败
+```
+
 ## 作家草稿箱列表查询
 ```text
 请求路径：
@@ -2547,7 +2619,11 @@ chapterName -> 章节名称
 chapterContent -> 章节正文
 preChapterId -> 上一章id，没有上一章时为null
 nextChapterId -> 下一章id，没有下一章时为null
-说明：未登录用户可直接访问正文；登录用户携带有效token访问时，会自动更新书架中的lastReadChapterId和lastReadTime
+说明：
+    1. 未登录用户可直接访问正文
+    2. 登录用户携带有效token且账号状态正常时，会自动更新书架中的lastReadChapterId和lastReadTime
+    3. 未携带token、token无效、token已失效、用户不存在或账号已被禁用时，按未登录处理，不会更新书架阅读进度
+    4. 账号已被禁用时，后端会清除该用户Redis中的登录token
 ```
 
 ## 书架小说列表查询

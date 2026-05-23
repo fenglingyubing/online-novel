@@ -1,12 +1,16 @@
 package com.fengling.interceptor;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fengling.common.constant.CacheConstants;
+import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.context.AuthUserInfo;
 import com.fengling.common.context.UserContext;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.util.JWTUtil;
 import com.fengling.common.util.RedisUtil;
+import com.fengling.entity.UserInfo;
+import com.fengling.mapper.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     private final JWTUtil jwtUtil;
     private final RedisUtil redisUtil;
+    private final UserMapper userMapper;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -58,6 +63,22 @@ public class AuthInterceptor implements HandlerInterceptor {
         // Redis中是否有这个token
         if (redisToken == null || redisToken.isBlank() || !token.equals(redisToken)) {
             throw new BusinessException(ResultCodeEnum.UNAUTHORIZED);
+        }
+
+        // 判断用户状态
+        UserInfo userInfo = userMapper.selectOne(
+                new LambdaQueryWrapper<UserInfo>()
+                        .select(UserInfo::getUserStatus)
+                        .eq(UserInfo::getId, userId)
+        );
+
+        if (userInfo == null) {
+            throw new BusinessException(ResultCodeEnum.UNAUTHORIZED);
+        }
+
+        if (!CommonConstants.USER_STATUS_NORMAL.equals(userInfo.getUserStatus())) {
+            redisUtil.deleteKey(CacheConstants.AUTH_TOKEN + userId);
+            throw new BusinessException(ResultCodeEnum.ACCOUNT_DISABLED);
         }
 
         UserContext.setAuthUserInfo(authUserInfo);
