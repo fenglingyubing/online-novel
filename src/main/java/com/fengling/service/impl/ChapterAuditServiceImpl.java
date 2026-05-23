@@ -9,6 +9,7 @@ import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.AdminAuthUtil;
 import com.fengling.entity.ChapterAudit;
 import com.fengling.entity.ChapterInfo;
+import com.fengling.entity.dto.AdminAuditChapterRespDto;
 import com.fengling.entity.dto.AdminAuditInfoReqDto;
 import com.fengling.entity.dto.AdminInfoDto;
 import com.fengling.mapper.ChapterAuditMapper;
@@ -116,5 +117,25 @@ public class ChapterAuditServiceImpl implements ChapterAuditService {
             throw new BusinessException(ResultCodeEnum.FAIL, "审核失败");
         }
         return CommonResult.success();
+    }
+
+    @Override
+    public CommonResult<AdminAuditChapterRespDto> getAuditChapterInfo(Long auditId, Integer auditStatus) {
+        if (
+                auditStatus == null ||
+                        auditStatus < CommonConstants.CHAPTER_AUDIT_STATUS_AUDIT ||
+                        auditStatus > CommonConstants.CHAPTER_AUDIT_STATUS_REJECTED
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        adminAuthUtil.adminAuth();
+
+        AdminAuditChapterRespDto chapterRespDto = chapterAuditMapper.getAuditChapterInfo(auditId, auditStatus);
+
+        if (chapterRespDto == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "审核信息不存在");
+        }
+        return CommonResult.success(chapterRespDto);
     }
 }

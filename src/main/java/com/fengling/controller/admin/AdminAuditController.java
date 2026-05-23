@@ -136,4 +136,19 @@ public class AdminAuditController {
     ) {
         return bookInfoChangeService.getAuditCreateInfo(auditId, auditStatus);
     }
+
+    /**
+     * 章节审核信息详情查询
+     *
+     * @param auditId     审核id
+     * @param auditStatus 审核状态
+     * @return 章节审核信息详情
+     */
+    @GetMapping("/{auditId}/info/chapter")
+    public CommonResult<AdminAuditChapterRespDto> getAuditChapterInfo(
+            @PathVariable("auditId") Long auditId,
+            @RequestParam("auditStatus") Integer auditStatus
+    ) {
+        return chapterAuditService.getAuditChapterInfo(auditId, auditStatus);
+    }
 }

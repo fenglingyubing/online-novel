@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fengling.mapper.ChapterAuditMapper">
+
+    <!-- 章节审核信息详情查询-->
+    <select id="getAuditChapterInfo" resultType="com.fengling.entity.dto.AdminAuditChapterRespDto">
+        select ca.id,
+               bi.book_name       as bookName,
+               bc.chapter_name    as chapterName,
+               bc.chapter_content as chapterContent,
+               bc.word_count      as wordCount,
+               ca.author_id       as authorId,
+               ai.author_name     as authorName,
+               ui.nick_name       as auditAdminName,
+               ca.audit_remark    as auditRemark,
+               ca.audit_status    as auditStatus,
+               ca.create_time     as subTime,
+               ca.audit_time      as auditTime
+        from chapter_audit ca
+                 inner join book_chapter bc on ca.chapter_id = bc.id and ca.book_id = bc.book_id
+                 inner join book_info bi on ca.book_id = bi.id
+                 inner join author_info ai on ca.author_id = ai.id
+                 left join user_info ui on ca.audit_admin_id = ui.id
+        where ca.id = #{auditId}
+          and ca.audit_status = #{auditStatus}
+    </select>
+</mapper>

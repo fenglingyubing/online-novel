@@ -127,6 +127,7 @@
                ui.nick_name     as auditAdminName,
                bic.book_intro   as bookIntro,
                bic.cover_url    as coverUrl,
+               bic.audit_remark as auditRemark,
                bic.audit_type   as auditType,
                bic.audit_status as auditStatus,
                bic.create_time  as subTime,

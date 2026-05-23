@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * 管理员审核新书：查询新书详情响应结果
+ * 章节审核信息详情查询
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminAuditCreateRespDto {
+public class AdminAuditChapterRespDto {
 
     /**
      * 审核id
@@ -25,12 +25,27 @@ public class AdminAuditCreateRespDto {
     private String bookName;
 
     /**
+     * 章节名
+     */
+    private String chapterName;
+
+    /**
+     * 章节正文
+     */
+    private String chapterContent;
+
+    /**
+     * 字数
+     */
+    private Integer wordCount;
+
+    /**
      * 作家id
      */
     private Long authorId;
 
     /**
-     * 作家名
+     * 作家笔名
      */
     private String authorName;
 
@@ -40,24 +55,9 @@ public class AdminAuditCreateRespDto {
     private String auditAdminName;
 
     /**
-     * 小说简介
-     */
-    private String bookIntro;
-
-    /**
-     * 小说封面
-     */
-    private String coverUrl;
-
-    /**
      * 审核备注
      */
     private String auditRemark;
-
-    /**
-     * 审核类型
-     */
-    private Integer auditType;
 
     /**
      * 审核状态
