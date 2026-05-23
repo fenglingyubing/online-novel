@@ -1,9 +1,9 @@
 package com.fengling.controller.admin;
 
 import com.fengling.common.constant.ApiPathConstants;
-import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.entity.dto.AdminUserManageListReqDto;
 import com.fengling.entity.dto.AdminUserManageListRespDto;
 import com.fengling.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +21,13 @@ public class AdminUserManageController {
     /**
      * 用户管理列表查询
      *
-     * @param pageReqDto 分页请求参数
+     * @param reqDto 用户管理列表请求参数
      * @return 用户管理列表
      */
     @GetMapping(ApiPathConstants.LIST)
-    public CommonResult<PageRespDto<AdminUserManageListRespDto>> listUserManage(PageReqDto pageReqDto) {
-        return userService.listUserManage(pageReqDto);
+    public CommonResult<PageRespDto<AdminUserManageListRespDto>> listUserManage(
+            AdminUserManageListReqDto reqDto
+    ) {
+        return userService.listUserManage(reqDto);
     }
 }

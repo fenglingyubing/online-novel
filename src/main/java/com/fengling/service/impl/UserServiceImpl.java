@@ -183,7 +183,7 @@ public class UserServiceImpl implements UserService {
                         .eq(UserInfo::getId, userId)
         );
         String oldUserPhoto = oldUserInfo == null ? null : oldUserInfo.getUserPhoto();
-        log.info("旧头像链接: {}",oldUserPhoto);
+        log.info("旧头像链接: {}", oldUserPhoto);
         UserInfo userInfo = new UserInfo();
         userInfo.setId(userId);
         String userPhoto;
@@ -195,7 +195,7 @@ public class UserServiceImpl implements UserService {
             // 校验图片链接格式是否正确
             if (
                     !lower.startsWith(CommonConstants.IMAGE_PREFIX_HTTP) &&
-                    !lower.startsWith(CommonConstants.IMAGE_PREFIX_HTTPS)
+                            !lower.startsWith(CommonConstants.IMAGE_PREFIX_HTTPS)
             ) {
                 throw new BusinessException(ResultCodeEnum.FAIL, "图片链接格式错误");
             }
@@ -218,15 +218,40 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CommonResult<PageRespDto<AdminUserManageListRespDto>> listUserManage(PageReqDto pageReqDto) {
+    public CommonResult<PageRespDto<AdminUserManageListRespDto>> listUserManage(AdminUserManageListReqDto reqDto) {
         adminAuthUtil.adminAuth();
-        pageAuthUtil.pageAuth(pageReqDto);
+        pageAuthUtil.pageAuth(reqDto);
+        userManageReqAuth(reqDto);
 
         Page<AdminUserManageListRespDto> page = new Page<>(
-                pageReqDto.getPageNum(),
-                pageReqDto.getPageSize()
+                reqDto.getPageNum(),
+                reqDto.getPageSize()
         );
-        Page<AdminUserManageListRespDto> pageUserManage = userMapper.listUserManage(page);
+        Page<AdminUserManageListRespDto> pageUserManage = userMapper.listUserManage(
+                page,
+                reqDto.getUserRole(),
+                reqDto.getUserStatus()
+        );
         return CommonResult.success(PageRespDto.of(pageUserManage));
+    }
+
+    private void userManageReqAuth(AdminUserManageListReqDto reqDto) {
+        Integer userRole = reqDto.getUserRole();
+        if (
+                userRole != null &&
+                        (userRole < CommonConstants.USER_ROLE_ADMIN ||
+                                userRole > CommonConstants.USER_ROLE_AUTHOR)
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        Integer userStatus = reqDto.getUserStatus();
+        if (
+                userStatus != null &&
+                        !CommonConstants.USER_STATUS_NORMAL.equals(userStatus) &&
+                        !CommonConstants.USER_STATUS_DISABLE.equals(userStatus)
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
     }
 }

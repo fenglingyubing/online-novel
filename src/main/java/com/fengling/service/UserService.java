@@ -57,8 +57,8 @@ public interface UserService {
     /**
      * 用户管理列表查询
      *
-     * @param pageReqDto 分页请求参数
+     * @param reqDto 用户管理列表请求参数
      * @return 用户管理列表
      */
-    CommonResult<PageRespDto<AdminUserManageListRespDto>> listUserManage(PageReqDto pageReqDto);
+    CommonResult<PageRespDto<AdminUserManageListRespDto>> listUserManage(AdminUserManageListReqDto reqDto);
 }

@@ -6,9 +6,14 @@ public class CommonConstants {
     }
 
     /**
-     * 用户状态
+     * 用户状态：正常
      */
     public static final Integer USER_STATUS_NORMAL = 0;
+
+    /**
+     * 用户状态：禁用
+     */
+    public static final Integer USER_STATUS_DISABLE = 1;
 
     /**
      * 用户角色-作者

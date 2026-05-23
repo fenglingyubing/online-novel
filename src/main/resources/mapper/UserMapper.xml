@@ -15,6 +15,14 @@
                ui.create_time  as createTime,
                ui.user_status  as userStatus
         from user_info ui
-        order by create_time desc
+        <where>
+            <if test="userRole != null">
+                and ui.user_role = #{userRole}
+            </if>
+            <if test="userStatus != null">
+                and ui.user_status = #{userStatus}
+            </if>
+        </where>
+        order by ui.create_time desc
     </select>
 </mapper>

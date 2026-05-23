@@ -2,6 +2,7 @@
 ## 结果码
 - 200 操作成功
 - 500 操作失败
+- 501 参数无效
 - 401 未登录或登录已失效
 - 403 无权限访问
 - 404 资源未找到
@@ -1574,7 +1575,7 @@ auditRemark -> 审核备注，不传或为null时表示无备注
 ## 管理员用户管理列表查询
 ```text
 请求路径：
-/api/admin/user/list?pageNum=1&pageSize=10
+/api/admin/user/list?pageNum=1&pageSize=10&userRole=1&userStatus=0
 请求方式：
     GET
 请求头：
@@ -1582,6 +1583,8 @@ auditRemark -> 审核备注，不传或为null时表示无备注
 参数：
     pageNum -> 当前是第几页，默认1
     pageSize -> 每页有多少条数据，默认10，最大20
+    userRole -> 用户角色（0-管理员，1-读者，2-作家），不传表示全部角色
+    userStatus -> 用户状态（0-正常，1-禁用），不传表示全部状态
 响应数据：
     {
         "code": 200,
@@ -1637,10 +1640,16 @@ pages -> 一共有几页
         "message": "无权限访问",
         "data": null
     }
-    参数无效：
+    分页参数无效：
     {
         "code": 500,
         "message": "操作失败",
+        "data": null
+    }
+    筛选参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
         "data": null
     }
 说明：
@@ -1648,9 +1657,11 @@ pages -> 一共有几页
     2. 只有管理员角色用户可以访问
     3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
     4. pageNum和pageSize必须大于0，pageSize最大为20
-    5. 列表按注册时间倒序排列，最新注册的用户排在前面
-    6. 当前查询全部用户角色，包含管理员、读者和作家
-    7. 如果暂无用户数据，records为空数组，total为0
+    5. userRole只允许传0、1、2，不传时查询全部角色
+    6. userStatus只允许传0、1，不传时查询全部状态
+    7. 列表按注册时间倒序排列，最新注册的用户排在前面
+    8. 当前支持按用户角色和用户状态筛选
+    9. 如果暂无用户数据，records为空数组，total为0
 ```
 
 ## 作家草稿箱列表查询
