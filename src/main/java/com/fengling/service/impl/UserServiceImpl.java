@@ -3,16 +3,16 @@ package com.fengling.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CacheConstants;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.context.UserContext;
+import com.fengling.common.dto.PageReqDto;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.common.util.JWTUtil;
-import com.fengling.common.util.OSSUtil;
-import com.fengling.common.util.RedisUtil;
-import com.fengling.common.util.RegisterUtil;
+import com.fengling.common.util.*;
 import com.fengling.entity.UserInfo;
 import com.fengling.entity.dto.*;
 import com.fengling.mapper.UserMapper;
@@ -37,6 +37,8 @@ public class UserServiceImpl implements UserService {
     private final RedisUtil redisUtil;
     private final RegisterUtil registerUtil;
     private final OSSUtil ossUtil;
+    private final AdminAuthUtil adminAuthUtil;
+    private final PageAuthUtil pageAuthUtil;
 
     @Override
     public CommonResult<UserAuthRespDto> register(UserRegisterReqDto userRegisterReqDto) {
@@ -213,5 +215,18 @@ public class UserServiceImpl implements UserService {
             log.info("删除成功");
         }
         return CommonResult.success(new UserUploadPhotoRespDto(userPhoto));
+    }
+
+    @Override
+    public CommonResult<PageRespDto<AdminUserManageListRespDto>> listUserManage(PageReqDto pageReqDto) {
+        adminAuthUtil.adminAuth();
+        pageAuthUtil.pageAuth(pageReqDto);
+
+        Page<AdminUserManageListRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        Page<AdminUserManageListRespDto> pageUserManage = userMapper.listUserManage(page);
+        return CommonResult.success(PageRespDto.of(pageUserManage));
     }
 }

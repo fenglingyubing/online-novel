@@ -42,6 +42,7 @@
     /api/admin/list/chapters
     /api/admin/{auditId}/info/chapter
     /api/admin/list/audit/{auditId}/chapters
+    /api/admin/user/list
 
 当前强制登录的功能：
     查询书架小说列表
@@ -75,6 +76,7 @@
     管理员查询章节审核列表
     管理员查询章节审核详情
     管理员审核章节申请
+    管理员查询用户管理列表
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -1567,6 +1569,88 @@ auditRemark -> 审核备注，不传或为null时表示无备注
     8. 审核驳回后，章节状态会从审核中（3）变为草稿（0）
     9. 审核成功后会记录审核管理员、审核备注和审核时间
     10. 审核成功并更新章节状态后，章节审核记录会标记为已应用
+```
+
+## 管理员用户管理列表查询
+```text
+请求路径：
+/api/admin/user/list?pageNum=1&pageSize=10
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认10，最大20
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 2052767332125331457,
+                    "nickName": "reader_123456",
+                    "userRole": 1,
+                    "userPhoto": "https://xxx.com/avatar.png",
+                    "userBalance": 0,
+                    "createTime": "2026-05-11T12:00:00",
+                    "userStatus": 0
+                },
+                {
+                    "id": 2052767332125331458,
+                    "nickName": "author_123456",
+                    "userRole": 2,
+                    "userPhoto": null,
+                    "userBalance": 100,
+                    "createTime": "2026-05-10T12:00:00",
+                    "userStatus": 0
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 10,
+            "pages": 1
+        }
+    }
+id -> 用户id
+nickName -> 用户昵称
+userRole -> 用户角色（0-管理员，1-读者，2-作家）
+userPhoto -> 用户头像，未设置时为null
+userBalance -> 用户书币余额
+createTime -> 注册时间
+userStatus -> 用户状态（0-正常，1-禁用）
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 500,
+        "message": "操作失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. pageNum和pageSize必须大于0，pageSize最大为20
+    5. 列表按注册时间倒序排列，最新注册的用户排在前面
+    6. 当前查询全部用户角色，包含管理员、读者和作家
+    7. 如果暂无用户数据，records为空数组，total为0
 ```
 
 ## 作家草稿箱列表查询

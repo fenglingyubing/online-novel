@@ -45,4 +45,9 @@ public final class ApiPathConstants {
      * 管理员后台请求前缀
      */
     public static final String ADMIN = API + "/admin";
+
+    /**
+     * 管理员后台用户管理模块请求前缀
+     */
+    public static final String USER_MANAGE = ADMIN + "/user";
 }

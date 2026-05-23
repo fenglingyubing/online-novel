@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fengling.mapper.UserMapper">
+
+    <!--管理员后台：用户管理列表查询-->
+    <select id="listUserManage" resultType="com.fengling.entity.dto.AdminUserManageListRespDto">
+        select ui.id,
+               ui.nick_name    as nickName,
+               ui.user_role    as userRole,
+               ui.user_photo   as userPhoto,
+               ui.user_balance as userBalance,
+               ui.create_time  as createTime,
+               ui.user_status  as userStatus
+        from user_info ui
+        order by create_time desc
+    </select>
+</mapper>

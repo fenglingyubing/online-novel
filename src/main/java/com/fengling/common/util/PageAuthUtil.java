@@ -17,7 +17,7 @@ public class PageAuthUtil {
         }
         Long pageNum = pageReqDto.getPageNum();
         Long pageSize = pageReqDto.getPageSize();
-        if (pageNum == null || pageNum <= 0 || pageSize == null || pageSize <= 0) {
+        if (pageNum == null || pageNum <= 0 || pageSize == null || pageSize <= 0 || pageSize > 20) {
             throw new BusinessException(ResultCodeEnum.FAIL);
         }
     }

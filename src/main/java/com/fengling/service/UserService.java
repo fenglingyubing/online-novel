@@ -1,5 +1,7 @@
 package com.fengling.service;
 
+import com.fengling.common.dto.PageReqDto;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,5 +45,20 @@ public interface UserService {
      */
     CommonResult<Void> updateUserInfo(UserInfoMineReqDto userInfoMineReqDto);
 
+    /**
+     * 上传用户头像
+     *
+     * @param file     上传的头像文件
+     * @param imageUrl 头像链接
+     * @return 图像链接
+     */
     CommonResult<UserUploadPhotoRespDto> uploadUserPhoto(MultipartFile file, String imageUrl);
+
+    /**
+     * 用户管理列表查询
+     *
+     * @param pageReqDto 分页请求参数
+     * @return 用户管理列表
+     */
+    CommonResult<PageRespDto<AdminUserManageListRespDto>> listUserManage(PageReqDto pageReqDto);
 }
