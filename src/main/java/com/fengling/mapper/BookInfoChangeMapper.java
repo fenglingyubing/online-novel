@@ -73,4 +73,14 @@ public interface BookInfoChangeMapper extends BaseMapper<BookInfoChange> {
                                             @Param("authorId") Long authorId,
                                             @Param("bookId") Long bookId,
                                             @Param("auditStatus") Integer auditStatus);
+
+    /**
+     * 新书审核信息详情查询
+     *
+     * @param auditId     审核id
+     * @param auditStatus 审核状态
+     * @return 新书审核信息详情
+     */
+    AdminAuditCreateRespDto getAuditCreateInfo(@Param("auditId") Long auditId,
+                                               @Param("auditStatus") Integer auditStatus);
 }

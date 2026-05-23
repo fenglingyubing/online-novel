@@ -122,4 +122,18 @@ public class AdminAuditController {
     ) {
         return bookInfoChangeService.getAuditInfo(auditId, authorId, bookId, auditStatus);
     }
+
+    /**
+     * 新书审核信息详情查询
+     *
+     * @param auditId 审核id
+     * @return 新书审核信息详情
+     */
+    @GetMapping("/{auditId}/info/create")
+    public CommonResult<AdminAuditCreateRespDto> getAuditCreateInfo(
+            @PathVariable("auditId") Long auditId,
+            @RequestParam("auditStatus") Integer auditStatus
+    ) {
+        return bookInfoChangeService.getAuditCreateInfo(auditId, auditStatus);
+    }
 }

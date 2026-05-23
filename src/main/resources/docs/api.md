@@ -37,6 +37,7 @@
     /api/admin/{auditId}/info/{authorId}/{bookId}
     /api/admin/list/audit/{auditId}
     /api/admin/list/audit/{auditId}/create
+    /api/admin/{auditId}/info/create
     /api/admin/list/create
     /api/admin/list/chapters
     /api/admin/list/audit/{auditId}/chapters
@@ -69,6 +70,7 @@
     管理员审核小说变更申请
     管理员审核新建作品申请
     管理员查询新书审核列表
+    管理员查询新书审核详情
     管理员查询章节审核列表
     管理员审核章节申请
 
@@ -1260,6 +1262,82 @@ auditRemark -> 审核备注，不传或为null时表示无备注
     8. 审核驳回后，只更新审核状态、审核备注和审核时间，不会创建正式作品
     9. 审核成功后会记录审核管理员、审核备注和审核时间
     10. 审核通过并创建正式作品成功后，审核记录会标记为已应用
+```
+
+## 管理员新书审核详情查询
+```text
+请求路径：
+/api/admin/{auditId}/info/create?auditStatus=0
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    auditId -> 审核记录id
+    auditStatus -> 审核状态（0-待审核，1-已通过，2-已驳回），必传
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "id": 1,
+            "bookName": "碧阳仙门",
+            "authorId": 1,
+            "authorName": "风铃",
+            "auditAdminName": null,
+            "bookIntro": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙土。",
+            "coverUrl": "https://xxx.com/book-cover.png",
+            "auditType": 1,
+            "auditStatus": 0,
+            "subTime": "2026-05-11T12:00:00",
+            "auditTime": null
+        }
+    }
+id -> 审核记录id
+bookName -> 新建作品名称
+authorId -> 作家id
+authorName -> 作家笔名
+auditAdminName -> 审核管理员昵称，未审核时为null
+bookIntro -> 新建作品简介
+coverUrl -> 新建作品封面链接
+auditType -> 审核类型（1-新建作品）
+auditStatus -> 审核状态（0-待审核，1-已通过，2-已驳回）
+subTime -> 提交时间
+auditTime -> 审核时间，未审核时为null
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    审核信息不存在：
+    {
+        "code": 404,
+        "message": "审核信息不存在",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 该接口只查询新建作品审核详情，不查询小说信息变更和章节审核详情
+    5. auditStatus为0时表示待审核，1表示已通过，2表示已驳回
+    6. auditId和auditStatus必须同时匹配才会返回审核详情
+    7. 待审核记录的auditAdminName和auditTime通常为null
+    8. 审核记录不存在或不匹配时返回404
 ```
 
 ## 管理员章节审核列表查询

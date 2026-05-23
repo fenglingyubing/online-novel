@@ -117,4 +117,25 @@
           and bic.author_id = #{authorId}
           and bic.audit_status = #{auditStatus}
     </select>
+
+    <!--新书审核信息详情查询-->
+    <select id="getAuditCreateInfo" resultType="com.fengling.entity.dto.AdminAuditCreateRespDto">
+        select bic.id,
+               bic.book_name    as bookName,
+               bic.author_id    as authorId,
+               ai.author_name   as authorName,
+               ui.nick_name     as auditAdminName,
+               bic.book_intro   as bookIntro,
+               bic.cover_url    as coverUrl,
+               bic.audit_type   as auditType,
+               bic.audit_status as auditStatus,
+               bic.create_time  as subTime,
+               bic.audit_time   as auditTime
+        from book_info_change bic
+                 inner join author_info ai on bic.author_id = ai.id
+                 left join user_info ui on bic.audit_admin_id = ui.id
+        where bic.id = #{auditId}
+          and bic.audit_status = #{auditStatus}
+          and bic.audit_type = 1
+    </select>
 </mapper>

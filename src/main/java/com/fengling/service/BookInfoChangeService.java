@@ -64,4 +64,13 @@ public interface BookInfoChangeService {
      * @return 审核信息详情
      */
     CommonResult<AdminAuditInfoRespDto> getAuditInfo(Long auditId, Long authorId, Long bookId, Integer auditStatus);
+
+    /**
+     * 新书审核信息详情查询
+     *
+     * @param auditId     审核id
+     * @param auditStatus
+     * @return 新书审核信息详情
+     */
+    CommonResult<AdminAuditCreateRespDto> getAuditCreateInfo(Long auditId, Integer auditStatus);
 }

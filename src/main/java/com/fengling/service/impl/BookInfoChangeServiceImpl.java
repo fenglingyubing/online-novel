@@ -273,6 +273,26 @@ public class BookInfoChangeServiceImpl implements BookInfoChangeService {
         return CommonResult.success(auditInfoRespDto);
     }
 
+    @Override
+    public CommonResult<AdminAuditCreateRespDto> getAuditCreateInfo(Long auditId, Integer auditStatus) {
+        if (
+                auditStatus == null ||
+                        auditStatus < CommonConstants.NEW_BOOK_CHANGE_AUDIT ||
+                        auditStatus > CommonConstants.NEW_BOOK_CHANGE_REJECTED
+        ){
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        adminAuthUtil.adminAuth();
+        AdminAuditCreateRespDto auditCreateInfo =bookInfoChangeMapper.getAuditCreateInfo(auditId, auditStatus);
+
+        if (auditCreateInfo == null){
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "审核信息不存在");
+        }
+
+        return CommonResult.success(auditCreateInfo);
+    }
+
     /**
      * 审核列表参数校验
      *
