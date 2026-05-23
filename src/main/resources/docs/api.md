@@ -1366,6 +1366,7 @@ auditTime -> 审核时间，未审核时为null
                     "id": 1,
                     "chapterId": 1,
                     "bookName": "碧阳仙门",
+                    "authorId": 1,
                     "authorName": "风铃",
                     "chapterName": "第一章 碧阳仙门",
                     "wordCount": 4200,
@@ -1375,6 +1376,7 @@ auditTime -> 审核时间，未审核时为null
                     "id": 2,
                     "chapterId": 2,
                     "bookName": "修仙界唯一出马仙",
+                    "authorId": 2,
                     "authorName": "尼禄2077",
                     "chapterName": "第二章 入门",
                     "wordCount": 3800,
@@ -1390,6 +1392,7 @@ auditTime -> 审核时间，未审核时为null
 id -> 章节审核记录id
 chapterId -> 章节id
 bookName -> 小说名称
+authorId -> 作家id
 authorName -> 作家笔名
 chapterName -> 章节名称
 wordCount -> 章节字数

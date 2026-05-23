@@ -83,6 +83,7 @@
         select ca.id,
                ca.chapter_id   as chapterId,
                bi.book_name    as bookName,
+               ca.author_id    as authorId,
                ai.author_name  as authorName,
                bc.chapter_name as chapterName,
                bc.word_count   as wordCount,

@@ -30,6 +30,11 @@ public class AdminAuditChaptersListRespDto {
     private String bookName;
 
     /**
+     * 作家id
+     */
+    private Long authorId;
+
+    /**
      * 作家名
      */
     private String authorName;
