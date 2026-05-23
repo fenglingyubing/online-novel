@@ -64,9 +64,9 @@ public interface UserService {
     /**
      * 用户状态更新
      *
-     * @param userId     用户id
-     * @param userStatus 用户状态
+     * @param userId                 用户id
+     * @param userChangeStatusReqDto 用户封禁信息请求参数
      * @return 无
      */
-    CommonResult<Void> updateUserStatus(Long userId, Integer userStatus);
+    CommonResult<Void> updateUserStatusDisable(Long userId, AdminUserChangeStatusReqDto userChangeStatusReqDto);
 }

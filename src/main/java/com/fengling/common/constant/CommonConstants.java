@@ -179,4 +179,9 @@ public class CommonConstants {
      * 新书审核审核状态：已驳回
      */
     public static final Integer NEW_BOOK_CHANGE_REJECTED = 2;
+
+    /**
+     * 封禁状态：永久封禁
+     */
+    public static final Integer USER_PERMANENT_BAN = -1;
 }

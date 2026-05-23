@@ -13,19 +13,21 @@ import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.*;
+import com.fengling.entity.UserDisableInfo;
 import com.fengling.entity.UserInfo;
 import com.fengling.entity.dto.*;
+import com.fengling.mapper.UserDisableInfoMapper;
 import com.fengling.mapper.UserMapper;
 import com.fengling.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -39,6 +41,7 @@ public class UserServiceImpl implements UserService {
     private final OSSUtil ossUtil;
     private final AdminAuthUtil adminAuthUtil;
     private final PageAuthUtil pageAuthUtil;
+    private final UserDisableInfoMapper userDisableInfoMapper;
 
     @Override
     public CommonResult<UserAuthRespDto> register(UserRegisterReqDto userRegisterReqDto) {
@@ -236,17 +239,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CommonResult<Void> updateUserStatus(Long userId, Integer userStatus) {
+    @Transactional
+    public CommonResult<Void> updateUserStatusDisable(Long userId, AdminUserChangeStatusReqDto userChangeStatusReqDto) {
         AdminInfoDto adminInfoDto = adminAuthUtil.adminAuth();
 
-        if (userId == null) {
-            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
-        }
-
-        if (
-                !CommonConstants.USER_STATUS_NORMAL.equals(userStatus) &&
-                        !CommonConstants.USER_STATUS_DISABLE.equals(userStatus)
-        ) {
+        if (userId == null || userChangeStatusReqDto == null) {
             throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
         }
 
@@ -254,14 +251,46 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ResultCodeEnum.FAIL, "不能修改自己的状态");
         }
 
+        Integer disableDays = userChangeStatusReqDto.getDisableDays();
+        if (
+                disableDays == null ||
+                        (!CommonConstants.USER_PERMANENT_BAN.equals(disableDays) && disableDays <= 0) ||
+                        userChangeStatusReqDto.getDisableInfo().isBlank()
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        UserDisableInfo userDisableInfo = BeanUtil.copyProperties(
+                userChangeStatusReqDto,
+                UserDisableInfo.class
+        );
+
+        userDisableInfo.setUserId(userId);
+        userDisableInfo.setDisableAdminId(adminInfoDto.getId());
+        userDisableInfo.setDisableStatus(CommonConstants.USER_STATUS_DISABLE);
+        LocalDateTime now = LocalDateTime.now();
+        userDisableInfo.setDisableStartTime(now);
+        userDisableInfo.setCreateTime(now);
+        userDisableInfo.setUpdateTime(now);
+
+        if (!CommonConstants.USER_PERMANENT_BAN.equals(disableDays)) {
+            userDisableInfo.setDisableEndTime(now.plusDays(disableDays));
+        }
+
+        int i = userDisableInfoMapper.insert(userDisableInfo);
+        if (i != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "封禁失败");
+        }
+
         int update = userMapper.update(
                 new LambdaUpdateWrapper<UserInfo>()
-                        .set(UserInfo::getUserStatus, userStatus)
-                        .set(UserInfo::getUpdateTime, LocalDateTime.now())
+                        .set(UserInfo::getUserStatus, CommonConstants.USER_STATUS_DISABLE)
+                        .set(UserInfo::getUpdateTime, now)
                         .eq(UserInfo::getId, userId)
         );
+
         if (update != 1) {
-            throw new BusinessException(ResultCodeEnum.FAIL, "操作失败");
+            throw new BusinessException(ResultCodeEnum.FAIL, "封禁失败");
         }
         return CommonResult.success();
     }

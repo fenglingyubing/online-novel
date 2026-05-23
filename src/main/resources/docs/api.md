@@ -45,7 +45,7 @@
     /api/admin/{auditId}/info/chapter
     /api/admin/list/audit/{auditId}/chapters
     /api/admin/user/list
-    /api/admin/user/update/status/{userId}/{userStatus}
+    /api/admin/user/update/status/{userId}/disable
 
 当前强制登录的功能：
     查询书架小说列表
@@ -80,7 +80,7 @@
     管理员查询章节审核详情
     管理员审核章节申请
     管理员查询用户管理列表
-    管理员更新用户状态
+    管理员封禁用户
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -1677,17 +1677,25 @@ pages -> 一共有几页
     9. 如果暂无用户数据，records为空数组，total为0
 ```
 
-## 管理员用户状态更新
+## 管理员用户封禁
 ```text
 请求路径：
-/api/admin/user/update/status/{userId}/{userStatus}
+/api/admin/user/update/status/{userId}/disable
 请求方式：
     PUT
 请求头：
     Authorization: Bearer token值
 参数：
-    userId -> 被修改状态的用户id
-    userStatus -> 用户状态（0-正常，1-禁用）
+    userId -> 被封禁的用户id
+请求体：
+    {
+        "disableInfo": "发布违规内容",
+        "disableDays": 7,
+        "disableRemark": "多次发布广告"
+    }
+disableInfo -> 封禁原因，必传且不能为空字符串
+disableDays -> 封禁天数，必传；-1表示永久封禁，正整数表示封禁对应天数
+disableRemark -> 封禁备注，不传或为null时表示无备注
 响应数据：
     {
         "code": 200,
@@ -1719,21 +1727,21 @@ pages -> 一共有几页
         "message": "不能修改自己的状态",
         "data": null
     }
-    更新失败：
+    封禁失败：
     {
         "code": 500,
-        "message": "操作失败",
+        "message": "封禁失败",
         "data": null
     }
 说明：
     1. 该接口需要登录后调用
     2. 只有管理员角色用户可以访问
     3. 用户id和用户角色由后端从token中解析，前端不需要传当前管理员id或userRole
-    4. userId为路径参数，表示需要被更新状态的用户id
-    5. userStatus只允许传0或1，0表示正常，1表示禁用
-    6. 管理员不能修改自己的状态
-    7. 更新成功后会同步更新用户信息的updateTime
-    8. 用户不存在或更新失败时返回操作失败
+    4. userId为路径参数，表示需要被封禁的用户id
+    5. 管理员不能封禁自己
+    6. disableDays只能传-1或大于0的整数，-1表示永久封禁
+    7. 非永久封禁时，后端会根据当前时间加disableDays计算封禁结束时间
+    8. 封禁成功后会写入用户封禁记录，并将用户状态更新为禁用
 ```
 
 ## 作家草稿箱列表查询

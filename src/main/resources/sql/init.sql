@@ -160,3 +160,26 @@ CREATE TABLE `chapter_audit`
     KEY `idx_author_audit_status` (`author_id`, `audit_status`),
     KEY `idx_chapter_audit_status` (`chapter_id`, `audit_status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='章节审核表';
+
+-- 封禁信息表
+CREATE TABLE `user_disable_info`
+(
+    `id`                 BIGINT   NOT NULL AUTO_INCREMENT COMMENT '封禁id',
+    `user_id`            BIGINT   NOT NULL COMMENT '用户id',
+    `disable_info`       VARCHAR(255) NOT NULL COMMENT '封禁原因',
+    `disable_days`       INT      NOT NULL COMMENT '封禁天数（-1永久封禁）',
+    `disable_admin_id`   BIGINT   NOT NULL COMMENT '操作管理员id',
+    `disable_remark`     VARCHAR(500) DEFAULT NULL COMMENT '封禁备注',
+    `disable_start_time` DATETIME NOT NULL COMMENT '封禁开始时间',
+    `disable_end_time`   DATETIME     DEFAULT NULL COMMENT '封禁结束时间',
+    `disable_status`     TINYINT  NOT NULL DEFAULT 1 COMMENT '封禁状态（1-封禁中，2-已解封）',
+    `enable_time`        DATETIME     DEFAULT NULL COMMENT '解封时间',
+    `enable_admin_id`    BIGINT       DEFAULT NULL COMMENT '解封管理员id',
+    `create_time`        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_user_id` (`user_id`),
+    KEY `idx_disable_status` (`disable_status`),
+    KEY `idx_user_disable_status` (`user_id`, `disable_status`),
+    KEY `idx_disable_end_time` (`disable_end_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户封禁信息表';

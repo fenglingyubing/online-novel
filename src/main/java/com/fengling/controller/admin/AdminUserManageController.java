@@ -3,6 +3,7 @@ package com.fengling.controller.admin;
 import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.entity.dto.AdminUserChangeStatusReqDto;
 import com.fengling.entity.dto.AdminUserManageListReqDto;
 import com.fengling.entity.dto.AdminUserManageListRespDto;
 import com.fengling.service.UserService;
@@ -30,17 +31,16 @@ public class AdminUserManageController {
     }
 
     /**
-     * 用户状态更新
+     * 用户状态更新：封禁
      *
-     * @param userId     用户id
-     * @param userStatus 用户状态
+     * @param userId 用户id
      * @return 无
      */
-    @PutMapping("/update/status/{userId}/{userStatus}")
-    public CommonResult<Void> updateUserStatus(
+    @PutMapping("/update/status/{userId}/disable")
+    public CommonResult<Void> updateUserStatusDisable(
             @PathVariable("userId") Long userId,
-            @PathVariable("userStatus") Integer userStatus
+            @RequestBody AdminUserChangeStatusReqDto userChangeStatusReqDto
     ) {
-        return userService.updateUserStatus(userId, userStatus);
+        return userService.updateUserStatusDisable(userId, userChangeStatusReqDto);
     }
 }
