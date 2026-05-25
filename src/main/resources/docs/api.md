@@ -46,6 +46,7 @@
     /api/admin/list/audit/{auditId}/chapters
     /api/admin/user/list
     /api/admin/user/update/status/{userId}/disable
+    /api/admin/user/update/status/{userId}/enable
 
 当前强制登录的功能：
     查询书架小说列表
@@ -81,6 +82,7 @@
     管理员审核章节申请
     管理员查询用户管理列表
     管理员封禁用户
+    管理员解封用户
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -1742,6 +1744,70 @@ disableRemark -> 封禁备注，不传或为null时表示无备注
     6. disableDays只能传-1或大于0的整数，-1表示永久封禁
     7. 非永久封禁时，后端会根据当前时间加disableDays计算封禁结束时间
     8. 封禁成功后会写入用户封禁记录，并将用户状态更新为禁用
+```
+
+## 管理员用户解封
+```text
+请求路径：
+/api/admin/user/update/status/{userId}/enable
+请求方式：
+    PUT
+请求头：
+    Authorization: Bearer token值
+参数：
+    userId -> 被解封的用户id
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    修改自己的状态：
+    {
+        "code": 500,
+        "message": "不能修改自己的状态",
+        "data": null
+    }
+    封禁信息不存在：
+    {
+        "code": 404,
+        "message": "封禁信息不存在",
+        "data": null
+    }
+    解封失败：
+    {
+        "code": 500,
+        "message": "解封失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传当前管理员id或userRole
+    4. userId为路径参数，表示需要被解封的用户id
+    5. 管理员不能解封自己
+    6. 只有存在封禁中记录的用户可以解封
+    7. 解封成功后会更新封禁记录的解封时间、解封管理员和封禁状态
+    8. 解封成功后会将用户状态更新为正常
 ```
 
 ## 作家草稿箱列表查询

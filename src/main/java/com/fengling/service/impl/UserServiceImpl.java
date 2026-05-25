@@ -295,6 +295,60 @@ public class UserServiceImpl implements UserService {
         return CommonResult.success();
     }
 
+    @Override
+    @Transactional
+    public CommonResult<Void> updateUserStatusEnable(Long userId) {
+        AdminInfoDto adminInfoDto = adminAuthUtil.adminAuth();
+        if (userId == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        if (userId.equals(adminInfoDto.getId())) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "不能修改自己的状态");
+        }
+
+        UserDisableInfo userDisableInfo = userDisableInfoMapper.selectOne(
+                new LambdaQueryWrapper<UserDisableInfo>()
+                        .select(UserDisableInfo::getId)
+                        .eq(UserDisableInfo::getUserId, userId)
+                        .eq(UserDisableInfo::getDisableStatus, CommonConstants.USER_DISABLE_STATUS_DISABLE)
+                        .orderByDesc(UserDisableInfo::getCreateTime)
+                        .last("LIMIT 1")
+        );
+
+        if (userDisableInfo == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "封禁信息不存在");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        UserDisableInfo updateInfo = new UserDisableInfo();
+        updateInfo.setId(userDisableInfo.getId());
+        updateInfo.setEnableTime(now);
+        updateInfo.setDisableStatus(CommonConstants.USER_DISABLE_STATUS_ENABLE);
+        updateInfo.setUpdateTime(now);
+        updateInfo.setEnableAdminId(adminInfoDto.getId());
+
+        int i = userDisableInfoMapper.updateById(updateInfo);
+        if (i != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "解封失败");
+        }
+
+        int update = userMapper.update(
+                new LambdaUpdateWrapper<UserInfo>()
+                        .set(UserInfo::getUserStatus, CommonConstants.USER_STATUS_NORMAL)
+                        .set(UserInfo::getUpdateTime, now)
+                        .eq(UserInfo::getId, userId)
+                        .eq(UserInfo::getUserStatus, CommonConstants.USER_STATUS_DISABLE)
+        );
+
+        if (update != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "解封失败");
+        }
+
+        return CommonResult.success();
+    }
+
     private void userManageReqAuth(AdminUserManageListReqDto reqDto) {
         Integer userRole = reqDto.getUserRole();
         if (

@@ -43,4 +43,17 @@ public class AdminUserManageController {
     ) {
         return userService.updateUserStatusDisable(userId, userChangeStatusReqDto);
     }
+
+    /**
+     * 用户状态更新：解封
+     *
+     * @param userId 用户id
+     * @return 无
+     */
+    @PutMapping("/update/status/{userId}/enable")
+    public CommonResult<Void> updateUserStatusEnable(
+            @PathVariable("userId") Long userId
+    ) {
+        return userService.updateUserStatusEnable(userId);
+    }
 }

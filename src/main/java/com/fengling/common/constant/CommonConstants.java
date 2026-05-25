@@ -16,6 +16,16 @@ public class CommonConstants {
     public static final Integer USER_STATUS_DISABLE = 1;
 
     /**
+     * 封禁表：已解封
+     */
+    public static final Integer USER_DISABLE_STATUS_ENABLE = 2;
+
+    /**
+     * 封禁表：封禁中
+     */
+    public static final Integer USER_DISABLE_STATUS_DISABLE = 1;
+
+    /**
      * 用户角色-作者
      */
     public static final Integer USER_ROLE_AUTHOR = 2;

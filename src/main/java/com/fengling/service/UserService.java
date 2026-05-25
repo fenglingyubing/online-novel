@@ -69,4 +69,12 @@ public interface UserService {
      * @return 无
      */
     CommonResult<Void> updateUserStatusDisable(Long userId, AdminUserChangeStatusReqDto userChangeStatusReqDto);
+
+    /**
+     * 用户状态更新：解封
+     *
+     * @param userId 用户id
+     * @return 无
+     */
+    CommonResult<Void> updateUserStatusEnable(Long userId);
 }
