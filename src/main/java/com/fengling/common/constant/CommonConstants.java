@@ -194,4 +194,14 @@ public class CommonConstants {
      * 封禁状态：永久封禁
      */
     public static final Integer USER_PERMANENT_BAN = -1;
+
+    /**
+     * 推荐类型：首页
+     */
+    public static final Integer RECOMMEND_TYPE_HOME = 1;
+
+    /**
+     * 推荐类型：分类页
+     */
+    public static final Integer RECOMMEND_TYPE_CATEGORY = 2;
 }

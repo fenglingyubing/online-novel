@@ -47,6 +47,8 @@
     /api/admin/user/list
     /api/admin/user/update/status/{userId}/disable
     /api/admin/user/update/status/{userId}/enable
+    /api/admin/recommend/create
+    /api/admin/recommend/create/search
 
 当前强制登录的功能：
     查询书架小说列表
@@ -83,6 +85,8 @@
     管理员查询用户管理列表
     管理员封禁用户
     管理员解封用户
+    管理员新增推荐
+    管理员新增推荐时搜索小说
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -1808,6 +1812,133 @@ disableRemark -> 封禁备注，不传或为null时表示无备注
     6. 只有存在封禁中记录的用户可以解封
     7. 解封成功后会更新封禁记录的解封时间、解封管理员和封禁状态
     8. 解封成功后会将用户状态更新为正常
+```
+
+## 管理员新增推荐
+```text
+请求路径：
+/api/admin/recommend/create
+请求方式：
+    POST
+请求头：
+    Authorization: Bearer token值
+Content-Type：
+    application/json
+请求体：
+    {
+        "bookId": 1,
+        "categoryId": 1,
+        "recommendType": 2,
+        "startTime": "2026-05-25T10:00:00",
+        "endTime": "2026-06-01T10:00:00"
+    }
+bookId -> 推荐小说id，必传，且小说必须存在并处于上架状态
+categoryId -> 分类id；recommendType为2时必传，且必须与小说所属分类一致；recommendType为1时可不传
+recommendType -> 推荐类型（1-首页推荐，2-分类页轮播），必传
+startTime -> 推荐开始时间，必传
+endTime -> 推荐结束时间，必传，必须晚于startTime
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    小说不存在或未上架：
+    {
+        "code": 404,
+        "message": "小说信息不存在",
+        "data": null
+    }
+    新增失败：
+    {
+        "code": 500,
+        "message": "操作失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. 管理员id由后端从token中解析，前端不需要传adminId
+    4. recommendType只能传1或2；1表示首页推荐，2表示分类页轮播
+    5. recommendType为2时，categoryId不能为空，且必须与推荐小说的分类id一致
+    6. startTime必须早于endTime
+    7. 只有已上架小说可以被推荐
+    8. 推荐状态默认由数据库决定，当前表设计为0-启用
+```
+
+## 管理员新增推荐小说搜索
+```text
+请求路径：
+/api/admin/recommend/create/search?bookName=碧阳&authorName=风铃
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    bookName -> 小说名称，bookName和authorName至少传一个
+    authorName -> 作家笔名，bookName和authorName至少传一个
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": [
+            {
+                "id": 1,
+                "bookName": "碧阳仙门",
+                "authorName": "风铃",
+                "categoryId": 1
+            }
+        ]
+    }
+id -> 小说id
+bookName -> 小说名称
+authorName -> 作家笔名
+categoryId -> 小说分类id
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. bookName和authorName至少传一个，不能都为空
+    4. 当前只查询已上架小说
+    5. 当前按小说更新时间倒序返回前20条
+    6. 如果暂无匹配小说，data为空数组
 ```
 
 ## 作家草稿箱列表查询

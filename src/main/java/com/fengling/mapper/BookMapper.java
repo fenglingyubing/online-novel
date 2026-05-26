@@ -66,4 +66,14 @@ public interface BookMapper extends BaseMapper<BookInfo> {
      */
     AuthorBookInfoRespDto getAuthorBookInfo(@Param("bookId") Long bookId,
                                             @Param("authorId") Long authorId);
+
+    /**
+     * 根据小说名或作家名查询小说信息
+     *
+     * @param bookName   小说名
+     * @param authorName 作家名
+     * @return 小说信息
+     */
+    List<AdminRecommendSearchRespDto> getSearchBookInfo(@Param("bookName") String bookName,
+                                                  @Param("authorName") String authorName);
 }

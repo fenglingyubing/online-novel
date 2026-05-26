@@ -105,4 +105,32 @@
           and bi.author_id = #{authorId}
     </select>
 
+    <!--根据小说名或作家名查询小说信息-->
+    <select id="getSearchBookInfo" resultType="com.fengling.entity.dto.AdminRecommendSearchRespDto">
+        select bi.id,
+               bi.book_name as bookName,
+               ai.author_name as authorName,
+               bi.category_id as categoryId
+        from book_info bi
+        inner join author_info ai on bi.author_id = ai.id
+        <where>
+            bi.publish_status = 1
+            <if test="bookName != null and bookName != '' or authorName != null and authorName != ''">
+                and (
+                <if test="bookName != null and bookName != ''">
+                    bi.book_name like concat('%', #{bookName}, '%')
+                </if>
+                <if test="bookName != null and bookName != '' and authorName != null and authorName != ''">
+                    or
+                </if>
+                <if test="authorName != null and authorName != ''">
+                    ai.author_name like concat('%', #{authorName}, '%')
+                </if>
+                )
+            </if>
+        </where>
+        order by bi.update_time desc
+        limit 20
+    </select>
+
 </mapper>
