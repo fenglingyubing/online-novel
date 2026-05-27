@@ -52,6 +52,7 @@
     /api/admin/recommend/list
     /api/admin/recommend/update/{recommendId}/{recommendStatus}
     /api/admin/announcement/create
+    /api/admin/announcement/list
 
 当前强制登录的功能：
     查询书架小说列表
@@ -93,6 +94,7 @@
     管理员推荐列表查询
     管理员修改推荐状态
     管理员创建公告
+    管理员公告列表查询
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -2142,6 +2144,81 @@ publishStatus -> 发布状态（0-发布，1-草稿，2-下架），必传
     5. publishStatus只能传0、1、2；0表示发布，1表示草稿，2表示下架
     6. publishStatus为0时，后端会自动设置发布时间publishTime
     7. publishStatus为1或2时，publishTime为空
+```
+
+
+## 管理员公告列表查询
+```text
+请求路径：
+/api/admin/announcement/list?pageNum=1&pageSize=10
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认10
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "title": "系统维护通知",
+                    "announcementType": 0,
+                    "publishTime": null,
+                    "publishStatus": 1
+                },
+                {
+                    "id": 2,
+                    "title": "作者后台维护通知",
+                    "announcementType": 1,
+                    "publishTime": "2026-05-27T12:00:00",
+                    "publishStatus": 0
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 10,
+            "pages": 1
+        }
+    }
+id -> 公告id
+title -> 公告标题
+announcementType -> 公告类型（0-全体，1-作者，2-读者）
+publishTime -> 发布时间，草稿或未发布时为null
+publishStatus -> 发布状态（0-发布，1-草稿，2-下架）
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    分页参数无效：
+    {
+        "code": 500,
+        "message": "操作失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. pageNum和pageSize必须大于0
+    4. 列表按公告创建时间倒序排列，最新创建的公告排在前面
+    5. 如果暂无公告，records为空数组，total为0
 ```
 
 ## 作家草稿箱列表查询

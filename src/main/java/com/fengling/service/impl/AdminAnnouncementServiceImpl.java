@@ -1,13 +1,19 @@
 package com.fengling.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
+import com.fengling.common.dto.PageReqDto;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.AdminAuthUtil;
+import com.fengling.common.util.PageAuthUtil;
 import com.fengling.entity.AnnouncementInfo;
 import com.fengling.entity.dto.AdminAnnouncementCreateReqDto;
+import com.fengling.entity.dto.AdminAnnouncementListRespDto;
 import com.fengling.entity.dto.AdminInfoDto;
 import com.fengling.mapper.AnnouncementInfoMapper;
 import com.fengling.service.AdminAnnouncementService;
@@ -22,6 +28,7 @@ public class AdminAnnouncementServiceImpl implements AdminAnnouncementService {
 
     private final AnnouncementInfoMapper announcementInfoMapper;
     private final AdminAuthUtil adminAuthUtil;
+    private final PageAuthUtil pageAuthUtil;
 
     @Override
     public CommonResult<Void> saveAdminAnnouncementInfo(AdminAnnouncementCreateReqDto createReqDto) {
@@ -74,5 +81,19 @@ public class AdminAnnouncementServiceImpl implements AdminAnnouncementService {
             throw new BusinessException(ResultCodeEnum.FAIL, "创建公告失败");
         }
         return CommonResult.success();
+    }
+
+    @Override
+    public CommonResult<PageRespDto<AdminAnnouncementListRespDto>> listAnnouncement(PageReqDto pageReqDto) {
+        adminAuthUtil.adminAuth();
+        pageAuthUtil.pageAuth(pageReqDto);
+
+        Page<AdminAnnouncementListRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+
+        Page<AdminAnnouncementListRespDto> pageAnnouncement = announcementInfoMapper.listAnnouncement(page);
+        return CommonResult.success(PageRespDto.of(pageAnnouncement));
     }
 }

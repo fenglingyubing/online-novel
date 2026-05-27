@@ -1,7 +1,10 @@
 package com.fengling.service;
 
+import com.fengling.common.dto.PageReqDto;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.AdminAnnouncementCreateReqDto;
+import com.fengling.entity.dto.AdminAnnouncementListRespDto;
 
 public interface AdminAnnouncementService {
 
@@ -12,4 +15,12 @@ public interface AdminAnnouncementService {
      * @return 无
      */
     CommonResult<Void> saveAdminAnnouncementInfo(AdminAnnouncementCreateReqDto createReqDto);
+
+    /**
+     * 公告列表查询
+     *
+     * @param pageReqDto 分页请求参数
+     * @return 公告列表
+     */
+    CommonResult<PageRespDto<AdminAnnouncementListRespDto>> listAnnouncement(PageReqDto pageReqDto);
 }

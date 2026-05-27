@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fengling.mapper.AnnouncementInfoMapper">
+
+    <!--公告列表查询-->
+    <select id="listAnnouncement" resultType="com.fengling.entity.dto.AdminAnnouncementListRespDto">
+        select ai.id,
+               ai.title,
+               ai.announcement_type as announcementType,
+               ai.publish_time      as publishTime,
+               ai.publish_status    as publishStatus
+        from announcement_info ai
+        order by ai.create_time desc
+    </select>
+</mapper>
