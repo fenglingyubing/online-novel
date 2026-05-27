@@ -31,4 +31,12 @@ public interface AdminRecommendService {
      * @return 推荐类别列表
      */
     CommonResult<PageRespDto<AdminRecommendListRespDto>> listRecommendInfo(AdminRecommendReqDto recommendReqDto);
+
+    /**
+     * 修改推荐状态（上线/下线）
+     *
+     * @param recommendId 推荐id
+     * @return 无
+     */
+    CommonResult<Void> updateRecommendInfo(Long recommendId, Integer recommendStatus);
 }

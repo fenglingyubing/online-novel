@@ -146,7 +146,7 @@ public class AdminRecommendServiceImpl implements AdminRecommendService {
         Integer recommendType = recommendReqDto.getRecommendType();
         if (
                 recommendType != null &&
-                !CommonConstants.RECOMMEND_TYPE_HOME.equals(recommendType) &&
+                        !CommonConstants.RECOMMEND_TYPE_HOME.equals(recommendType) &&
                         !CommonConstants.RECOMMEND_TYPE_CATEGORY.equals(recommendType)
         ) {
             throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
@@ -158,5 +158,38 @@ public class AdminRecommendServiceImpl implements AdminRecommendService {
                 recommendType
         );
         return CommonResult.success(PageRespDto.of(pageRecommend));
+    }
+
+    @Override
+    public CommonResult<Void> updateRecommendInfo(Long recommendId, Integer recommendStatus) {
+        adminAuthUtil.adminAuth();
+        if (
+                recommendId == null ||
+                        recommendStatus == null ||
+                        (!CommonConstants.RECOMMEND_STATUS_ENABLE.equals(recommendStatus) &&
+                                !CommonConstants.RECOMMEND_STATUS_DISABLE.equals(recommendStatus))
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        AdminRecommend selectOne = adminRecommendMapper.selectOne(
+                new LambdaQueryWrapper<AdminRecommend>()
+                        .select(AdminRecommend::getId)
+                        .eq(AdminRecommend::getId, recommendId)
+        );
+
+        if (selectOne == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "推荐信息不存在");
+        }
+
+        AdminRecommend adminRecommend = new AdminRecommend();
+        adminRecommend.setId(recommendId);
+        adminRecommend.setRecommendStatus(recommendStatus);
+
+        int i = adminRecommendMapper.updateById(adminRecommend);
+        if (i != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "修改失败");
+        }
+        return CommonResult.success();
     }
 }

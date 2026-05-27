@@ -49,4 +49,18 @@ public class AdminRecommendController {
     public CommonResult<PageRespDto<AdminRecommendListRespDto>> listRecommendInfo(AdminRecommendReqDto recommendReqDto) {
         return adminRecommendService.listRecommendInfo(recommendReqDto);
     }
+
+    /**
+     * 修改推荐状态（上线/下线）
+     *
+     * @param recommendId 推荐id
+     * @return 无
+     */
+    @PutMapping("/update/{recommendId}/{recommendStatus}")
+    public CommonResult<Void> updateRecommendInfo(
+            @PathVariable("recommendId") Long recommendId,
+            @PathVariable("recommendStatus") Integer recommendStatus
+    ) {
+        return adminRecommendService.updateRecommendInfo(recommendId, recommendStatus);
+    }
 }

@@ -50,6 +50,7 @@
     /api/admin/recommend/create
     /api/admin/recommend/create/search
     /api/admin/recommend/list
+    /api/admin/recommend/update/{recommendId}/{recommendStatus}
 
 当前强制登录的功能：
     查询书架小说列表
@@ -89,6 +90,7 @@
     管理员新增推荐
     管理员新增推荐时搜索小说
     管理员推荐列表查询
+    管理员修改推荐状态
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -2019,6 +2021,62 @@ pages -> 一共有几页
     5. 当前只查询启用状态的推荐记录
     6. 列表按创建时间升序排列，先创建的推荐排在前面
     7. 如果暂无推荐记录，records为空数组，total为0
+```
+
+## 管理员修改推荐状态
+```text
+请求路径：
+/api/admin/recommend/update/{recommendId}/{recommendStatus}
+请求方式：
+    PUT
+请求头：
+    Authorization: Bearer token值
+参数：
+    recommendId -> 推荐id
+    recommendStatus -> 推荐状态（0-启用，1-禁用）
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    推荐信息不存在：
+    {
+        "code": 404,
+        "message": "推荐信息不存在",
+        "data": null
+    }
+    修改失败：
+    {
+        "code": 500,
+        "message": "修改失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. recommendStatus只能传0或1；0表示启用，1表示禁用
+    4. recommendId必须对应已存在的推荐记录
+    5. 该接口只修改推荐状态，不修改推荐小说、推荐类型和推荐时间
 ```
 
 ## 作家草稿箱列表查询

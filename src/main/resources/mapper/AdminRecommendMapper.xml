@@ -20,7 +20,6 @@
                  inner join book_info bi on ar.book_id = bi.id
                  inner join author_info ai on bi.author_id = ai.id
         <where>
-            ar.recommend_status = 0
             <if test="recommendType != null">
                 and ar.recommend_type = #{recommendType}
             </if>

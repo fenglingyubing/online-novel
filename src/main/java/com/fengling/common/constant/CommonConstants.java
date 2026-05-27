@@ -204,4 +204,14 @@ public class CommonConstants {
      * 推荐类型：分类页
      */
     public static final Integer RECOMMEND_TYPE_CATEGORY = 2;
+
+    /**
+     * 推荐状态：启用
+     */
+    public static final Integer RECOMMEND_STATUS_ENABLE = 0;
+
+    /**
+     * 推荐状态：禁用
+     */
+    public static final Integer RECOMMEND_STATUS_DISABLE = 1;
 }
