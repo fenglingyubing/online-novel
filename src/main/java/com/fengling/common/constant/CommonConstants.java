@@ -214,4 +214,34 @@ public class CommonConstants {
      * 推荐状态：禁用
      */
     public static final Integer RECOMMEND_STATUS_DISABLE = 1;
+
+    /**
+     * 公告发布状态：发布
+     */
+    public static final Integer ANNOUNCEMENT_PUBLISH_STATUS_RELEASE = 0;
+
+    /**
+     * 公告发布状态：草稿
+     */
+    public static final Integer ANNOUNCEMENT_PUBLISH_STATUS_DRAFT = 1;
+
+    /**
+     * 公告发布状态：下架
+     */
+    public static final Integer ANNOUNCEMENT_PUBLISH_STATUS_UNDER = 2;
+
+    /**
+     * 公告类型：全体用户
+     */
+    public static final Integer ANNOUNCEMENT_TYPE_ALL_USER = 0;
+
+    /**
+     * 公告类型：作家
+     */
+    public static final Integer ANNOUNCEMENT_TYPE_AUTHOR = 1;
+
+    /**
+     * 公告类型：读者
+     */
+    public static final Integer ANNOUNCEMENT_TYPE_READER = 2;
 }

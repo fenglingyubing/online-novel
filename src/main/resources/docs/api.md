@@ -51,6 +51,7 @@
     /api/admin/recommend/create/search
     /api/admin/recommend/list
     /api/admin/recommend/update/{recommendId}/{recommendStatus}
+    /api/admin/announcement/create
 
 当前强制登录的功能：
     查询书架小说列表
@@ -91,6 +92,7 @@
     管理员新增推荐时搜索小说
     管理员推荐列表查询
     管理员修改推荐状态
+    管理员创建公告
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -2077,6 +2079,69 @@ pages -> 一共有几页
     3. recommendStatus只能传0或1；0表示启用，1表示禁用
     4. recommendId必须对应已存在的推荐记录
     5. 该接口只修改推荐状态，不修改推荐小说、推荐类型和推荐时间
+```
+
+
+## 管理员创建公告
+```text
+请求路径：
+/api/admin/announcement/create
+请求方式：
+    POST
+请求头：
+    Authorization: Bearer token值
+Content-Type：
+    application/json
+请求体：
+    {
+        "title": "系统维护通知",
+        "announcementType": 0,
+        "content": "系统将于今晚进行维护，请提前保存数据。",
+        "publishStatus": 1
+    }
+title -> 公告标题，必传且不能为空字符串
+announcementType -> 公告类型（0-全体，1-作者，2-读者），必传
+content -> 公告内容，必传且不能为空字符串
+publishStatus -> 发布状态（0-发布，1-草稿，2-下架），必传
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    创建失败：
+    {
+        "code": 500,
+        "message": "创建公告失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. 发布人id由后端从token中解析，前端不需要传publisherId
+    4. announcementType只能传0、1、2；0表示全体，1表示作者，2表示读者
+    5. publishStatus只能传0、1、2；0表示发布，1表示草稿，2表示下架
+    6. publishStatus为0时，后端会自动设置发布时间publishTime
+    7. publishStatus为1或2时，publishTime为空
 ```
 
 ## 作家草稿箱列表查询

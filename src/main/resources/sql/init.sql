@@ -203,3 +203,20 @@ CREATE TABLE `admin_recommend`
     KEY                `idx_book_id` (`book_id`),
     KEY                `idx_admin_id` (`admin_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员推荐表';
+
+-- 公告表
+CREATE TABLE `announcement_info`
+(
+    `id`                BIGINT       NOT NULL AUTO_INCREMENT COMMENT '公告id',
+    `publisher_id`      BIGINT       NOT NULL COMMENT '发布人id',
+    `title`             VARCHAR(255) NOT NULL COMMENT '公告标题',
+    `content`           TEXT         NOT NULL COMMENT '公告详情',
+    `publish_status`    TINYINT      NOT NULL DEFAULT 1 COMMENT '发布状态（0-发布，1-草稿，2-下架）',
+    `announcement_type` TINYINT      NOT NULL DEFAULT 0 COMMENT '公告类型（0-全体，1-作者，2-读者）',
+    `publish_time`      DATETIME              DEFAULT NULL COMMENT '发布时间',
+    `create_time`       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    KEY                 `idx_status_type_time` (`publish_status`, `announcement_type`, `publish_time`),
+    KEY                 `idx_publisher_id` (`publisher_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='公告信息表';

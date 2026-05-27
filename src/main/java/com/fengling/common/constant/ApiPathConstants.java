@@ -55,4 +55,9 @@ public final class ApiPathConstants {
      * 管理员后台推荐模块请求前缀
      */
     public static final String RECOMMEND = ADMIN + "/recommend";
+
+    /**
+     * 管理员后台公告模块请求前缀
+     */
+    public static final String ANNOUNCEMENT = ADMIN + "/announcement";
 }

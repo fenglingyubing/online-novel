@@ -1,0 +1,78 @@
+package com.fengling.service.impl;
+
+import cn.hutool.core.bean.BeanUtil;
+import com.fengling.common.constant.CommonConstants;
+import com.fengling.common.constant.ResultCodeEnum;
+import com.fengling.common.exception.BusinessException;
+import com.fengling.common.resp.CommonResult;
+import com.fengling.common.util.AdminAuthUtil;
+import com.fengling.entity.AnnouncementInfo;
+import com.fengling.entity.dto.AdminAnnouncementCreateReqDto;
+import com.fengling.entity.dto.AdminInfoDto;
+import com.fengling.mapper.AnnouncementInfoMapper;
+import com.fengling.service.AdminAnnouncementService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
+@Service
+@RequiredArgsConstructor
+public class AdminAnnouncementServiceImpl implements AdminAnnouncementService {
+
+    private final AnnouncementInfoMapper announcementInfoMapper;
+    private final AdminAuthUtil adminAuthUtil;
+
+    @Override
+    public CommonResult<Void> saveAdminAnnouncementInfo(AdminAnnouncementCreateReqDto createReqDto) {
+        if (createReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+        AdminInfoDto adminInfoDto = adminAuthUtil.adminAuth();
+
+        Integer announcementType = createReqDto.getAnnouncementType();
+        Integer publishStatus = createReqDto.getPublishStatus();
+        String title = createReqDto.getTitle();
+        String content = createReqDto.getContent();
+        if (
+                title == null ||
+                        title.isBlank() ||
+                        announcementType == null ||
+                        content == null ||
+                        content.isBlank() ||
+                        publishStatus == null
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        if (
+                announcementType < CommonConstants.ANNOUNCEMENT_TYPE_ALL_USER ||
+                        announcementType > CommonConstants.ANNOUNCEMENT_TYPE_READER ||
+                        publishStatus < CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_RELEASE ||
+                        publishStatus > CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_UNDER
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        AnnouncementInfo announcementInfo = BeanUtil.copyProperties(
+                createReqDto,
+                AnnouncementInfo.class
+        );
+
+        LocalDateTime now = LocalDateTime.now();
+        announcementInfo.setPublisherId(adminInfoDto.getId());
+        announcementInfo.setCreateTime(now);
+        announcementInfo.setUpdateTime(now);
+
+        if (CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_RELEASE.equals(publishStatus)) {
+            announcementInfo.setPublishTime(now);
+        }
+
+        int insert = announcementInfoMapper.insert(announcementInfo);
+
+        if (insert != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "创建公告失败");
+        }
+        return CommonResult.success();
+    }
+}
