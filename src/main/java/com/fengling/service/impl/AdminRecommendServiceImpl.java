@@ -2,17 +2,16 @@ package com.fengling.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.AdminAuthUtil;
 import com.fengling.entity.AdminRecommend;
 import com.fengling.entity.BookInfo;
-import com.fengling.entity.dto.AdminInfoDto;
-import com.fengling.entity.dto.AdminRecommendCreateReqDto;
-import com.fengling.entity.dto.AdminRecommendSearchReqDto;
-import com.fengling.entity.dto.AdminRecommendSearchRespDto;
+import com.fengling.entity.dto.*;
 import com.fengling.mapper.AdminRecommendMapper;
 import com.fengling.mapper.BookMapper;
 import com.fengling.service.AdminRecommendService;
@@ -128,5 +127,36 @@ public class AdminRecommendServiceImpl implements AdminRecommendService {
                 authorName
         );
         return CommonResult.success(searchRespDto);
+    }
+
+    @Override
+    public CommonResult<PageRespDto<AdminRecommendListRespDto>> listRecommendInfo(AdminRecommendReqDto recommendReqDto) {
+        adminAuthUtil.adminAuth();
+
+        if (recommendReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        Long pageNum = recommendReqDto.getPageNum();
+        Long pageSize = recommendReqDto.getPageSize();
+        if (pageNum == null || pageNum <= 0 || pageSize == null || pageSize <= 0 || pageSize > 20) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        Integer recommendType = recommendReqDto.getRecommendType();
+        if (
+                recommendType != null &&
+                !CommonConstants.RECOMMEND_TYPE_HOME.equals(recommendType) &&
+                        !CommonConstants.RECOMMEND_TYPE_CATEGORY.equals(recommendType)
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        Page<AdminRecommendListRespDto> page = new Page<>(pageNum, pageSize);
+        Page<AdminRecommendListRespDto> pageRecommend = adminRecommendMapper.listRecommendInfo(
+                page,
+                recommendType
+        );
+        return CommonResult.success(PageRespDto.of(pageRecommend));
     }
 }

@@ -49,6 +49,7 @@
     /api/admin/user/update/status/{userId}/enable
     /api/admin/recommend/create
     /api/admin/recommend/create/search
+    /api/admin/recommend/list
 
 当前强制登录的功能：
     查询书架小说列表
@@ -87,6 +88,7 @@
     管理员解封用户
     管理员新增推荐
     管理员新增推荐时搜索小说
+    管理员推荐列表查询
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -1939,6 +1941,84 @@ categoryId -> 小说分类id
     4. 当前只查询已上架小说
     5. 当前按小说更新时间倒序返回前20条
     6. 如果暂无匹配小说，data为空数组
+```
+
+## 管理员推荐列表查询
+```text
+请求路径：
+/api/admin/recommend/list?pageNum=1&pageSize=10&recommendType=1
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认10，最大20
+    recommendType -> 推荐类型（1-首页推荐，2-分类页轮播），不传表示查询全部类型
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "recommendType": 1,
+                    "bookId": 1,
+                    "coverUrl": "https://xxx.com/book-cover.png",
+                    "bookName": "碧阳仙门",
+                    "authorName": "风铃",
+                    "startTime": "2026-05-25T10:00:00",
+                    "endTime": "2026-06-01T10:00:00",
+                    "recommendStatus": 0
+                }
+            ],
+            "total": 1,
+            "pageNum": 1,
+            "pageSize": 10,
+            "pages": 1
+        }
+    }
+id -> 推荐id
+recommendType -> 推荐类型（1-首页推荐，2-分类页轮播）
+bookId -> 推荐小说id
+coverUrl -> 小说封面链接
+bookName -> 小说名称
+authorName -> 作家笔名
+startTime -> 推荐开始时间
+endTime -> 推荐结束时间
+recommendStatus -> 推荐状态（0-启用）
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. recommendType不传时查询全部推荐类型；传入时只能为1或2，1表示首页推荐，2表示分类页轮播
+    4. pageNum和pageSize必须大于0，pageSize最大为20
+    5. 当前只查询启用状态的推荐记录
+    6. 列表按创建时间升序排列，先创建的推荐排在前面
+    7. 如果暂无推荐记录，records为空数组，total为0
 ```
 
 ## 作家草稿箱列表查询

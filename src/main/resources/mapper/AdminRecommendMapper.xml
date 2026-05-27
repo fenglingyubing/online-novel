@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fengling.mapper.AdminRecommendMapper">
+
+    <!--推荐列表查询-->
+    <select id="listRecommendInfo" resultType="com.fengling.entity.dto.AdminRecommendListRespDto">
+        select ar.id,
+               ar.recommend_type   as recommendType,
+               ar.book_id          as bookId,
+               bi.cover_url        as coverUrl,
+               bi.book_name        as bookName,
+               ai.author_name      as authorName,
+               ar.start_time       as startTime,
+               ar.end_time         as endTime,
+               ar.recommend_status as recommendStatus
+        from admin_recommend ar
+                 inner join book_info bi on ar.book_id = bi.id
+                 inner join author_info ai on bi.author_id = ai.id
+        <where>
+            ar.recommend_status = 0
+            <if test="recommendType != null">
+                and ar.recommend_type = #{recommendType}
+            </if>
+        </where>
+        order by ar.create_time
+    </select>
+</mapper>

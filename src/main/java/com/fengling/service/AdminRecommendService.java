@@ -1,9 +1,8 @@
 package com.fengling.service;
 
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.AdminRecommendCreateReqDto;
-import com.fengling.entity.dto.AdminRecommendSearchReqDto;
-import com.fengling.entity.dto.AdminRecommendSearchRespDto;
+import com.fengling.entity.dto.*;
 
 import java.util.List;
 
@@ -24,4 +23,12 @@ public interface AdminRecommendService {
      * @return 小说信息
      */
     CommonResult<List<AdminRecommendSearchRespDto>> getSearchBookInfo(AdminRecommendSearchReqDto searchReqDto);
+
+    /**
+     * 推荐类列表查询
+     *
+     * @param recommendReqDto 列表查询请求参数
+     * @return 推荐类别列表
+     */
+    CommonResult<PageRespDto<AdminRecommendListRespDto>> listRecommendInfo(AdminRecommendReqDto recommendReqDto);
 }

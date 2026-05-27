@@ -1,10 +1,9 @@
 package com.fengling.controller.admin;
 
 import com.fengling.common.constant.ApiPathConstants;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.AdminRecommendCreateReqDto;
-import com.fengling.entity.dto.AdminRecommendSearchReqDto;
-import com.fengling.entity.dto.AdminRecommendSearchRespDto;
+import com.fengling.entity.dto.*;
 import com.fengling.service.AdminRecommendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -38,5 +37,16 @@ public class AdminRecommendController {
     @GetMapping("/create/search")
     public CommonResult<List<AdminRecommendSearchRespDto>> getSearchBookInfo(AdminRecommendSearchReqDto searchReqDto) {
         return adminRecommendService.getSearchBookInfo(searchReqDto);
+    }
+
+    /**
+     * 推荐类列表查询
+     *
+     * @param recommendReqDto 列表查询请求参数
+     * @return 推荐类别列表
+     */
+    @GetMapping(ApiPathConstants.LIST)
+    public CommonResult<PageRespDto<AdminRecommendListRespDto>> listRecommendInfo(AdminRecommendReqDto recommendReqDto) {
+        return adminRecommendService.listRecommendInfo(recommendReqDto);
     }
 }
