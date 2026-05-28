@@ -111,4 +111,11 @@ public interface BookService {
      * @return 变更信息详情
      */
     CommonResult<AuthorAuditInfoRespDto> getAuditInfo(Long auditId);
+
+    /**
+     * 首页推荐书籍查询
+     *
+     * @return 推荐书籍
+     */
+    CommonResult<RecommendBookInfoRespDto> getRecommendBookInfo();
 }

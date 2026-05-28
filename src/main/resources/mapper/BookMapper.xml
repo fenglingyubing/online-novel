@@ -133,4 +133,18 @@
         limit 20
     </select>
 
+    <!--首页推荐书籍查询-->
+    <select id="getRecommendBookInfo" resultType="com.fengling.entity.dto.RecommendBookInfoRespDto">
+        select bi.id,
+               bi.book_name as bookName,
+               bi.book_intro as bookIntro,
+               bi.cover_url as coverUrl
+        from book_info bi
+        inner join admin_recommend ac on bi.id = ac.book_id
+        where ac.start_time &lt; #{nowDate} and ac.end_time &gt; #{nowDate}
+        and ac.recommend_type = 1
+        and ac.recommend_status = 0
+        order by ac.create_time desc
+        limit 1
+    </select>
 </mapper>

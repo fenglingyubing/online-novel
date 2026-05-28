@@ -4,10 +4,7 @@ import com.fengling.common.constant.ApiPathConstants;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.BookInfoRespDto;
-import com.fengling.entity.dto.BookListRespDto;
-import com.fengling.entity.dto.BookRecentListRespDto;
-import com.fengling.entity.dto.ChapterContentRespDto;
+import com.fengling.entity.dto.*;
 import com.fengling.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,5 +67,15 @@ public class BookController {
     @GetMapping("/recent")
     public CommonResult<List<BookRecentListRespDto>> listRecentBookList() {
         return bookService.listRecentBookList();
+    }
+
+    /**
+     * 首页推荐书籍查询
+     *
+     * @return 推荐书籍
+     */
+    @GetMapping("/recommend")
+    public CommonResult<RecommendBookInfoRespDto> getRecommendBookInfo() {
+        return bookService.getRecommendBookInfo();
     }
 }

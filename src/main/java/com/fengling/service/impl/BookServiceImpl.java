@@ -432,6 +432,17 @@ public class BookServiceImpl implements BookService {
         return CommonResult.success(authorAuditInfoRespDto);
     }
 
+    @Override
+    public CommonResult<RecommendBookInfoRespDto> getRecommendBookInfo() {
+        LocalDateTime now = LocalDateTime.now();
+        RecommendBookInfoRespDto respDto = bookMapper.getRecommendBookInfo(now);
+        if (respDto == null) {
+            return CommonResult.success(null);
+        }
+        respDto.setBookIntro(shortBookIntro(respDto.getBookIntro()));
+        return CommonResult.success(respDto);
+    }
+
     /**
      * 验证小说是否属于当前作者
      *

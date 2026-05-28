@@ -7,6 +7,7 @@ import com.fengling.entity.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -75,5 +76,13 @@ public interface BookMapper extends BaseMapper<BookInfo> {
      * @return 小说信息
      */
     List<AdminRecommendSearchRespDto> getSearchBookInfo(@Param("bookName") String bookName,
-                                                  @Param("authorName") String authorName);
+                                                        @Param("authorName") String authorName);
+
+    /**
+     * 首页推荐书籍查询
+     *
+     * @param now 当前时间
+     * @return 推荐书籍
+     */
+    RecommendBookInfoRespDto getRecommendBookInfo(@Param("nowDate") LocalDateTime nowDate);
 }

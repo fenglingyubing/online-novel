@@ -3200,6 +3200,35 @@ categoryName -> 小说分类名称
 说明：该接口默认返回已发布小说中最新上架的前4本
 ```
 
+## 首页推荐书籍查询
+```text
+请求路径：
+/api/novel/recommend
+请求方式：
+    GET
+参数：
+    无
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "id": 1,
+            "bookName": "碧阳仙门",
+            "bookIntro": "自从天道定鼎，仙释共分万国。仙门称碧阳，赤释作妙……",
+            "coverUrl": "https://bookcover.yuewen.com/qdbimg/349573/1048992740/600.webp"
+        }
+    }
+id -> 小说id
+bookName -> 小说名称
+bookIntro -> 小说简介（截断后）
+coverUrl -> 小说封面链接
+说明：
+    1. 该接口查询当前时间内生效、启用状态的首页推荐小说
+    2. 当前只返回一条首页推荐小说
+    3. 如果暂无生效的首页推荐小说，data为null
+```
+
 ## 小说详情页查询
 ```text
 请求路径：
