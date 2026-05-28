@@ -39,7 +39,7 @@ public class AuthorServiceImpl implements AuthorService {
     private final AuthorAuthUtil authorAuthUtil;
     private final ChapterMapper chapterMapper;
     private final PageAuthUtil pageAuthUtil;
-    private final BookInfoChangeMapper bookInfoChangeMapper;
+    private final AnnouncementInfoMapper announcementInfoMapper;
 
     @Transactional
     @Override
@@ -248,6 +248,19 @@ public class AuthorServiceImpl implements AuthorService {
                 authorId
         );
         return CommonResult.success(PageRespDto.of(pageList));
+    }
+
+    @Override
+    public CommonResult<PageRespDto<AuthorAnnouncement>> listAnnouncement(PageReqDto pageReqDto) {
+        authorAuthUtil.authorAuth();
+        pageAuthUtil.pageAuth(pageReqDto);
+
+        Page<AuthorAnnouncement> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        Page<AuthorAnnouncement> pageAnnouncement = announcementInfoMapper.listAnnouncementAuthor(page);
+        return CommonResult.success(PageRespDto.of(pageAnnouncement));
     }
 
     /**

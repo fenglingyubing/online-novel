@@ -26,4 +26,15 @@
         from announcement_info ai
         where ai.id = #{announcementId}
     </select>
+
+    <!--作家后台公告列表查询-->
+    <select id="listAnnouncementAuthor" resultType="com.fengling.entity.dto.AuthorAnnouncement">
+        select ai.id,
+               ai.title,
+               ai.publish_time as publishTime
+        from announcement_info ai
+        where ai.publish_status = 0
+          and (ai.announcement_type = 1 or ai.announcement_type = 0)
+        order by ai.publish_time desc
+    </select>
 </mapper>

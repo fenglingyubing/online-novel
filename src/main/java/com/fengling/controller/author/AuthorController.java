@@ -81,4 +81,15 @@ public class AuthorController {
     public CommonResult<PageRespDto<AuthorAuditListRespDto>> listAudits(PageReqDto pageReqDto) {
         return authorService.listAudits(pageReqDto);
     }
+
+    /**
+     * 公告列表查询
+     *
+     * @param pageReqDto 分页请求参数
+     * @return 公告列表
+     */
+    @GetMapping(ApiPathConstants.LIST + "/announcement")
+    public CommonResult<PageRespDto<AuthorAnnouncement>> listAnnouncement(PageReqDto pageReqDto) {
+        return authorService.listAnnouncement(pageReqDto);
+    }
 }

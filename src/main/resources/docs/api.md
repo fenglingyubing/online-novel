@@ -31,6 +31,7 @@
     /api/author/bookinfo/audit/{auditId}
     /api/author/drafts
     /api/author/audit/list
+    /api/author/list/announcement
     /api/author/edit/booklist
     /api/author/{bookId}/chapters
     /api/author/{bookId}/chapters/{chapterId}
@@ -75,6 +76,7 @@
     删除小说变更信息待审核记录
     查询作家草稿箱列表
     查询作家审核章节列表
+    查询作家公告列表
     查询作家编辑页小说列表
     新增作家章节信息
     查询作家某本小说的某个章节信息
@@ -2551,6 +2553,70 @@ pages -> 一共有几页
     4. 只查询当前登录作家自己作品下的审核中章节
     5. 只返回审核中状态章节，按提交审核时间倒序排列
     6. 如果当前作家暂无审核中章节，records为空数组，total为0
+```
+
+## 作家公告列表查询
+```text
+请求路径：
+/api/author/list/announcement?pageNum=1&pageSize=10
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认10
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "title": "作者后台维护通知",
+                    "publishTime": "2026-05-27T12:00:00"
+                },
+                {
+                    "id": 2,
+                    "title": "平台公告",
+                    "publishTime": "2026-05-26T12:00:00"
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 10,
+            "pages": 1
+        }
+    }
+id -> 公告id
+title -> 公告标题
+publishTime -> 发布时间
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是作家：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有作家角色用户可以访问
+    3. 用户id和用户角色由后端从token中解析，前端不需要传userId或userRole
+    4. 只查询已发布公告
+    5. 只返回面向作家和全体用户的公告
+    6. 列表按发布时间倒序排列，最新发布的公告排在前面
+    7. 如果暂无公告，records为空数组，total为0
 ```
 
 ## 作家审核章节撤回

@@ -55,4 +55,12 @@ public interface AuthorService {
      * @return 作家审核章节响应结果
      */
     CommonResult<PageRespDto<AuthorAuditListRespDto>> listAudits(PageReqDto pageReqDto);
+
+    /**
+     * 公告列表查询
+     *
+     * @param pageReqDto 分页请求参数
+     * @return 公告列表
+     */
+    CommonResult<PageRespDto<AuthorAnnouncement>> listAnnouncement(PageReqDto pageReqDto);
 }
