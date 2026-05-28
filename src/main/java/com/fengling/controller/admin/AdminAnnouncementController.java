@@ -68,4 +68,18 @@ public class AdminAnnouncementController {
         return announcementService.updateAnnouncement(announcementId, updateReqDto);
     }
 
+    /**
+     * 修改发布状态
+     *
+     * @param announcementId 发布id
+     * @param publishStatus  发布状态
+     * @return 无
+     */
+    @PutMapping(ApiPathConstants.LIST + "/{announcementId}/{publishStatus}")
+    public CommonResult<Void> updateAnnouncementStatus(
+            @PathVariable("announcementId") Long announcementId,
+            @PathVariable("publishStatus") Integer publishStatus
+    ) {
+        return announcementService.updateAnnouncementStatus(announcementId, publishStatus);
+    }
 }

@@ -53,6 +53,8 @@
     /api/admin/recommend/update/{recommendId}/{recommendStatus}
     /api/admin/announcement/create
     /api/admin/announcement/list
+    /api/admin/announcement/list/{announcementId}
+    /api/admin/announcement/list/{announcementId}/{publishStatus}
 
 当前强制登录的功能：
     查询书架小说列表
@@ -95,6 +97,9 @@
     管理员修改推荐状态
     管理员创建公告
     管理员公告列表查询
+    管理员公告详情查询
+    管理员公告信息修改
+    管理员公告发布状态修改
 
 当前可选登录解析的接口：
     /api/novel/{bookId}/chapter/{chapterId}
@@ -2342,6 +2347,63 @@ publishStatus -> 发布状态，非必传；0表示发布，1表示草稿，2表
     7. publishStatus只能传0、1、2；0表示发布，1表示草稿，2表示下架
     8. 公告从草稿或下架修改为发布时，后端会自动设置发布时间publishTime
     9. 已发布公告再次传publishStatus为0时，不会刷新发布时间publishTime
+```
+
+## 管理员公告发布状态修改
+```text
+请求路径：
+/api/admin/announcement/list/{announcementId}/{publishStatus}
+请求方式：
+    PUT
+请求头：
+    Authorization: Bearer token值
+参数：
+    announcementId -> 公告id
+    publishStatus -> 发布状态（0-发布，1-草稿，2-下架）
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    公告不存在：
+    {
+        "code": 404,
+        "message": "公告信息不存在",
+        "data": null
+    }
+    更改失败：
+    {
+        "code": 500,
+        "message": "更改失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. announcementId为路径参数，表示要修改状态的公告id
+    4. publishStatus只能传0、1、2；0表示发布，1表示草稿，2表示下架
+    5. 公告从草稿或下架修改为发布时，后端会自动设置发布时间publishTime
+    6. 已发布公告再次传publishStatus为0时，不会刷新发布时间publishTime
 ```
 
 ## 作家草稿箱列表查询

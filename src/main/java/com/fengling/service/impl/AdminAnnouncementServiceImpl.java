@@ -2,6 +2,7 @@ package com.fengling.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
@@ -180,6 +181,48 @@ public class AdminAnnouncementServiceImpl implements AdminAnnouncementService {
 
         if (i != 1) {
             throw new BusinessException(ResultCodeEnum.FAIL, "修改失败");
+        }
+        return CommonResult.success();
+    }
+
+    @Override
+    public CommonResult<Void> updateAnnouncementStatus(Long announcementId, Integer publishStatus) {
+        adminAuthUtil.adminAuth();
+
+        if (
+                publishStatus == null ||
+                        publishStatus < CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_RELEASE ||
+                        publishStatus > CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_UNDER
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        AnnouncementInfo selectOne = announcementInfoMapper.selectOne(
+                new LambdaQueryWrapper<AnnouncementInfo>()
+                        .select(AnnouncementInfo::getId, AnnouncementInfo::getPublishStatus)
+                        .eq(AnnouncementInfo::getId, announcementId)
+        );
+
+        if (selectOne == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "公告信息不存在");
+        }
+
+        AnnouncementInfo announcementInfo = new AnnouncementInfo();
+        announcementInfo.setId(announcementId);
+        announcementInfo.setPublishStatus(publishStatus);
+        LocalDateTime now = LocalDateTime.now();
+        announcementInfo.setUpdateTime(now);
+        if (
+                CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_RELEASE.equals(publishStatus) &&
+                        !CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_RELEASE.equals(selectOne.getPublishStatus())
+        ) {
+            announcementInfo.setPublishTime(now);
+        }
+
+        int update = announcementInfoMapper.updateById(announcementInfo);
+
+        if (update != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "更改失败");
         }
         return CommonResult.success();
     }

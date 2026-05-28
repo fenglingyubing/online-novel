@@ -41,4 +41,13 @@ public interface AdminAnnouncementService {
      * @return 无
      */
     CommonResult<Void> updateAnnouncement(Long announcementId, AdminAnnouncementCreateReqDto updateReqDto);
+
+    /**
+     * 修改发布状态
+     *
+     * @param announcementId 发布id
+     * @param publishStatus  发布状态
+     * @return 无
+     */
+    CommonResult<Void> updateAnnouncementStatus(Long announcementId, Integer publishStatus);
 }
