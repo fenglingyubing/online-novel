@@ -32,4 +32,13 @@ public interface AdminAnnouncementService {
      * @return 公告详情
      */
     CommonResult<AdminAnnouncementRespDto> getAnnouncement(Long announcementId);
+
+    /**
+     * 公告信息修改
+     *
+     * @param announcementId 公告id
+     * @param updateReqDto   变更信息请求参数
+     * @return 无
+     */
+    CommonResult<Void> updateAnnouncement(Long announcementId, AdminAnnouncementCreateReqDto updateReqDto);
 }

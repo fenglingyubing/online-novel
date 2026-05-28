@@ -52,4 +52,20 @@ public class AdminAnnouncementController {
     ) {
         return announcementService.getAnnouncement(announcementId);
     }
+
+    /**
+     * 公告信息修改
+     *
+     * @param announcementId 公告id
+     * @param updateReqDto   变更信息请求参数
+     * @return 无
+     */
+    @PutMapping(ApiPathConstants.LIST + "/{announcementId}")
+    public CommonResult<Void> updateAnnouncement(
+            @PathVariable("announcementId") Long announcementId,
+            @RequestBody AdminAnnouncementCreateReqDto updateReqDto
+    ) {
+        return announcementService.updateAnnouncement(announcementId, updateReqDto);
+    }
+
 }

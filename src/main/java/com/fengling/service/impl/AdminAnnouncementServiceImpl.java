@@ -111,4 +111,76 @@ public class AdminAnnouncementServiceImpl implements AdminAnnouncementService {
         }
         return CommonResult.success(announcementRespDto);
     }
+
+    @Override
+    public CommonResult<Void> updateAnnouncement(Long announcementId, AdminAnnouncementCreateReqDto updateReqDto) {
+        adminAuthUtil.adminAuth();
+
+        if (updateReqDto == null) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        String title = updateReqDto.getTitle();
+        String content = updateReqDto.getContent();
+        Integer announcementType = updateReqDto.getAnnouncementType();
+        Integer publishStatus = updateReqDto.getPublishStatus();
+
+        if (
+                title == null &&
+                        content == null &&
+                        announcementType == null &&
+                        publishStatus == null
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        if (
+                (title != null && title.isBlank()) ||
+                        (content != null && content.isBlank())
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        if (
+                (announcementType != null &&
+                        (announcementType < CommonConstants.ANNOUNCEMENT_TYPE_ALL_USER ||
+                                announcementType > CommonConstants.ANNOUNCEMENT_TYPE_READER)) ||
+                        (publishStatus != null &&
+                                (publishStatus < CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_RELEASE ||
+                                        publishStatus > CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_UNDER))
+        ) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        AnnouncementInfo selectOne = announcementInfoMapper.selectOne(
+                new LambdaQueryWrapper<AnnouncementInfo>()
+                        .select(AnnouncementInfo::getId, AnnouncementInfo::getPublishStatus)
+                        .eq(AnnouncementInfo::getId, announcementId)
+        );
+
+        if (selectOne == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "公告信息不存在");
+        }
+
+        AnnouncementInfo announcementInfo = BeanUtil.copyProperties(
+                updateReqDto,
+                AnnouncementInfo.class
+        );
+        announcementInfo.setId(announcementId);
+        LocalDateTime now = LocalDateTime.now();
+        announcementInfo.setUpdateTime(now);
+        if (
+                CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_RELEASE.equals(publishStatus) &&
+                        !CommonConstants.ANNOUNCEMENT_PUBLISH_STATUS_RELEASE.equals(selectOne.getPublishStatus())
+        ) {
+            announcementInfo.setPublishTime(now);
+        }
+
+        int i = announcementInfoMapper.updateById(announcementInfo);
+
+        if (i != 1) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "修改失败");
+        }
+        return CommonResult.success();
+    }
 }
