@@ -14,6 +14,7 @@ import com.fengling.common.util.PageAuthUtil;
 import com.fengling.entity.AnnouncementInfo;
 import com.fengling.entity.dto.AdminAnnouncementCreateReqDto;
 import com.fengling.entity.dto.AdminAnnouncementListRespDto;
+import com.fengling.entity.dto.AdminAnnouncementRespDto;
 import com.fengling.entity.dto.AdminInfoDto;
 import com.fengling.mapper.AnnouncementInfoMapper;
 import com.fengling.service.AdminAnnouncementService;
@@ -95,5 +96,19 @@ public class AdminAnnouncementServiceImpl implements AdminAnnouncementService {
 
         Page<AdminAnnouncementListRespDto> pageAnnouncement = announcementInfoMapper.listAnnouncement(page);
         return CommonResult.success(PageRespDto.of(pageAnnouncement));
+    }
+
+    @Override
+    public CommonResult<AdminAnnouncementRespDto> getAnnouncement(Long announcementId) {
+        adminAuthUtil.adminAuth();
+        if (announcementId < 0) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        AdminAnnouncementRespDto announcementRespDto = announcementInfoMapper.getAnnouncement(announcementId);
+        if (announcementRespDto == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND);
+        }
+        return CommonResult.success(announcementRespDto);
     }
 }

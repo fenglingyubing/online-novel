@@ -6,6 +6,7 @@ import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.AdminAnnouncementCreateReqDto;
 import com.fengling.entity.dto.AdminAnnouncementListRespDto;
+import com.fengling.entity.dto.AdminAnnouncementRespDto;
 import com.fengling.service.AdminAnnouncementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +38,18 @@ public class AdminAnnouncementController {
     @GetMapping(ApiPathConstants.LIST)
     public CommonResult<PageRespDto<AdminAnnouncementListRespDto>> listAnnouncement(PageReqDto pageReqDto) {
         return announcementService.listAnnouncement(pageReqDto);
+    }
+
+    /**
+     * 公告详情查询
+     *
+     * @param announcementId 公告id
+     * @return 公告详情
+     */
+    @GetMapping(ApiPathConstants.LIST + "/{announcementId}")
+    public CommonResult<AdminAnnouncementRespDto> getAnnouncement(
+            @PathVariable("announcementId") Long announcementId
+    ) {
+        return announcementService.getAnnouncement(announcementId);
     }
 }

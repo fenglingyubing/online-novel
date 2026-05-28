@@ -2221,6 +2221,59 @@ pages -> 一共有几页
     5. 如果暂无公告，records为空数组，total为0
 ```
 
+## 管理员公告详情查询
+```text
+请求路径：
+/api/admin/announcement/list/{announcementId}
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    announcementId -> 公告id
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "id": 1,
+            "title": "系统维护通知",
+            "announcementType": 0,
+            "content": "系统将于今晚进行维护，请提前保存数据。",
+            "publishStatus": 1
+        }
+    }
+id -> 公告id
+title -> 公告标题
+announcementType -> 公告类型（0-全体，1-作者，2-读者）
+content -> 公告内容
+publishStatus -> 发布状态（0-发布，1-草稿，2-下架）
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    当前用户不是管理员：
+    {
+        "code": 403,
+        "message": "无权限访问",
+        "data": null
+    }
+    公告不存在：
+    {
+        "code": 404,
+        "message": "资源未找到",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 只有管理员角色用户可以访问
+    3. announcementId为路径参数，表示要查询的公告id
+    4. 公告不存在时返回404
+```
+
 ## 作家草稿箱列表查询
 ```text
 请求路径：

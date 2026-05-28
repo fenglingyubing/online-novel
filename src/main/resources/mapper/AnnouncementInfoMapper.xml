@@ -15,4 +15,15 @@
         from announcement_info ai
         order by ai.create_time desc
     </select>
+
+    <!--公告详情查询-->
+    <select id="getAnnouncement" resultType="com.fengling.entity.dto.AdminAnnouncementRespDto">
+        select ai.id,
+               ai.title,
+               ai.announcement_type as announcementType,
+               ai.content,
+               ai.publish_status    as publishStatus
+        from announcement_info ai
+        where ai.id = #{announcementId}
+    </select>
 </mapper>
