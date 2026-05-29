@@ -48,4 +48,18 @@
           and (ai.announcement_type = 2 or ai.announcement_type = 0)
         order by ai.publish_time desc
     </select>
+
+    <!--用户公告详情查询-->
+    <select id="getAnnouncementInfo" resultType="com.fengling.entity.dto.AnnouncementInfoRespDto">
+        select ai.id,
+               ai.title,
+               ai.content,
+               ai.publish_time as publishTime,
+               ui.nick_name    as nickName
+        from announcement_info ai
+                 left join user_info ui on ai.publisher_id = ui.id
+        where ai.id = #{announcementId}
+          and ai.publish_status = 0
+          and (ai.announcement_type = 2 or ai.announcement_type = 0)
+    </select>
 </mapper>

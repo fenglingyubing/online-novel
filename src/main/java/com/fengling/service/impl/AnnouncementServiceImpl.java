@@ -233,4 +233,16 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         Page<AnnouncementRespDto> pageAnnouncement = announcementInfoMapper.listAnnouncementUser(page);
         return CommonResult.success(PageRespDto.of(pageAnnouncement));
     }
+
+    @Override
+    public CommonResult<AnnouncementInfoRespDto> getAnnouncementInfo(Long announcementId) {
+        if (announcementId <= 0) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+        AnnouncementInfoRespDto respDto = announcementInfoMapper.getAnnouncementInfo(announcementId);
+        if (respDto == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "公告信息不存在");
+        }
+        return CommonResult.success(respDto);
+    }
 }

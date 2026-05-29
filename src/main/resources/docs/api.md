@@ -111,9 +111,11 @@
 
 当前无需登录的公告接口：
     /api/home/list/announcement
+    /api/home/list/announcement/{announcementId}
 
 当前无需登录的公告功能：
     用户公告列表查询
+    用户公告详情查询
 
 认证失败响应：
     {
@@ -2678,6 +2680,52 @@ pages -> 一共有几页
     4. 只返回面向读者和全体用户的公告
     5. 列表按发布时间倒序排列，最新发布的公告排在前面
     6. 如果暂无公告，records为空数组，total为0
+```
+
+## 用户公告详情查询
+```text
+请求路径：
+/api/home/list/announcement/{announcementId}
+请求方式：
+    GET
+参数：
+    announcementId -> 公告id
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "id": 1,
+            "title": "读者活动通知",
+            "content": "平台将于今晚进行维护，请提前保存数据。",
+            "publishTime": "2026-05-27T12:00:00",
+            "nickName": "管理员"
+        }
+    }
+id -> 公告id
+title -> 公告标题
+content -> 公告内容
+publishTime -> 发布时间
+nickName -> 发布人昵称
+异常响应：
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+    公告不存在：
+    {
+        "code": 404,
+        "message": "公告信息不存在",
+        "data": null
+    }
+说明：
+    1. 该接口无需登录即可调用
+    2. announcementId必须大于0
+    3. 只查询已发布公告
+    4. 只返回面向读者和全体用户的公告详情
+    5. 草稿、下架、仅面向作者或不存在的公告均返回404
 ```
 
 ## 作家审核章节撤回

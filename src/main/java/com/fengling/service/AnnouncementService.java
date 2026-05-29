@@ -3,10 +3,7 @@ package com.fengling.service;
 import com.fengling.common.dto.PageReqDto;
 import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.resp.CommonResult;
-import com.fengling.entity.dto.AdminAnnouncementCreateReqDto;
-import com.fengling.entity.dto.AdminAnnouncementListRespDto;
-import com.fengling.entity.dto.AdminAnnouncementRespDto;
-import com.fengling.entity.dto.AnnouncementRespDto;
+import com.fengling.entity.dto.*;
 
 public interface AnnouncementService {
 
@@ -59,4 +56,12 @@ public interface AnnouncementService {
      * @return 用户公告列表
      */
     CommonResult<PageRespDto<AnnouncementRespDto>> listAnnouncementUser(PageReqDto pageReqDto);
+
+    /**
+     * 用户公告详情查询
+     *
+     * @param announcementId 公告id
+     * @return 公告详情
+     */
+    CommonResult<AnnouncementInfoRespDto> getAnnouncementInfo(Long announcementId);
 }
