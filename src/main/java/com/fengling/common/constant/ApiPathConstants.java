@@ -65,4 +65,9 @@ public final class ApiPathConstants {
      * 首页请求前缀
      */
     public static final String HOME = API + "/home";
+
+    /**
+     * 阅读历史请求前缀
+     */
+    public static final String READING_HISTORY = API + "/reading-history";
 }

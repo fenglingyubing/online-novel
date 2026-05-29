@@ -18,6 +18,7 @@
 
 当前强制登录拦截的接口：
     /api/shelf/**
+    /api/reading-history/**
     /api/user/logout
     /api/user/mine
     /api/user/updateinfo
@@ -61,6 +62,7 @@
 当前强制登录的功能：
     查询书架小说列表
     添加小说到书架
+    更新阅读历史
     退出登录
     查询我的页面用户信息
     修改我的页面用户信息
@@ -2790,6 +2792,53 @@ nickName -> 发布人昵称
     3. 只查询已发布公告
     4. 只返回面向读者和全体用户的公告详情
     5. 草稿、下架、仅面向作者或不存在的公告均返回404
+```
+
+## 阅读历史更新
+```text
+请求路径：
+/api/reading-history/{bookId}
+请求方式：
+    PUT
+请求头：
+    Authorization: Bearer token值
+Content-Type：
+    application/json
+参数：
+    bookId -> 小说id
+请求体：
+    {
+        "chapterId": 1,
+        "chapterName": "第一章 碧阳仙门"
+    }
+chapterId -> 最后阅读章节id，必传且必须大于0
+chapterName -> 最后阅读章节名，必传且不能为空字符串
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    参数无效：
+    {
+        "code": 501,
+        "message": "参数无效",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 用户id由后端从token中解析，前端不需要传userId
+    3. bookId为路径参数，表示当前阅读的小说id，必须大于0
+    4. 该接口用于保存最新阅读进度；首次阅读会新增缓存记录，后续阅读会覆盖同一用户同一本书的历史进度
+    5. 当前阅读历史先写入Redis Hash，key格式为novel:reading:history:{userId}，hashKey为bookId，value为阅读历史JSON字符串
+    6. Redis阅读历史缓存时间当前为30分钟，每次更新会刷新该用户阅读历史缓存过期时间
 ```
 
 ## 作家审核章节撤回

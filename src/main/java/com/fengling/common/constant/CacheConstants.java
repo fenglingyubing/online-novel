@@ -45,4 +45,14 @@ public class CacheConstants {
      * 作家后台作品管理缓存时间
      */
     public static final Long DRAFTS_TTL = 1000 * 60 * 30L;
+
+    /**
+     * 阅读历史缓存前缀
+     */
+    public static final String READING_HISTORY = REDIS_PREFIX + "reading:history:";
+
+    /**
+     * 阅读历史缓存时间
+     */
+    public static final Long READING_HISTORY_TTL = 1000 * 60 * 30L;
 }

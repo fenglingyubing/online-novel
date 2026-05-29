@@ -24,7 +24,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/user/updateinfo",
                         "/api/user/uploadphoto",
                         "/api/author/**",
-                        "/api/admin/**"
+                        "/api/admin/**",
+                        "/api/reading-history/**"
                 )
                 .excludePathPatterns(
                         "/api/user/login",

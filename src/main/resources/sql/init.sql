@@ -220,3 +220,20 @@ CREATE TABLE `announcement_info`
     KEY                 `idx_status_type_time` (`publish_status`, `announcement_type`, `publish_time`),
     KEY                 `idx_publisher_id` (`publisher_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='公告信息表';
+
+-- 阅读历史表
+CREATE TABLE `reading_history`
+(
+    `id`                BIGINT   NOT NULL AUTO_INCREMENT COMMENT '阅读历史id',
+    `user_id`           BIGINT   NOT NULL COMMENT '用户id',
+    `book_id`           BIGINT   NOT NULL COMMENT '小说id',
+    `last_chapter_id`   BIGINT   NOT NULL COMMENT '最后阅读章节id',
+    `last_chapter_name` VARCHAR(255) NOT NULL COMMENT '最后阅读章节名',
+    `create_time`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_user_book` (`user_id`, `book_id`),
+    KEY                 `idx_user_update_time` (`user_id`, `update_time`),
+    KEY                 `idx_book_id` (`book_id`),
+    KEY                 `idx_last_chapter_id` (`last_chapter_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='阅读历史表';
