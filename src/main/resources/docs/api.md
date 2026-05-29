@@ -109,6 +109,12 @@
 当前可选登录的功能：
     小说正文查询
 
+当前无需登录的公告接口：
+    /api/home/list/announcement
+
+当前无需登录的公告功能：
+    用户公告列表查询
+
 认证失败响应：
     {
         "code": 401,
@@ -2617,6 +2623,61 @@ pages -> 一共有几页
     5. 只返回面向作家和全体用户的公告
     6. 列表按发布时间倒序排列，最新发布的公告排在前面
     7. 如果暂无公告，records为空数组，total为0
+```
+
+## 用户公告列表查询
+```text
+请求路径：
+/api/home/list/announcement?pageNum=1&pageSize=10
+请求方式：
+    GET
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认10，最大20
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "title": "读者活动通知",
+                    "publishTime": "2026-05-27T12:00:00"
+                },
+                {
+                    "id": 2,
+                    "title": "平台公告",
+                    "publishTime": "2026-05-26T12:00:00"
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 10,
+            "pages": 1
+        }
+    }
+id -> 公告id
+title -> 公告标题
+publishTime -> 发布时间
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    分页参数无效：
+    {
+        "code": 500,
+        "message": "操作失败",
+        "data": null
+    }
+说明：
+    1. 该接口无需登录即可调用
+    2. pageNum和pageSize必须大于0，pageSize最大为20
+    3. 只查询已发布公告
+    4. 只返回面向读者和全体用户的公告
+    5. 列表按发布时间倒序排列，最新发布的公告排在前面
+    6. 如果暂无公告，records为空数组，total为0
 ```
 
 ## 作家审核章节撤回

@@ -89,7 +89,7 @@ public class AuthorController {
      * @return 公告列表
      */
     @GetMapping(ApiPathConstants.LIST + "/announcement")
-    public CommonResult<PageRespDto<AuthorAnnouncement>> listAnnouncement(PageReqDto pageReqDto) {
+    public CommonResult<PageRespDto<AnnouncementRespDto>> listAnnouncement(PageReqDto pageReqDto) {
         return authorService.listAnnouncement(pageReqDto);
     }
 }

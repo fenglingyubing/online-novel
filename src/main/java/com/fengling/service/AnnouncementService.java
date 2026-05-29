@@ -6,8 +6,9 @@ import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.AdminAnnouncementCreateReqDto;
 import com.fengling.entity.dto.AdminAnnouncementListRespDto;
 import com.fengling.entity.dto.AdminAnnouncementRespDto;
+import com.fengling.entity.dto.AnnouncementRespDto;
 
-public interface AdminAnnouncementService {
+public interface AnnouncementService {
 
     /**
      * 创建公告
@@ -50,4 +51,12 @@ public interface AdminAnnouncementService {
      * @return 无
      */
     CommonResult<Void> updateAnnouncementStatus(Long announcementId, Integer publishStatus);
+
+    /**
+     * 用户公告列表查询
+     *
+     * @param pageReqDto 分页请求参数
+     * @return 用户公告列表
+     */
+    CommonResult<PageRespDto<AnnouncementRespDto>> listAnnouncementUser(PageReqDto pageReqDto);
 }

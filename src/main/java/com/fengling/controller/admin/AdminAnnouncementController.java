@@ -7,7 +7,7 @@ import com.fengling.common.resp.CommonResult;
 import com.fengling.entity.dto.AdminAnnouncementCreateReqDto;
 import com.fengling.entity.dto.AdminAnnouncementListRespDto;
 import com.fengling.entity.dto.AdminAnnouncementRespDto;
-import com.fengling.service.AdminAnnouncementService;
+import com.fengling.service.AnnouncementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AdminAnnouncementController {
 
-    private final AdminAnnouncementService announcementService;
+    private final AnnouncementService announcementService;
 
     /**
      * 创建公告

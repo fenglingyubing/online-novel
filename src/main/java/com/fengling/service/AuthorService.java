@@ -62,5 +62,5 @@ public interface AuthorService {
      * @param pageReqDto 分页请求参数
      * @return 公告列表
      */
-    CommonResult<PageRespDto<AuthorAnnouncement>> listAnnouncement(PageReqDto pageReqDto);
+    CommonResult<PageRespDto<AnnouncementRespDto>> listAnnouncement(PageReqDto pageReqDto);
 }

@@ -60,4 +60,9 @@ public final class ApiPathConstants {
      * 管理员后台公告模块请求前缀
      */
     public static final String ANNOUNCEMENT = ADMIN + "/announcement";
+
+    /**
+     * 首页请求前缀
+     */
+    public static final String HOME = API + "/home";
 }

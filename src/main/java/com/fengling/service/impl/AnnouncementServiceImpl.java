@@ -2,7 +2,6 @@ package com.fengling.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
@@ -13,12 +12,9 @@ import com.fengling.common.resp.CommonResult;
 import com.fengling.common.util.AdminAuthUtil;
 import com.fengling.common.util.PageAuthUtil;
 import com.fengling.entity.AnnouncementInfo;
-import com.fengling.entity.dto.AdminAnnouncementCreateReqDto;
-import com.fengling.entity.dto.AdminAnnouncementListRespDto;
-import com.fengling.entity.dto.AdminAnnouncementRespDto;
-import com.fengling.entity.dto.AdminInfoDto;
+import com.fengling.entity.dto.*;
 import com.fengling.mapper.AnnouncementInfoMapper;
-import com.fengling.service.AdminAnnouncementService;
+import com.fengling.service.AnnouncementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +22,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class AdminAnnouncementServiceImpl implements AdminAnnouncementService {
+public class AnnouncementServiceImpl implements AnnouncementService {
 
     private final AnnouncementInfoMapper announcementInfoMapper;
     private final AdminAuthUtil adminAuthUtil;
@@ -225,5 +221,16 @@ public class AdminAnnouncementServiceImpl implements AdminAnnouncementService {
             throw new BusinessException(ResultCodeEnum.FAIL, "更改失败");
         }
         return CommonResult.success();
+    }
+
+    @Override
+    public CommonResult<PageRespDto<AnnouncementRespDto>> listAnnouncementUser(PageReqDto pageReqDto) {
+        pageAuthUtil.pageAuth(pageReqDto);
+        Page<AnnouncementRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        Page<AnnouncementRespDto> pageAnnouncement = announcementInfoMapper.listAnnouncementUser(page);
+        return CommonResult.success(PageRespDto.of(pageAnnouncement));
     }
 }

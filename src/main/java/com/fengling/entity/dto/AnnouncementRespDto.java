@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthorAnnouncement {
+public class AnnouncementRespDto {
 
     /**
      * 公告id

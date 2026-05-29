@@ -251,15 +251,15 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public CommonResult<PageRespDto<AuthorAnnouncement>> listAnnouncement(PageReqDto pageReqDto) {
+    public CommonResult<PageRespDto<AnnouncementRespDto>> listAnnouncement(PageReqDto pageReqDto) {
         authorAuthUtil.authorAuth();
         pageAuthUtil.pageAuth(pageReqDto);
 
-        Page<AuthorAnnouncement> page = new Page<>(
+        Page<AnnouncementRespDto> page = new Page<>(
                 pageReqDto.getPageNum(),
                 pageReqDto.getPageSize()
         );
-        Page<AuthorAnnouncement> pageAnnouncement = announcementInfoMapper.listAnnouncementAuthor(page);
+        Page<AnnouncementRespDto> pageAnnouncement = announcementInfoMapper.listAnnouncementAuthor(page);
         return CommonResult.success(PageRespDto.of(pageAnnouncement));
     }
 

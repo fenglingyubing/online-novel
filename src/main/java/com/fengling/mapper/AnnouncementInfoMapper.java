@@ -2,11 +2,10 @@ package com.fengling.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fengling.common.dto.PageReqDto;
 import com.fengling.entity.AnnouncementInfo;
 import com.fengling.entity.dto.AdminAnnouncementListRespDto;
 import com.fengling.entity.dto.AdminAnnouncementRespDto;
-import com.fengling.entity.dto.AuthorAnnouncement;
+import com.fengling.entity.dto.AnnouncementRespDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -30,10 +29,18 @@ public interface AnnouncementInfoMapper extends BaseMapper<AnnouncementInfo> {
     AdminAnnouncementRespDto getAnnouncement(@Param("announcementId") Long announcementId);
 
     /**
-     * 作家公告列表
+     * 作家公告列表查询
      *
      * @param page 分页参数
      * @return 公告列表
      */
-    Page<AuthorAnnouncement> listAnnouncementAuthor(Page<AuthorAnnouncement> page);
+    Page<AnnouncementRespDto> listAnnouncementAuthor(Page<AnnouncementRespDto> page);
+
+    /**
+     * 用户公告列表查询
+     *
+     * @param page 分页请求参数
+     * @return 用户公告列表
+     */
+    Page<AnnouncementRespDto> listAnnouncementUser(Page<AnnouncementRespDto> page);
 }
