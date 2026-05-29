@@ -52,4 +52,12 @@ public interface AnnouncementInfoMapper extends BaseMapper<AnnouncementInfo> {
      * @return 公告详情
      */
     AnnouncementInfoRespDto getAnnouncementInfo(@Param("announcementId") Long announcementId);
+
+    /**
+     * 作家后台公告详情查询
+     *
+     * @param announcementId 公告id
+     * @return 公告详情
+     */
+    AnnouncementInfoRespDto getAnnouncementInfoAuthor(@Param("announcementId") Long announcementId);
 }

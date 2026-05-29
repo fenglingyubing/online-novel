@@ -92,4 +92,17 @@ public class AuthorController {
     public CommonResult<PageRespDto<AnnouncementRespDto>> listAnnouncement(PageReqDto pageReqDto) {
         return authorService.listAnnouncement(pageReqDto);
     }
+
+    /**
+     * 公告详情查询
+     *
+     * @param announcementId 公告id
+     * @return 公告详情
+     */
+    @GetMapping(ApiPathConstants.LIST + "/announcement/{announcementId}")
+    public CommonResult<AnnouncementInfoRespDto> getAnnouncementInfo(
+            @PathVariable("announcementId") Long announcementId
+    ) {
+        return authorService.getAnnouncementInfo(announcementId);
+    }
 }

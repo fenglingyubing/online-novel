@@ -263,6 +263,20 @@ public class AuthorServiceImpl implements AuthorService {
         return CommonResult.success(PageRespDto.of(pageAnnouncement));
     }
 
+    @Override
+    public CommonResult<AnnouncementInfoRespDto> getAnnouncementInfo(Long announcementId) {
+        authorAuthUtil.authorAuth();
+        if (announcementId <= 0) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+
+        AnnouncementInfoRespDto respDto = announcementInfoMapper.getAnnouncementInfoAuthor(announcementId);
+        if (respDto == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "公告信息不存在");
+        }
+        return CommonResult.success(respDto);
+    }
+
     /**
      * 压缩小说正文
      *

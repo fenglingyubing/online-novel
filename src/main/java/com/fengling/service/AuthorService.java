@@ -63,4 +63,12 @@ public interface AuthorService {
      * @return 公告列表
      */
     CommonResult<PageRespDto<AnnouncementRespDto>> listAnnouncement(PageReqDto pageReqDto);
+
+    /**
+     * 公告详情查询
+     *
+     * @param announcementId 公告id
+     * @return 公告详情
+     */
+    CommonResult<AnnouncementInfoRespDto> getAnnouncementInfo(Long announcementId);
 }
