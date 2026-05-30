@@ -70,4 +70,9 @@ public final class ApiPathConstants {
      * 阅读历史请求前缀
      */
     public static final String READING_HISTORY = API + "/reading-history";
+
+    /**
+     * 评论请求前缀
+     */
+    public static final String BOOK_REVIEWS = API + "/book-reviews";
 }

@@ -3795,3 +3795,36 @@ pages -> 一共有几页
     3. 只会删除当前登录用户书架中bookIdList对应的小说记录
     4. 如果列表中的小说不在当前用户书架中，不会产生影响
 ```
+
+## 发表评论
+```text
+请求路径：
+/api/book-reviews/{bookId}
+请求方式：
+    POST
+请求头：
+    Authorization: Bearer token值
+参数：
+    bookId -> 小说id
+请求体示例：
+    {
+        "reviewContent": "这本书的代入感很强，剧情节奏也不错。",
+        "stars": 5,
+        "parentId": 0
+    }
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": null
+    }
+reviewContent -> 评论内容
+stars -> 评分，主评论必传，范围1-5；回复评论不需要传
+parentId -> 父评论id，0或不传表示主评论；大于0表示回复该主评论
+说明：
+    1. 该接口需要登录后调用
+    2. 用户id由后端从token中解析，前端不需要传userId
+    3. 主评论必须传评分，回复评论不会保存评分
+    4. 回复评论时，parentId必须是同一本小说下正常状态的主评论id
+    5. 回复评论发表成功后，父评论reply_count会自动加1
+```

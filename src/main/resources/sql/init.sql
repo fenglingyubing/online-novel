@@ -237,3 +237,37 @@ CREATE TABLE `reading_history`
     KEY                 `idx_book_id` (`book_id`),
     KEY                 `idx_last_chapter_id` (`last_chapter_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='阅读历史表';
+
+-- 小说评论表
+CREATE TABLE `book_reviews`
+(
+    `id`             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '评论id',
+    `user_id`        BIGINT UNSIGNED NOT NULL COMMENT '用户id',
+    `book_id`        BIGINT UNSIGNED NOT NULL COMMENT '小说id',
+    `review_content` TEXT            NOT NULL COMMENT '评论内容',
+    `stars`          TINYINT                  DEFAULT NULL COMMENT '评分',
+    `parent_id`      BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '父评论id，0表示主评论',
+    `like_count`     INT UNSIGNED    NOT NULL DEFAULT 0 COMMENT '点赞总数',
+    `reply_count`    INT UNSIGNED    NOT NULL DEFAULT 0 COMMENT '回复总数',
+    `review_status`  TINYINT         NOT NULL DEFAULT 0 COMMENT '评论状态（0-正常，1-禁用）',
+    `create_time`    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_book_time` (`book_id`, `review_status`, `create_time`),
+    KEY `idx_book_like` (`book_id`, `review_status`, `like_count`),
+    KEY `idx_parent_time` (`parent_id`, `review_status`, `create_time`),
+    KEY `idx_user_book` (`user_id`, `book_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='小说评论表';
+
+-- 小说评论点赞表
+CREATE TABLE `book_review_likes`
+(
+    `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '点赞id',
+    `review_id`   BIGINT UNSIGNED NOT NULL COMMENT '评论id',
+    `user_id`     BIGINT UNSIGNED NOT NULL COMMENT '用户id',
+    `create_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_review_user` (`review_id`, `user_id`),
+    KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='小说评论点赞表';
+

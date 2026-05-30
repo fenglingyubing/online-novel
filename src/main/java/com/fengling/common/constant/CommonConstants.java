@@ -244,4 +244,29 @@ public class CommonConstants {
      * 公告类型：读者
      */
     public static final Integer ANNOUNCEMENT_TYPE_READER = 2;
+
+    /**
+     * 主评论父评论id
+     */
+    public static final Long BOOK_REVIEW_PARENT_ID_ROOT = 0L;
+
+    /**
+     * 评论默认计数
+     */
+    public static final Integer BOOK_REVIEW_DEFAULT_COUNT = 0;
+
+    /**
+     * 评论状态：正常
+     */
+    public static final Integer BOOK_REVIEW_STATUS_NORMAL = 0;
+
+    /**
+     * 评论最低评分
+     */
+    public static final Integer BOOK_REVIEW_MIN_STARS = 1;
+
+    /**
+     * 评论最高评分
+     */
+    public static final Integer BOOK_REVIEW_MAX_STARS = 5;
 }
