@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fengling.mapper.ReadingHistoryMapper">
+
+    <!--插入/更新 阅读历史-->
+    <insert id="upsert">
+        insert into reading_history (
+            user_id,
+            book_id,
+            last_chapter_id,
+            last_chapter_name,
+            create_time,
+            update_time
+        )
+        values (
+            #{userId},
+            #{bookId},
+            #{lastChapterId},
+            #{lastChapterName},
+            now(),
+            #{updateTime}
+        ) as new
+        on duplicate key update
+            last_chapter_id = new.last_chapter_id,
+            last_chapter_name = new.last_chapter_name,
+            update_time = new.update_time
+    </insert>
+</mapper>
