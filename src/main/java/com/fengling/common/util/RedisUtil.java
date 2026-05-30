@@ -1,13 +1,9 @@
 package com.fengling.common.util;
 
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -41,35 +37,26 @@ public class RedisUtil {
         return value == null ? null : value.toString();
     }
 
-    public Map<Object, Object> getHashEntries(String key) {
-        return redisTemplate.opsForHash().entries(key);
+    public List<String> getHashValues(String key, List<String> hashKeys) {
+        List<Object> objects = redisTemplate.opsForHash().multiGet(key, new ArrayList<>(hashKeys));
+        if (objects == null) {
+            return List.of();
+        }
+        return objects.stream()
+                .filter(Objects::nonNull)
+                .map(String::valueOf)
+                .toList();
     }
 
-    public Set<String> scanKeys(String pattern, long count) {
-        return redisTemplate.execute(
-                (RedisCallback<Set<String>>) connection -> {
-                    Set<String> keys = new HashSet<>();
-                    ScanOptions options = ScanOptions.scanOptions()
-                            .match(pattern)
-                            .count(count)
-                            .build();
-
-                    try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
-                        while (cursor.hasNext()) {
-                            keys.add(new String(cursor.next(), StandardCharsets.UTF_8));
-                        }
-                    }
-
-                    return keys;
-                }
-        );
+    public Map<Object, Object> getHashEntries(String key) {
+        return redisTemplate.opsForHash().entries(key);
     }
 
     /**
      * zset 获取脏数据并移除
      *
      * @param key      键
-     * @param maxScore 当前时间戳
+     * @param maxScore 当前时间戳往前10秒钟
      * @param count    数量
      * @return 脏数据列表
      */
@@ -106,5 +93,30 @@ public class RedisUtil {
      */
     public void addZSet(String key, String value, double maxScore) {
         redisTemplate.opsForZSet().add(key, value, maxScore);
+    }
+
+    /**
+     * zset 获取长度
+     *
+     * @param key 键
+     * @return 长度
+     */
+    public Long getZSetSize(String key) {
+        Long size = redisTemplate.opsForZSet().zCard(key);
+        return size == null ? 0L : size;
+    }
+
+
+    /**
+     * 倒序获取zset 中的元素
+     *
+     * @param key   键
+     * @param start 起始坐标
+     * @param end   结束坐标
+     * @return 元素列表
+     */
+    public List<String> reverseRangeZSet(String key, Long start, Long end) {
+        Set<String> values = redisTemplate.opsForZSet().reverseRange(key, start, end);
+        return values == null ? List.of() : new ArrayList<>(values);
     }
 }

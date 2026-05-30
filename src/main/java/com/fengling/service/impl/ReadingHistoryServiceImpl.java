@@ -1,15 +1,21 @@
 package com.fengling.service.impl;
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CacheConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.context.AuthUserInfo;
+import com.fengling.common.dto.PageReqDto;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.common.util.PageAuthUtil;
 import com.fengling.common.util.RedisUtil;
 import com.fengling.common.util.UserAuthUtil;
 import com.fengling.entity.ReadingHistory;
 import com.fengling.entity.dto.ReadingHistoryReqDto;
+import com.fengling.entity.dto.ReadingHistoryRespDto;
+import com.fengling.mapper.ReadingHistoryMapper;
 import com.fengling.service.ReadingHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +28,8 @@ public class ReadingHistoryServiceImpl implements ReadingHistoryService {
 
     private final UserAuthUtil userAuthUtil;
     private final RedisUtil redisUtil;
+    private final PageAuthUtil pageAuthUtil;
+    private final ReadingHistoryMapper readingHistoryMapper;
 
     @Override
     public CommonResult<Void> updateReadingHistory(Long bookId, ReadingHistoryReqDto reqDto) {
@@ -49,6 +57,7 @@ public class ReadingHistoryServiceImpl implements ReadingHistoryService {
         String key = CacheConstants.READING_HISTORY + userId;
         String hashKey = String.valueOf(bookId);
         String value = JSONUtil.toJsonStr(readingHistory);
+        long score = System.currentTimeMillis();
 
         redisUtil.addRedisCacheHash(key, hashKey, value, CacheConstants.READING_HISTORY_TTL);
 
@@ -57,8 +66,26 @@ public class ReadingHistoryServiceImpl implements ReadingHistoryService {
         redisUtil.addZSet(
                 CacheConstants.READING_HISTORY_DIRTY,
                 dirtyValue,
-                System.currentTimeMillis()
+                score
         );
         return CommonResult.success();
+    }
+
+    @Override
+    public CommonResult<PageRespDto<ReadingHistoryRespDto>> listReadingHistory(PageReqDto pageReqDto) {
+        AuthUserInfo authUserInfo = userAuthUtil.userAuth();
+        pageAuthUtil.pageAuth(pageReqDto);
+        Long userId = authUserInfo.getUserId();
+        Page<ReadingHistoryRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        // 先从MySQL查询
+        Page<ReadingHistoryRespDto> pageReadingHistory = readingHistoryMapper.listReadingHistory(
+                page,
+                userId
+        );
+
+        return CommonResult.success(PageRespDto.of(pageReadingHistory));
     }
 }

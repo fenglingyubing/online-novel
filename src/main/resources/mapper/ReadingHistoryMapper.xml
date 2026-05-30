@@ -28,4 +28,19 @@
             last_chapter_name = new.last_chapter_name,
             update_time = new.update_time
     </insert>
+
+    <!--阅读历史列表查询-->
+    <select id="listReadingHistory" resultType="com.fengling.entity.dto.ReadingHistoryRespDto">
+        select rh.id,
+               rh.book_id           as bookId,
+               bi.book_name         as bookName,
+               bi.cover_url         as coverUrl,
+               rh.last_chapter_id   as lastChapterId,
+               rh.last_chapter_name as lastChapterName,
+               rh.update_time       as updateTime
+        from reading_history rh
+                 inner join book_info bi on rh.book_id = bi.id
+        where rh.user_id = #{userId}
+        order by rh.update_time desc
+    </select>
 </mapper>

@@ -63,6 +63,7 @@
     查询书架小说列表
     添加小说到书架
     更新阅读历史
+    查询阅读历史列表
     退出登录
     查询我的页面用户信息
     修改我的页面用户信息
@@ -2838,7 +2839,83 @@ chapterName -> 最后阅读章节名，必传且不能为空字符串
     3. bookId为路径参数，表示当前阅读的小说id，必须大于0
     4. 该接口用于保存最新阅读进度；首次阅读会新增缓存记录，后续阅读会覆盖同一用户同一本书的历史进度
     5. 当前阅读历史先写入Redis Hash，key格式为novel:reading:history:{userId}，hashKey为bookId，value为阅读历史JSON字符串
-    6. Redis阅读历史缓存时间当前为30分钟，每次更新会刷新该用户阅读历史缓存过期时间
+    6. 当前会写入Redis ZSet脏数据集合，等待定时任务异步落库
+    7. Redis阅读历史缓存时间当前为30分钟，每次更新会刷新该用户阅读历史缓存过期时间
+```
+
+## 阅读历史列表查询
+```text
+请求路径：
+/api/reading-history/list?pageNum=1&pageSize=10
+请求方式：
+    GET
+请求头：
+    Authorization: Bearer token值
+参数：
+    pageNum -> 当前是第几页，默认1
+    pageSize -> 每页有多少条数据，默认10，最大20
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "bookId": 1,
+                    "bookName": "碧阳仙门",
+                    "coverUrl": "https://bookcover.yuewen.com/qdbimg/349573/1048992740/600.webp",
+                    "lastChapterId": 1,
+                    "lastChapterName": "第一章 碧阳仙门",
+                    "updateTime": "2026-05-30T12:00:00"
+                },
+                {
+                    "id": 2,
+                    "bookId": 2,
+                    "bookName": "修仙界唯一出马仙",
+                    "coverUrl": "https://bookcover.yuewen.com/qdbimg/349573/1048721558/600.webp",
+                    "lastChapterId": 10,
+                    "lastChapterName": "第十章 入门",
+                    "updateTime": "2026-05-29T12:00:00"
+                }
+            ],
+            "total": 2,
+            "pageNum": 1,
+            "pageSize": 10,
+            "pages": 1
+        }
+    }
+id -> 阅读历史id
+bookId -> 小说id
+bookName -> 小说名称
+coverUrl -> 小说封面链接
+lastChapterId -> 最后阅读章节id
+lastChapterName -> 最后阅读章节名称
+updateTime -> 最后阅读时间
+total -> 一共有多少条数据
+pageNum -> 当前是第几页
+pageSize -> 当前页有多少条数据
+pages -> 一共有几页
+异常响应：
+    未登录或登录失效：
+    {
+        "code": 401,
+        "message": "未登录或登录已失效",
+        "data": null
+    }
+    分页参数无效：
+    {
+        "code": 500,
+        "message": "操作失败",
+        "data": null
+    }
+说明：
+    1. 该接口需要登录后调用
+    2. 用户id由后端从token中解析，前端不需要传userId
+    3. pageNum和pageSize必须大于0，pageSize最大为20
+    4. 当前列表直接从MySQL分页查询，并关联小说信息返回小说名称和封面链接
+    5. 列表按最后阅读时间倒序排列，最近阅读的记录排在前面
+    6. 如果当前用户暂无阅读历史，records为空数组，total为0
 ```
 
 ## 作家审核章节撤回

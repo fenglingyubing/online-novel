@@ -60,4 +60,9 @@ public class CacheConstants {
      * 阅读历史待同步脏数据
      */
     public static final String READING_HISTORY_DIRTY = READING_HISTORY + "dirty";
+
+    /**
+     * 阅读历史列表缓存前缀
+     */
+    public static final String READING_HISTORY_LIST = REDIS_PREFIX + "reading:history:list:";
 }
