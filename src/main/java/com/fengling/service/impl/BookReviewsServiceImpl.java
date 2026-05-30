@@ -2,13 +2,18 @@ package com.fengling.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fengling.common.constant.CommonConstants;
 import com.fengling.common.constant.ResultCodeEnum;
 import com.fengling.common.context.UserContext;
+import com.fengling.common.dto.PageReqDto;
+import com.fengling.common.dto.PageRespDto;
 import com.fengling.common.exception.BusinessException;
 import com.fengling.common.resp.CommonResult;
+import com.fengling.common.util.PageAuthUtil;
 import com.fengling.entity.BookInfo;
 import com.fengling.entity.BookReviews;
+import com.fengling.entity.dto.BookReviewListRespDto;
 import com.fengling.entity.dto.BookReviewSaveReqDto;
 import com.fengling.mapper.BookMapper;
 import com.fengling.mapper.BookReviewsMapper;
@@ -25,6 +30,24 @@ public class BookReviewsServiceImpl implements BookReviewsService {
 
     private final BookReviewsMapper bookReviewsMapper;
     private final BookMapper bookMapper;
+    private final PageAuthUtil pageAuthUtil;
+
+    @Override
+    public CommonResult<PageRespDto<BookReviewListRespDto>> listBookReviews(Long bookId, PageReqDto pageReqDto) {
+        pageAuthUtil.pageAuth(pageReqDto);
+        checkBookExists(bookId);
+        Page<BookReviewListRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        Page<BookReviewListRespDto> pageBookReviews = bookReviewsMapper.listBookReviews(
+                page,
+                bookId,
+                CommonConstants.BOOK_REVIEW_PARENT_ID_ROOT,
+                CommonConstants.BOOK_REVIEW_STATUS_NORMAL
+        );
+        return CommonResult.success(PageRespDto.of(pageBookReviews));
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -62,10 +85,7 @@ public class BookReviewsServiceImpl implements BookReviewsService {
         if (bookId == null || reqDto == null || reqDto.getReviewContent() == null || reqDto.getReviewContent().trim().isEmpty()) {
             throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
         }
-        BookInfo bookInfo = bookMapper.selectById(bookId);
-        if (bookInfo == null) {
-            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "小说信息不存在");
-        }
+        checkBookExists(bookId);
         Long parentId = reqDto.getParentId() == null ? CommonConstants.BOOK_REVIEW_PARENT_ID_ROOT : reqDto.getParentId();
         if (parentId.equals(CommonConstants.BOOK_REVIEW_PARENT_ID_ROOT)) {
             if (reqDto.getStars() == null || reqDto.getStars() < CommonConstants.BOOK_REVIEW_MIN_STARS || reqDto.getStars() > CommonConstants.BOOK_REVIEW_MAX_STARS) {
@@ -82,6 +102,16 @@ public class BookReviewsServiceImpl implements BookReviewsService {
         );
         if (parentReview == null) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND, "父评论不存在");
+        }
+    }
+
+    private void checkBookExists(Long bookId) {
+        if (bookId == null || bookId <= 0) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+        BookInfo bookInfo = bookMapper.selectById(bookId);
+        if (bookInfo == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "小说信息不存在");
         }
     }
 }

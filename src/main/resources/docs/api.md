@@ -3828,3 +3828,57 @@ parentId -> 父评论id，0或不传表示主评论；大于0表示回复该主�
     4. 回复评论时，parentId必须是同一本小说下正常状态的主评论id
     5. 回复评论发表成功后，父评论reply_count会自动加1
 ```
+
+## 评论列表查询
+```text
+请求路径：
+/api/book-reviews/{bookId}/list
+请求方式：
+    GET
+参数：
+    bookId -> 小说id
+    pageNum -> 当前页码，从1开始
+    pageSize -> 每页数量，最大20
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 1,
+                    "userId": 2,
+                    "nickName": "风铃读者",
+                    "userPhoto": "https://example.com/user-photo.jpg",
+                    "reviewContent": "这本书的代入感很强，剧情节奏也不错。",
+                    "stars": 5,
+                    "likeCount": 0,
+                    "replyCount": 2,
+                    "createTime": "2026-05-30T10:00:00"
+                }
+            ],
+            "total": 1,
+            "pageNum": 1,
+            "pageSize": 10,
+            "pages": 1
+        }
+    }
+records -> 评论列表
+id -> 评论id
+userId -> 评论用户id
+nickName -> 评论用户昵称
+userPhoto -> 评论用户头像
+reviewContent -> 评论内容
+stars -> 主评论评分
+likeCount -> 点赞数
+replyCount -> 回复数
+createTime -> 评论创建时间
+total -> 总记录数
+pageNum -> 当前页码
+pageSize -> 每页数量
+pages -> 总页数
+说明：
+    1. 该接口无需登录即可调用
+    2. 仅查询当前小说下状态正常的主评论，不包含回复评论列表
+    3. 查询结果按评论创建时间倒序返回
+```

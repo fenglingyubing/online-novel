@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fengling.mapper.BookReviewsMapper">
+
+    <!--小说评论列表查询-->
+    <select id="listBookReviews" resultType="com.fengling.entity.dto.BookReviewListRespDto">
+        select br.id,
+               br.user_id        as userId,
+               ui.nick_name      as nickName,
+               ui.user_photo     as userPhoto,
+               br.review_content as reviewContent,
+               br.stars,
+               br.like_count     as likeCount,
+               br.reply_count    as replyCount,
+               br.create_time    as createTime
+        from book_reviews br
+                 inner join user_info ui on br.user_id = ui.id
+        where br.book_id = #{bookId}
+          and br.parent_id = #{parentId}
+          and br.review_status = #{reviewStatus}
+        order by br.create_time desc
+    </select>
+</mapper>

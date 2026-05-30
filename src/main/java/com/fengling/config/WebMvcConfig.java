@@ -25,8 +25,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/user/uploadphoto",
                         "/api/author/**",
                         "/api/admin/**",
-                        "/api/reading-history/**",
-                        "/api/book-reviews/**"
+                        "/api/reading-history/**"
                 )
                 .excludePathPatterns(
                         "/api/user/login",
@@ -34,6 +33,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/author/register"
                 );
         registry.addInterceptor(optionalAuthInterceptor)
-                .addPathPatterns("/api/novel/*/chapter/*");
+                .addPathPatterns(
+                        "/api/novel/*/chapter/*",
+                        "/api/book-reviews/**"
+                );
     }
 }
