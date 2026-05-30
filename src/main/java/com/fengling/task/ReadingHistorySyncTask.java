@@ -6,12 +6,13 @@ import com.fengling.common.util.RedisUtil;
 import com.fengling.entity.ReadingHistory;
 import com.fengling.mapper.ReadingHistoryMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ReadingHistorySyncTask {
@@ -21,25 +22,41 @@ public class ReadingHistorySyncTask {
 
     @Scheduled(fixedDelay = 60_000)
     public void syncReadingHistory() {
-        String pattern = CacheConstants.READING_HISTORY + "*";
-        Set<String> keys = redisUtil.scanKeys(pattern, 100);
-        if (keys == null || keys.isEmpty()) {
+        long maxScore = System.currentTimeMillis() - 10_000;
+
+        List<String> dirtyValues = redisUtil.popZSetByScore(
+                CacheConstants.READING_HISTORY_DIRTY,
+                maxScore,
+                100
+        );
+
+        if (dirtyValues.isEmpty()) {
             return;
         }
 
-        for (String key : keys) {
-            Map<Object, Object> entries = redisUtil.getHashEntries(key);
-            if (entries == null || entries.isEmpty()) {
-                continue;
-            }
-
-            for (Object value : entries.values()) {
-                if (value == null) {
+        for (String dirtyValue : dirtyValues) {
+            try {
+                String[] parts = dirtyValue.split(":", 2);
+                if (parts.length != 2) {
                     continue;
                 }
+                String userId = parts[0];
+                String bookId = parts[1];
 
-                ReadingHistory readingHistory = JSONUtil.toBean(value.toString(), ReadingHistory.class);
+                String key = CacheConstants.READING_HISTORY + userId;
+                String hashValue = redisUtil.getHashValue(key, bookId);
+                if (hashValue == null) {
+                    continue;
+                }
+                ReadingHistory readingHistory = JSONUtil.toBean(hashValue, ReadingHistory.class);
                 readingHistoryMapper.upsert(readingHistory);
+            } catch (Exception e) {
+                log.error("同步阅读历史失败，dirtyValue={}", dirtyValue, e);
+                redisUtil.addZSet(
+                        CacheConstants.READING_HISTORY_DIRTY,
+                        dirtyValue,
+                        System.currentTimeMillis()
+                );
             }
         }
     }

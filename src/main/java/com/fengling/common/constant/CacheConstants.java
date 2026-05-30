@@ -55,4 +55,9 @@ public class CacheConstants {
      * 阅读历史缓存时间
      */
     public static final Long READING_HISTORY_TTL = 1000 * 60 * 30L;
+
+    /**
+     * 阅读历史待同步脏数据
+     */
+    public static final String READING_HISTORY_DIRTY = READING_HISTORY + "dirty";
 }

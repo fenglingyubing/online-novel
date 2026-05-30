@@ -51,6 +51,14 @@ public class ReadingHistoryServiceImpl implements ReadingHistoryService {
         String value = JSONUtil.toJsonStr(readingHistory);
 
         redisUtil.addRedisCacheHash(key, hashKey, value, CacheConstants.READING_HISTORY_TTL);
+
+        // 标记脏数据
+        String dirtyValue = userId + ":" + bookId;
+        redisUtil.addZSet(
+                CacheConstants.READING_HISTORY_DIRTY,
+                dirtyValue,
+                System.currentTimeMillis()
+        );
         return CommonResult.success();
     }
 }
