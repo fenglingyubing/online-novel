@@ -50,6 +50,28 @@ public class BookReviewsServiceImpl implements BookReviewsService {
     }
 
     @Override
+    public CommonResult<PageRespDto<BookReviewListRespDto>> listBookReviewReplies(
+            Long bookId,
+            Long parentId,
+            PageReqDto pageReqDto
+    ) {
+        pageAuthUtil.pageAuth(pageReqDto);
+        checkBookExists(bookId);
+        checkParentReviewExists(bookId, parentId);
+        Page<BookReviewListRespDto> page = new Page<>(
+                pageReqDto.getPageNum(),
+                pageReqDto.getPageSize()
+        );
+        Page<BookReviewListRespDto> pageBookReviews = bookReviewsMapper.listBookReviews(
+                page,
+                bookId,
+                parentId,
+                CommonConstants.BOOK_REVIEW_STATUS_NORMAL
+        );
+        return CommonResult.success(PageRespDto.of(pageBookReviews));
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public CommonResult<Void> saveBookReview(Long bookId, BookReviewSaveReqDto reqDto) {
         checkBookReviewParam(bookId, reqDto);
@@ -112,6 +134,23 @@ public class BookReviewsServiceImpl implements BookReviewsService {
         BookInfo bookInfo = bookMapper.selectById(bookId);
         if (bookInfo == null) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND, "小说信息不存在");
+        }
+    }
+
+    private void checkParentReviewExists(Long bookId, Long parentId) {
+        if (parentId == null || parentId <= 0) {
+            throw new BusinessException(ResultCodeEnum.PARAM_NOT_VALID);
+        }
+        BookReviews parentReview = bookReviewsMapper.selectOne(
+                new LambdaQueryWrapper<BookReviews>()
+                        .select(BookReviews::getId)
+                        .eq(BookReviews::getId, parentId)
+                        .eq(BookReviews::getBookId, bookId)
+                        .eq(BookReviews::getParentId, CommonConstants.BOOK_REVIEW_PARENT_ID_ROOT)
+                        .eq(BookReviews::getReviewStatus, CommonConstants.BOOK_REVIEW_STATUS_NORMAL)
+        );
+        if (parentReview == null) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND, "父评论不存在");
         }
     }
 }

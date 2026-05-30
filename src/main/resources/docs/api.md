@@ -3882,3 +3882,58 @@ pages -> 总页数
     2. 仅查询当前小说下状态正常的主评论，不包含回复评论列表
     3. 查询结果按评论创建时间倒序返回
 ```
+
+## 评论回复列表查询
+```text
+请求路径：
+/api/book-reviews/{bookId}/{parentId}/reply/list
+请求方式：
+    GET
+参数：
+    bookId -> 小说id
+    parentId -> 父评论id，必须是当前小说下正常状态的主评论id
+    pageNum -> 当前页码，从1开始
+    pageSize -> 每页数量，最大20
+响应数据：
+    {
+        "code": 200,
+        "message": "操作成功",
+        "data": {
+            "records": [
+                {
+                    "id": 3,
+                    "userId": 4,
+                    "nickName": "追更用户",
+                    "userPhoto": "https://example.com/reply-user-photo.jpg",
+                    "reviewContent": "我也觉得这一段写得很好。",
+                    "stars": null,
+                    "likeCount": 0,
+                    "replyCount": 0,
+                    "createTime": "2026-05-30T11:00:00"
+                }
+            ],
+            "total": 1,
+            "pageNum": 1,
+            "pageSize": 10,
+            "pages": 1
+        }
+    }
+records -> 评论回复列表
+id -> 评论id
+userId -> 评论用户id
+nickName -> 评论用户昵称
+userPhoto -> 评论用户头像
+reviewContent -> 评论内容
+stars -> 回复评论评分，固定为null
+likeCount -> 点赞数
+replyCount -> 回复数
+createTime -> 评论创建时间
+total -> 总记录数
+pageNum -> 当前页码
+pageSize -> 每页数量
+pages -> 总页数
+说明：
+    1. 该接口无需登录即可调用
+    2. 仅查询当前小说下指定主评论的正常状态回复评论
+    3. 查询结果按评论创建时间倒序返回
+```

@@ -38,6 +38,23 @@ public class BookReviewController {
     }
 
     /**
+     * 评论回复列表查询
+     *
+     * @param bookId 小说id
+     * @param parentId 父评论id
+     * @param pageReqDto 分页请求参数
+     * @return 评论回复列表
+     */
+    @GetMapping("/{bookId}/{parentId}/reply" + ApiPathConstants.LIST)
+    public CommonResult<PageRespDto<BookReviewListRespDto>> listBookReviewReplies(
+            @PathVariable("bookId") Long bookId,
+            @PathVariable("parentId") Long parentId,
+            PageReqDto pageReqDto
+    ) {
+        return bookReviewsService.listBookReviewReplies(bookId, parentId, pageReqDto);
+    }
+
+    /**
      * 发表评论
      *
      * @param bookId 小说id

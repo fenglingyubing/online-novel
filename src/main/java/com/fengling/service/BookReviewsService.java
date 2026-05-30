@@ -18,6 +18,20 @@ public interface BookReviewsService {
     CommonResult<PageRespDto<BookReviewListRespDto>> listBookReviews(Long bookId, PageReqDto pageReqDto);
 
     /**
+     * 评论回复列表查询
+     *
+     * @param bookId 小说id
+     * @param parentId 父评论id
+     * @param pageReqDto 分页请求参数
+     * @return 评论回复列表
+     */
+    CommonResult<PageRespDto<BookReviewListRespDto>> listBookReviewReplies(
+            Long bookId,
+            Long parentId,
+            PageReqDto pageReqDto
+    );
+
+    /**
      * 发表评论
      *
      * @param bookId 小说id
