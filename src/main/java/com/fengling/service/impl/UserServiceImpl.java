@@ -21,6 +21,7 @@ import com.fengling.mapper.UserMapper;
 import com.fengling.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,9 +74,13 @@ public class UserServiceImpl implements UserService {
         userInfo.setUserRole(CommonConstants.USER_ROLE_READER);
         userInfo.setUserStatus(CommonConstants.USER_STATUS_NORMAL);
         userInfo.setUserBalance(CommonConstants.USER_DEFAULT_BALANCE);
-        int insert = userMapper.insert(userInfo);
-        if (insert != 1) {
-            throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
+        try {
+            int insert = userMapper.insert(userInfo);
+            if (insert != 1) {
+                throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
+            }
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException(ResultCodeEnum.USERNAME_EXIST);
         }
         //生成JWT
         Long userId = userInfo.getId();

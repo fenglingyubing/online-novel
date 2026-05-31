@@ -17,6 +17,7 @@ import com.fengling.mapper.*;
 import com.fengling.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +62,9 @@ public class AuthorServiceImpl implements AuthorService {
             throw new BusinessException(ResultCodeEnum.FAIL, "作者名为空");
         }
 
+        username = username.trim();
+        authorName = authorName.trim();
+
         UserInfo one = registerUtil.getUserInfoByUserName(username);
         if (one != null) {
             throw new BusinessException(ResultCodeEnum.USERNAME_EXIST);
@@ -83,17 +87,28 @@ public class AuthorServiceImpl implements AuthorService {
         registerUser.setNickName(registerUtil.generateNickname());
         registerUser.setUserStatus(CommonConstants.USER_STATUS_NORMAL);
         registerUser.setUserBalance(CommonConstants.USER_DEFAULT_BALANCE);
-        int insert = userMapper.insert(registerUser);
-        if (insert != 1) {
-            throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
+
+        try {
+            int insert = userMapper.insert(registerUser);
+            if (insert != 1) {
+                throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
+            }
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException(ResultCodeEnum.USERNAME_EXIST);
         }
+
         Long userId = registerUser.getId();
-        int author = authorMapper.insert(new AuthorInfo(
-                authorName,
-                userId
-        ));
-        if (author != 1) {
-            throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
+
+        try {
+            int author = authorMapper.insert(new AuthorInfo(
+                    authorName,
+                    userId
+            ));
+            if (author != 1) {
+                throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
+            }
+        } catch (DuplicateKeyException e) {
+            throw new BusinessException(ResultCodeEnum.FAIL, "作家名已存在");
         }
         // 生成JWT令牌
         String jwtToken = jwtUtil.createJwtToken(userId, registerUser.getUserRole());
