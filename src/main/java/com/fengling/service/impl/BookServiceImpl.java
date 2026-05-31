@@ -44,7 +44,6 @@ public class BookServiceImpl implements BookService {
     private final AuthorAuthUtil authorAuthUtil;
     private final BookInfoChangeMapper bookInfoChangeMapper;
     private final OSSUtil ossUtil;
-    private final PageAuthUtil pageAuthUtil;
     private final BookCategoryMapper bookCategoryMapper;
 
     @Override
@@ -101,19 +100,7 @@ public class BookServiceImpl implements BookService {
                 chapterMapper.getNextChapterId(bookId, chapterContentRespDto.getChapterNum())
         );
 
-        AuthUserInfo authUserInfo = UserContext.getAuthUserInfo();
-        if (authUserInfo != null) {
-            //设置小说最后阅读到的章节id和最后阅读时间
-            bookShelfMapper.update(
-                    new BookShelf()
-                            .setLastReadChapterId(chapterId)
-                            .setLastReadTime(LocalDateTime.now()),
-                    new LambdaQueryWrapper<BookShelf>()
-                            .eq(BookShelf::getUserId, authUserInfo.getUserId())
-                            .eq(BookShelf::getBookId, bookId)
-            );
-        }
-
+        UserContext.getAuthUserInfo();
         return CommonResult.success(chapterContentRespDto);
     }
 
