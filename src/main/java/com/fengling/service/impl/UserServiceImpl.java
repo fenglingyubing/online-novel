@@ -21,6 +21,7 @@ import com.fengling.mapper.UserMapper;
 import com.fengling.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -43,6 +45,7 @@ public class UserServiceImpl implements UserService {
     private final AdminAuthUtil adminAuthUtil;
     private final PageAuthUtil pageAuthUtil;
     private final UserDisableInfoMapper userDisableInfoMapper;
+    private final LockUtil lockUtil;
 
     @Override
     public CommonResult<UserAuthRespDto> register(UserRegisterReqDto userRegisterReqDto) {
@@ -62,10 +65,13 @@ public class UserServiceImpl implements UserService {
         // 去除空格
         username = username.trim();
         // 判断用户是否存在
-        UserInfo existUser = registerUtil.getUserInfoByUserName(username);
-        if (existUser != null) {
+        String lockKey = CacheConstants.REGISTER_USER + username;
+        String requestId = UUID.randomUUID().toString();
+        boolean tryLock = lockUtil.tryLock(lockKey, requestId, CacheConstants.REGISTER_USER_TTL);
+        if (!tryLock) {
             throw new BusinessException(ResultCodeEnum.USERNAME_EXIST);
         }
+
         UserInfo userInfo = new UserInfo();
 
         userInfo.setUsername(username);
@@ -74,6 +80,7 @@ public class UserServiceImpl implements UserService {
         userInfo.setUserRole(CommonConstants.USER_ROLE_READER);
         userInfo.setUserStatus(CommonConstants.USER_STATUS_NORMAL);
         userInfo.setUserBalance(CommonConstants.USER_DEFAULT_BALANCE);
+
         try {
             int insert = userMapper.insert(userInfo);
             if (insert != 1) {
@@ -81,7 +88,11 @@ public class UserServiceImpl implements UserService {
             }
         } catch (DuplicateKeyException e) {
             throw new BusinessException(ResultCodeEnum.USERNAME_EXIST);
+        } catch (DataAccessException e) {
+            lockUtil.unlock(lockKey, requestId);
+            throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
         }
+
         //生成JWT
         Long userId = userInfo.getId();
         Integer userRole = userInfo.getUserRole();

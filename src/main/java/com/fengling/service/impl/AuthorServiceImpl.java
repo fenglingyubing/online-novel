@@ -17,12 +17,14 @@ import com.fengling.mapper.*;
 import com.fengling.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Slf4j
@@ -41,6 +43,7 @@ public class AuthorServiceImpl implements AuthorService {
     private final ChapterMapper chapterMapper;
     private final PageAuthUtil pageAuthUtil;
     private final AnnouncementInfoMapper announcementInfoMapper;
+    private final LockUtil lockUtil;
 
     @Transactional
     @Override
@@ -65,18 +68,21 @@ public class AuthorServiceImpl implements AuthorService {
         username = username.trim();
         authorName = authorName.trim();
 
-        UserInfo one = registerUtil.getUserInfoByUserName(username);
-        if (one != null) {
+        // 判断作者名是否存在
+        String userNameLockKey = CacheConstants.REGISTER_USER + username;
+        String authorNameLockKey = CacheConstants.REGISTER_AUTHOR + authorName;
+        String requestId = UUID.randomUUID().toString();
+        Long ttl = CacheConstants.REGISTER_USER_TTL;
+
+        boolean userLock = lockUtil.tryLock(userNameLockKey, requestId, ttl);
+        if (!userLock) {
             throw new BusinessException(ResultCodeEnum.USERNAME_EXIST);
         }
 
-        // 判断作者名是否存在
-        AuthorInfo authorInfo = authorMapper.selectOne(
-                new LambdaQueryWrapper<AuthorInfo>()
-                        .eq(AuthorInfo::getAuthorName, authorName)
-        );
-        if (authorInfo != null) {
-            throw new BusinessException(ResultCodeEnum.FAIL, "作者名已存在");
+        boolean authorLock = lockUtil.tryLock(authorNameLockKey, requestId, ttl);
+        if (!authorLock) {
+            lockUtil.unlock(userNameLockKey, requestId);
+            throw new BusinessException(ResultCodeEnum.FAIL, "作家名已存在");
         }
 
         UserInfo registerUser = new UserInfo();
@@ -91,10 +97,17 @@ public class AuthorServiceImpl implements AuthorService {
         try {
             int insert = userMapper.insert(registerUser);
             if (insert != 1) {
+                lockUtil.unlock(userNameLockKey, requestId);
+                lockUtil.unlock(authorNameLockKey, requestId);
                 throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
             }
         } catch (DuplicateKeyException e) {
+            lockUtil.unlock(authorNameLockKey, requestId);
             throw new BusinessException(ResultCodeEnum.USERNAME_EXIST);
+        } catch (DataAccessException e) {
+            lockUtil.unlock(userNameLockKey, requestId);
+            lockUtil.unlock(authorNameLockKey, requestId);
+            throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
         }
 
         Long userId = registerUser.getId();
@@ -105,10 +118,17 @@ public class AuthorServiceImpl implements AuthorService {
                     userId
             ));
             if (author != 1) {
+                lockUtil.unlock(userNameLockKey, requestId);
+                lockUtil.unlock(authorNameLockKey, requestId);
                 throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
             }
         } catch (DuplicateKeyException e) {
+            lockUtil.unlock(userNameLockKey, requestId);
             throw new BusinessException(ResultCodeEnum.FAIL, "作家名已存在");
+        } catch (DataAccessException e) {
+            lockUtil.unlock(userNameLockKey, requestId);
+            lockUtil.unlock(authorNameLockKey, requestId);
+            throw new BusinessException(ResultCodeEnum.FAIL, "注册失败");
         }
         // 生成JWT令牌
         String jwtToken = jwtUtil.createJwtToken(userId, registerUser.getUserRole());
@@ -150,8 +170,10 @@ public class AuthorServiceImpl implements AuthorService {
                         .orderByDesc(ChapterInfo::getUpdateTime)
                         .last("limit 1")
         );
+
         bookInfo.setLatestChapterName(chapterInfo.getChapterName());
         bookInfo.setLastChapterTime(chapterInfo.getUpdateTime());
+
         if (bookInfo != null) {
             AuthorRecentNovelRespDto recentNovelRespDto = BeanUtil.copyProperties(
                     bookInfo,

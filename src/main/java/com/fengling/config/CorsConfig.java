@@ -17,7 +17,9 @@ public class CorsConfig {
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedOrigins(
                                 "http://127.0.0.1:3000",
-                                "http://localhost:3000"
+                                "http://localhost:3000",
+                                "https://novel.fenglingyubing.dpdns.org",
+                                "http://novel.fenglingyubing.dpdns.org"
                         )
                         .allowCredentials(true)
                         .allowedHeaders("*")

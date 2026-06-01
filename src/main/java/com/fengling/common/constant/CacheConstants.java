@@ -7,6 +7,21 @@ public class CacheConstants {
     public static final String REDIS_PREFIX = "novel:";
 
     /**
+     * 注册用户缓存前缀
+     */
+    public static final String REGISTER_USER = REDIS_PREFIX + "register:user:";
+
+    /**
+     * 注册作家缓存前缀
+     */
+    public static final String REGISTER_AUTHOR = REDIS_PREFIX + "register:author:";
+
+    /**
+     * 注册缓存ttl（秒）
+     */
+    public static final Long REGISTER_USER_TTL = 30L;
+
+    /**
      * jwt令牌缓存前缀
      */
     public static final String AUTH_TOKEN = REDIS_PREFIX + "jwt:";

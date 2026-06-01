@@ -14,27 +14,5 @@ import java.nio.file.Path;
 @SpringBootTest
 class OnlineNovelApplicationTests {
 
-    @Autowired
-    private OSSUtil ossUtil;
-
-    @Test
-    void contextLoads() {
-    }
-
-    @Test
-    void uploadPhoto() throws IOException {
-        Path path = Path.of("C:\\Users\\风铃\\Pictures\\Saved Pictures\\fengling.jpeg");
-        try (InputStream inputStream = Files.newInputStream(path)){
-            MockMultipartFile file = new MockMultipartFile(
-                    "file",
-                    "fengling.jpeg",
-                    "image/jpeg",
-                    inputStream
-            );
-
-            String url = ossUtil.upload(file, "upload");
-            System.out.println(url);
-        }
-    }
 
 }
